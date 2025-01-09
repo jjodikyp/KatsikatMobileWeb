@@ -11,8 +11,8 @@ const Absensi = () => {
 
   // Koordinat outlet
   const OUTLET_LOCATION = {
-    lat: -7.9286581, // Latitude outlet Katsikat
-    lng: 112.6413793,    // Longitude outlet Katsikat
+    lat: -7.988927, // Latitude outlet Katsikat
+    lng: 112.6838651, // Longitude outlet Katsikat
   };
   // const OUTLET_LOCATION = {
   //   lat: -7.9672996,  // Latitude outlet Katsikat

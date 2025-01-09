@@ -23,6 +23,7 @@ const LoginKaryawan = () => {
 
     try {
       const response = await axios.post(
+        "http://192.168.18.182:3002/api/auth/login",
         "http://192.168.1.10:3002/api/auth/login",
         {
           email: formData.email,
