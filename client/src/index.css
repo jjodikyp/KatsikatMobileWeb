@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+@media screen and (max-height: 500px) {
+  html, body, #root {
+    height: auto;
+    overflow-y: auto;
+  }
+}
+
+/* Prevent zoom on input focus on mobile */
+@media screen and (max-width: 767px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
