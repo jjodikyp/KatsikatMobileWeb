@@ -1,108 +1,124 @@
-const { OrderDetail, Order, Customer, Treatment, Item, ShoePhoto } = require('../models');
-const { Op } = require('sequelize');
+const {
+  OrderDetail,
+  Order,
+  Customer,
+  Treatment,
+  Item,
+  ShoePhoto,
+} = require("../models");
+const { Op } = require("sequelize");
 
 const orderDetailController = {
   getByProcessTimeAndDateRange: async (req, res) => {
     try {
       const { processTime } = req.params;
-      const { startDate, endDate } = req.query;
+      const { startDate, endDate, serviceType } = req.query;
 
-      console.log('Received request:', {
+      console.log("Received request:", {
         processTime,
         startDate,
-        endDate
+        endDate,
+        serviceType,
       });
 
-      // Validasi input
-      if (!startDate || !endDate) {
-        return res.status(400).json({
-          status: 'error',
-          message: 'startDate dan endDate harus diisi'
-        });
-      }
+      // Definisikan ID treatment untuk masing-masing kategori
+      const treatmentCategories = {
+        cleaning: [1, 2, 21, 25], // ID untuk Deep Clean dan Outside Clean
+        repair: [
+          5, 6, 7, 8, 9, 10, 11, 12, 13, 35, 41, 43, 63, 64, 67, 71, 74, 75, 79,
+          80, 81, 82,
+        ], // ID untuk jenis Repair
+      };
 
-      // Query untuk mendapatkan data berdasarkan process_time dan rentang tanggal
       const query = {
         where: {
           process_time: processTime,
           status: {
-            [Op.or]: ['not_yet', null]
+            [Op.or]: ["not_yet", null],
           },
           due_date: {
-            [Op.between]: [startDate, endDate]
-          }
+            [Op.between]: [startDate, endDate],
+          },
         },
         include: [
           {
             model: Order,
-            as: 'order',
-            include: [{
-              model: Customer,
-              as: 'customer',
-              attributes: ['name']
-            }]
+            as: "order",
+            include: [
+              {
+                model: Customer,
+                as: "customer",
+                attributes: ["name"],
+              },
+            ],
           },
           {
             model: Treatment,
-            as: 'treatment',
-            attributes: ['name']
+            as: "treatment",
+            where: serviceType
+              ? {
+                  id: {
+                    [Op.in]: treatmentCategories[serviceType],
+                  },
+                }
+              : {},
+            attributes: ["id", "name", "type_service"],
           },
           {
             model: Item,
-            as: 'item',
-            attributes: ['name']
+            as: "item",
+            attributes: ["name"],
           },
           {
             model: ShoePhoto,
-            as: 'shoes_photos',
-            attributes: ['url_photo']
-          }
+            as: "shoes_photos",
+            attributes: ["url_photo"],
+          },
         ],
-        order: [['due_date', 'ASC']]
+        order: [["due_date", "ASC"]],
       };
 
-      // Log query yang akan dijalankan
-      console.log('Executing query with parameters:', {
+      // Log query untuk debugging
+      console.log("Query filter:", {
+        treatmentIds: serviceType ? treatmentCategories[serviceType] : "all",
         processTime,
         dateRange: { startDate, endDate },
-        whereClause: query.where
       });
 
       const orderDetails = await OrderDetail.findAll(query);
 
-      // Log hasil query
-      console.log('Query results:', {
-        totalFound: orderDetails.length,
-        sampleDates: orderDetails.slice(0, 3).map(od => ({
-          id: od.id,
-          due_date: od.due_date,
-          process_time: od.process_time
-        }))
+      // Log hasil untuk debugging
+      console.log("Found orders:", {
+        total: orderDetails.length,
+        treatments: orderDetails.map((od) => ({
+          id: od.treatment?.id,
+          name: od.treatment?.name,
+          type: od.treatment?.type_service,
+        })),
       });
 
-      console.log(`Found ${orderDetails.length} orders for ${processTime} between ${startDate} and ${endDate}`);
-
       return res.json({
-        status: 'success',
+        status: "success",
         data: orderDetails,
         meta: {
           total: orderDetails.length,
           filters: {
             processTime,
+            serviceType,
+            treatmentIds: serviceType ? treatmentCategories[serviceType] : null,
             dateRange: {
               start: startDate,
-              end: endDate
-            }
-          }
-        }
+              end: endDate,
+            },
+          },
+        },
       });
-
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       return res.status(500).json({
-        status: 'error',
-        message: 'Gagal mengambil data orderan',
-        error: error.message
+        status: "error",
+        message: "Gagal mengambil data orderan",
+        error: error.message,
       });
     }
   },
@@ -114,15 +130,15 @@ const orderDetailController = {
       const query = {
         where: {
           status: {
-            [Op.or]: ['not_yet', null]
-          }
-        }
+            [Op.or]: ["not_yet", null],
+          },
+        },
       };
 
       // Tambahkan filter tanggal jika ada
       if (startDate && endDate) {
         query.where.due_date = {
-          [Op.between]: [startDate, endDate]
+          [Op.between]: [startDate, endDate],
         };
       }
 
@@ -130,59 +146,66 @@ const orderDetailController = {
       query.include = [
         {
           model: Order,
-          as: 'order',
-          include: [{
-            model: Customer,
-            as: 'customer',
-            attributes: ['name']
-          }]
+          as: "order",
+          include: [
+            {
+              model: Customer,
+              as: "customer",
+              attributes: ["name"],
+            },
+          ],
         },
         {
           model: Treatment,
-          as: 'treatment',
-          attributes: ['name']
+          as: "treatment",
+          attributes: ["name"],
         },
         {
           model: Item,
-          as: 'item',
-          attributes: ['name']
+          as: "item",
+          attributes: ["name"],
         },
         {
           model: ShoePhoto,
-          as: 'shoes_photos',
-          attributes: ['url_photo']
-        }
+          as: "shoes_photos",
+          attributes: ["url_photo"],
+        },
       ];
 
-      query.order = [['due_date', 'ASC']];
+      query.order = [["due_date", "ASC"]];
 
       const orderDetails = await OrderDetail.findAll(query);
 
-      console.log(`Found ${orderDetails.length} total orders${startDate ? ` between ${startDate} and ${endDate}` : ''}`);
+      console.log(
+        `Found ${orderDetails.length} total orders${
+          startDate ? ` between ${startDate} and ${endDate}` : ""
+        }`
+      );
 
       return res.json({
-        status: 'success',
+        status: "success",
         data: orderDetails,
         meta: {
           total: orderDetails.length,
-          filters: startDate ? {
-            dateRange: {
-              start: startDate,
-              end: endDate
-            }
-          } : null
-        }
+          filters: startDate
+            ? {
+                dateRange: {
+                  start: startDate,
+                  end: endDate,
+                },
+              }
+            : null,
+        },
       });
-
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
       return res.status(500).json({
-        status: 'error',
-        message: 'Gagal mengambil semua data orderan',
-        error: error.message
+        status: "error",
+        message: "Gagal mengambil semua data orderan",
+        error: error.message,
       });
     }
-  }
+  },
 };
 
-module.exports = orderDetailController; 
+module.exports = orderDetailController;

@@ -6,8 +6,20 @@ const Absensi = () => {
   const navigate = useNavigate();
   const [userLocation, setUserLocation] = useState(null);
   const [showIzinModal, setShowIzinModal] = useState(false);
+  const [showModalContent, setShowModalContent] = useState(false);
   const [alasanIzin, setAlasanIzin] = useState("");
   const [error, setError] = useState("");
+
+  // Handle modal animation
+  useEffect(() => {
+    if (showIzinModal) {
+      setTimeout(() => {
+        setShowModalContent(true);
+      }, 100);
+    } else {
+      setShowModalContent(false);
+    }
+  }, [showIzinModal]);
 
   // Koordinat outlet
   const OUTLET_LOCATION = {
@@ -98,6 +110,14 @@ const Absensi = () => {
     navigate("/loginSuccess");
   };
 
+  // Handle modal close dengan animasi
+  const handleCloseModal = () => {
+    setShowModalContent(false);
+    setTimeout(() => {
+      setShowIzinModal(false);
+    }, 300);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Container dengan padding yang responsive */}
@@ -141,11 +161,17 @@ const Absensi = () => {
             HADIR
           </button>
 
-          {/* Modal Izin - Full screen on mobile, centered on desktop */}
+          {/* Modal Izin dengan animasi */}
           {showIzinModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-xl p-6 w-full max-w-[320px] mx-4 sm:mx-auto">
-                <h2 className="font-bebas text-xl mb-4 text-center">
+            <div 
+              className={`fixed inset-0 bg-black transition-opacity duration-300 flex items-center justify-center p-4 z-50
+                ${showModalContent ? 'bg-opacity-50' : 'bg-opacity-0'}`}
+            >
+              <div 
+                className={`bg-white rounded-xl p-6 w-full max-w-[320px] mx-4 sm:mx-auto transform transition-all duration-300
+                  ${showModalContent ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-full scale-150'}`}
+              >
+                <h2 className="font-bebas text-2xl mb-4 text-center">
                   ALASAN IZIN / LIBUR
                 </h2>
                 <textarea
@@ -156,14 +182,14 @@ const Absensi = () => {
                 />
                 <div className="flex gap-3">
                   <button
-                    onClick={() => setShowIzinModal(false)}
-                    className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-montserrat rounded-xl text-xs"
+                    onClick={handleCloseModal}
+                    className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-montserrat rounded-xl text-xs hover:bg-gray-200 transition-colors"
                   >
                     BATAL
                   </button>
                   <button
                     onClick={handleSubmitIzin}
-                    className="flex-1 py-3 px-4 bg-blue-500 text-white font-montserrat rounded-xl text-xs"
+                    className="flex-1 py-3 px-4 bg-[#51A7D9] text-white font-montserrat rounded-xl text-xs hover:bg-opacity-90 transition-colors"
                   >
                     KIRIM
                   </button>

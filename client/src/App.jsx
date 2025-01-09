@@ -3,11 +3,15 @@ import LoginKaryawan from './pages/LoginKaryawan';
 import LoginSuccess from './pages/LoginSuccess';
 import Absensi from './pages/Absensi';
 import Beranda from './pages/Beranda';
+import Antrian from './pages/Antrian';
+import KurirTransport from './pages/KurirTransport';
 
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<Beranda />} />
+        <Route path="/antrian/:estimasi" element={<Antrian />} />
         <Route path="/login" element={<LoginKaryawan />} />
         <Route 
           path="/loginSuccess" 
@@ -15,6 +19,7 @@ function App() {
         />
         <Route path="/absensi" element={<Absensi />} />
         <Route path="/beranda" element={<Beranda />} />
+        <Route path="/kurir/transport" element={<KurirTransport />} />
       </Routes>
     </Router>
   );

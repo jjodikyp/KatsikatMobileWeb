@@ -3,13 +3,15 @@ const router = express.Router();
 const orderDetailRoutes = require('./orderDetailRoute');
 const authRoute = require('./authRoute');
 const karyawanRoute = require('./karyawanRoute');
+const courierRoute = require('./courierRoute');
 
-// Debug middleware khusus untuk order-details routes
-router.use('/order-details', (req, res, next) => {
-  console.log('Order Details Request:', {
+// Debug middleware untuk semua requests
+router.use((req, res, next) => {
+  console.log('Incoming Request:', {
+    method: req.method,
     path: req.path,
     query: req.query,
-    params: req.params
+    body: req.body
   });
   next();
 });
@@ -17,5 +19,6 @@ router.use('/order-details', (req, res, next) => {
 router.use('/', authRoute);
 router.use('/', orderDetailRoutes);
 router.use('/', karyawanRoute);
+router.use('/kurir', courierRoute);
 
 module.exports = router;

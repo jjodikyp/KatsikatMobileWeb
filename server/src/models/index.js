@@ -24,6 +24,7 @@ const Expense = require('./Expense');
 // const Collaboration = require('./Collaboration');
 // const Business = require('./Business');
 const Expenses = require('./Expense');
+const CourierTransport = require('./courierTransport');
 
 Order.belongsTo(Customer, { foreignKey: 'customer_id' });
 Order.belongsTo(Branch, { foreignKey: 'branch_id' });
@@ -107,6 +108,7 @@ module.exports = {
     // Membership,
     // Collaboration,
     // Business,
+    CourierTransport,
     sequelize,
     DataTypes,
     Op

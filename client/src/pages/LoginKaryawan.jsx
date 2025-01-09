@@ -23,7 +23,7 @@ const LoginKaryawan = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3002/api/auth/login",
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
         {
           email: formData.email,
           password: formData.password,

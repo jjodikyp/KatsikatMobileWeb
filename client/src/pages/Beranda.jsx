@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const Beranda = () => {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ const Beranda = () => {
       endDate: today
     };
   });
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showSwitchRoleModal, setShowSwitchRoleModal] = useState(false);
 
   // Fungsi untuk memformat tanggal ke format database (YYYY-MM-DD)
   const formatDateForDB = (dateString) => {
@@ -83,19 +86,19 @@ const Beranda = () => {
     try {
       console.log('Fetching data with new date range...');
       const [regularResponse, sameDayResponse, nextDayResponse] = await Promise.all([
-        axios.get("http://localhost:3002/api/order-details/process/regular", {
+        axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/regular`, {
           params: {
             startDate: newRange.startDate,
             endDate: newRange.endDate
           }
         }),
-        axios.get("http://localhost:3002/api/order-details/process/same_day", {
+        axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/same_day`, {
           params: {
             startDate: newRange.startDate,
             endDate: newRange.endDate
           }
         }),
-        axios.get("http://localhost:3002/api/order-details/process/next_day", {
+        axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/next_day`, {
           params: {
             startDate: newRange.startDate,
             endDate: newRange.endDate
@@ -149,14 +152,13 @@ const Beranda = () => {
       const formattedStartDate = formatDateForDB(range.startDate);
       const formattedEndDate = formatDateForDB(range.endDate);
       
-      // Log parameter sebelum dikirim
       console.log('Sending request with params:', {
         startDate: formattedStartDate,
         endDate: formattedEndDate
       });
 
-      // Pastikan parameter dikirim dengan benar
-      const baseUrl = 'http://localhost:3002/api/order-details/process';
+      // Gunakan VITE_API_URL dari env
+      const baseUrl = `${import.meta.env.VITE_API_URL}/api/order-details/process`;
       
       const [regularResponse, sameDayResponse, nextDayResponse] = await Promise.all([
         axios.get(`${baseUrl}/regular`, {
@@ -223,7 +225,7 @@ const Beranda = () => {
       const formattedStartDate = formatDateForDB(dateRange.startDate);
       const formattedEndDate = formatDateForDB(dateRange.endDate);
 
-      const baseUrl = 'http://localhost:3002/api/order-details';
+      const baseUrl = `${import.meta.env.VITE_API_URL}/api/order-details`;
       let response;
       
       if (estimasi === 'all') {
@@ -287,9 +289,9 @@ const Beranda = () => {
         });
 
         const [regularResponse, sameDayResponse, nextDayResponse] = await Promise.all([
-          axios.get("http://localhost:3002/api/order-details/process/regular", { params }),
-          axios.get("http://localhost:3002/api/order-details/process/same_day", { params }),
-          axios.get("http://localhost:3002/api/order-details/process/next_day", { params })
+          axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/regular`, { params }),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/same_day`, { params }),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/next_day`, { params })
         ]);
 
         // Log responses
@@ -337,14 +339,26 @@ const Beranda = () => {
     }
   }, []);
 
+  const handleLogoutConfirm = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+    setShowLogoutModal(false);
+  };
+
+  const handleSwitchRoleConfirm = () => {
+    navigate("/kurir/transport");
+    setShowSwitchRoleModal(false);
+  };
+
   return (
-    <div className="h-screen overflow-y-auto bg-[#FFFFFF]">
+    <div className="h-screen overflow-y-auto bg-[#FFFFFF] font-montserrat">
       {/* Header - Fixed at top */}
       <header className="fixed top-0 left-0 right-0 z-10">
         <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex justify-between items-center max-w-[390px] md:max-w-none">
           {/* Logout Button */}
           <button
-            onClick={handleLogout}
+            onClick={() => setShowLogoutModal(true)}
             className="w-[41px] h-[41px] rounded-full flex items-center justify-center bg-[#FD8087] hover:bg-opacity-90 transition-all"
           >
             <svg
@@ -383,11 +397,32 @@ const Beranda = () => {
               )}
             </div>
           </div>
+
+          {/* Switch Role Button */}
+          <button
+            onClick={() => setShowSwitchRoleModal(true)}
+            className="w-[41px] h-[41px] rounded-full flex items-center justify-center bg-[#51A7D9] hover:bg-opacity-90 transition-all"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="white"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"
+              />
+            </svg>
+          </button>
         </div>
       </header>
 
-      {/* Main Content - Adjust top padding to match header height */}
-      <main className="mx-auto px-4 md:px-10 pt-24 pb-6">
+      {/* Main Content */}
+      <main className="mx-auto px-4 md:px-10 pt-24 pb-6 min-h-screen">
         <div className="max-w-[390px] md:max-w-none mx-auto">
           {/* Date Range Picker */}
           <div className="mb-4 bg-[#F0F0F0] rounded-3xl p-4 shadow-sm">
@@ -418,8 +453,8 @@ const Beranda = () => {
             </div>
           </div>
 
-          {/* Detail Antrian Card */}
-          <div className="bg-[#F0F0F0] rounded-3xl p-4 shadow-sm sticky top-20 z-10">
+          {/* Detail Antrian Card dengan Button Buka Antrian */}
+          <div className="bg-[#F0F0F0] rounded-3xl p-4 shadow-sm">
             <h2 className="text-2xl font-bebas mb-2">Detail Antrian</h2>
             <div className="grid grid-cols-3 gap-2 font-['Montserrat']">
               <div
@@ -428,20 +463,12 @@ const Beranda = () => {
                     ? "bg-[#51A7D9] text-white"
                     : "bg-[#E2E2E3] text-gray-600"
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                onClick={() => filterTreatment("reguler")}
+                onClick={() => setSelectedEstimasi("reguler")}
               >
-                <h3
-                  className={
-                    selectedEstimasi === "reguler"
-                      ? "text-white"
-                      : "text-gray-600"
-                  }
-                >
+                <h3 className={selectedEstimasi === "reguler" ? "text-white" : "text-gray-600"}>
                   Reguler
                 </h3>
-                <p className="text-3xl font-bold">
-                  {antrianData?.reguler || 0}
-                </p>
+                <p className="text-3xl font-bold">{antrianData?.reguler || 0}</p>
               </div>
               <div
                 className={`${
@@ -449,20 +476,12 @@ const Beranda = () => {
                     ? "bg-[#51A7D9] text-white"
                     : "bg-[#E2E2E3] text-gray-600"
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                onClick={() => filterTreatment("sameDay")}
+                onClick={() => setSelectedEstimasi("sameDay")}
               >
-                <h3
-                  className={
-                    selectedEstimasi === "sameDay"
-                      ? "text-white"
-                      : "text-gray-600"
-                  }
-                >
+                <h3 className={selectedEstimasi === "sameDay" ? "text-white" : "text-gray-600"}>
                   Same Day
                 </h3>
-                <p className="text-3xl font-bold">
-                  {antrianData?.sameDay || 0}
-                </p>
+                <p className="text-3xl font-bold">{antrianData?.sameDay || 0}</p>
               </div>
               <div
                 className={`${
@@ -470,83 +489,46 @@ const Beranda = () => {
                     ? "bg-[#51A7D9] text-white"
                     : "bg-[#E2E2E3] text-gray-600"
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                onClick={() => filterTreatment("nextDay")}
+                onClick={() => setSelectedEstimasi("nextDay")}
               >
-                <h3
-                  className={
-                    selectedEstimasi === "nextDay"
-                      ? "text-white"
-                      : "text-gray-600"
-                  }
-                >
+                <h3 className={selectedEstimasi === "nextDay" ? "text-white" : "text-gray-600"}>
                   Next Day
                 </h3>
-                <p className="text-3xl font-bold">
-                  {antrianData?.nextDay || 0}
-                </p>
+                <p className="text-3xl font-bold">{antrianData?.nextDay || 0}</p>
               </div>
             </div>
-          </div>
-
-          {/* Antrian Treatment Section */}
-          <div className="mt-4 sticky top-0 pb-2 z-10 p-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bebas">Antrian Treatment</h2>
-            </div>
-          </div>
-
-          {/* Scrollable Treatment Cards Container */}
-          <div className="max-h-[calc(100vh-400px)] overflow-y-auto rounded-2xl">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 font-['Montserrat'] p-2">
-              {Array.isArray(antrianTreatment) &&
-              antrianTreatment.length > 0 ? (
-                antrianTreatment.map((item) => (
-                  <div key={item.id} className="bg-[#F4FBFF] rounded-2xl p-4 outline outline-2 outline-[#E3E3E3]">
-                    <div className="flex items-center gap-4">
-                      <div className="w-30 h-20 bg-gray-200 rounded-lg overflow-hidden">
-                        {item.shoes_photos && item.shoes_photos.length > 0 ? (
-                          <img
-                            src={item.shoes_photos[0].url_photo}
-                            alt="Shoes"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gray-200" />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium">
-                          {item.order?.customer?.name || "No Name"}
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          {item.treatment?.name || "No Treatment"}
-                        </p>
-                        <p className="text-sm text-blue-500">
-                          {item.process_time === "same_day"
-                            ? "Same Day"
-                            : item.process_time === "next_day"
-                            ? "Next Day"
-                            : "Regular"}
-                        </p>
-                        <p className="text-sm text-gray-500 mt-1 font-bold">
-                          {format(new Date(item.due_date), "EEEE, dd MMMM yyyy", { locale: id })}
-                        </p>
-                      </div>
-                    </div>
-                    <button className="w-full h-[35px] mb-auto mt-6 bg-[#FFCA42] text-black rounded-xl flex items-center justify-center text-sm border border-black shadow-[0_4px_0_0_rgba(0,0,0,1)]">
-                      Mulai Treatment
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-full text-center py-8 text-gray-500">
-                  Tidak ada antrian treatment untuk estimasi ini
-                </div>
-              )}
-            </div>
+            
+            {/* Button Buka Antrian */}
+            <button
+              onClick={() => navigate(`/antrian/${selectedEstimasi}`, { 
+                state: { 
+                  dateRange,
+                  estimasi: selectedEstimasi 
+                }
+              })}
+              className="w-full mt-4 py-3 bg-[#FFCA42] text-white rounded-xl font-medium hover:bg-opacity-90 transition-al font-montserrat"
+            >
+              Buka Antrian
+            </button>
           </div>
         </div>
       </main>
+
+      <ConfirmationModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogoutConfirm}
+        title="Konfirmasi Logout"
+        message="Apakah Anda yakin ingin keluar? Keluar dari aplikasi direkomendasikan saat jam kerja sudah selesai."
+      />
+
+      <ConfirmationModal
+        isOpen={showSwitchRoleModal}
+        onClose={() => setShowSwitchRoleModal(false)}
+        onConfirm={handleSwitchRoleConfirm}
+        title="Konfirmasi Ganti Role"
+        message="Apakah Anda yakin ingin beralih ke halaman kurir?"
+      />
     </div>
   );
 };
