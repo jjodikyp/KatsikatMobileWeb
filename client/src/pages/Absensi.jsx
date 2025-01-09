@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import absenImage from '../assets/images/absen.png';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import absenImage from "../assets/images/absen.png";
 
 const Absensi = () => {
   const navigate = useNavigate();
   const [userLocation, setUserLocation] = useState(null);
   const [showIzinModal, setShowIzinModal] = useState(false);
-  const [alasanIzin, setAlasanIzin] = useState('');
-  const [error, setError] = useState('');
+  const [alasanIzin, setAlasanIzin] = useState("");
+  const [error, setError] = useState("");
 
   // Koordinat outlet
   const OUTLET_LOCATION = {
-    lat: -6.9401128,  // Latitude outlet Katsikat
-    lng: 106.9447146  // Longitude outlet Katsikat
+    lat: -7.988927, // Latitude outlet Katsikat
+    lng: 112.6838651, // Longitude outlet Katsikat
   };
   // const OUTLET_LOCATION = {
   //   lat: -7.9672996,  // Latitude outlet Katsikat
@@ -24,15 +24,15 @@ const Absensi = () => {
   // Fungsi untuk menghitung jarak antara dua koordinat (dalam meter)
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371e3; // Radius bumi dalam meter
-    const φ1 = lat1 * Math.PI/180;
-    const φ2 = lat2 * Math.PI/180;
-    const Δφ = (lat2-lat1) * Math.PI/180;
-    const Δλ = (lon2-lon1) * Math.PI/180;
+    const φ1 = (lat1 * Math.PI) / 180;
+    const φ2 = (lat2 * Math.PI) / 180;
+    const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+    const Δλ = ((lon2 - lon1) * Math.PI) / 180;
 
-    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return R * c; // Jarak dalam meter
   };
@@ -44,54 +44,58 @@ const Absensi = () => {
         (position) => {
           const userLat = position.coords.latitude;
           const userLng = position.coords.longitude;
-          
+
           console.log("Lokasi user:", { lat: userLat, lng: userLng });
-          
+
           setUserLocation({ lat: userLat, lng: userLng });
-          
+
           // Hitung jarak ke outlet
           const distance = calculateDistance(
-            userLat, 
-            userLng, 
-            OUTLET_LOCATION.lat, 
+            userLat,
+            userLng,
+            OUTLET_LOCATION.lat,
             OUTLET_LOCATION.lng
           );
-          
+
           console.log("Jarak ke outlet:", distance, "meter");
-          
+
           if (distance <= ALLOWED_RADIUS) {
             // User dalam radius yang diizinkan
-            navigate('/loginSuccess');
+            navigate("/loginSuccess");
           } else {
-            setError('Anda harus berada dalam radius 10 meter dari outlet untuk melakukan absensi!');
+            setError(
+              "Anda harus berada dalam radius 10 meter dari outlet untuk melakukan absensi!"
+            );
           }
         },
         (error) => {
           console.error("Error getting location:", error);
-          setError('Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin lokasi diberikan.');
+          setError(
+            "Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin lokasi diberikan."
+          );
         }
       );
     } else {
-      setError('Browser Anda tidak mendukung geolocation.');
+      setError("Browser Anda tidak mendukung geolocation.");
     }
   };
 
   // Handle absensi hadir
   const handleHadir = () => {
-    setError('');
+    setError("");
     checkLocation();
   };
 
   // Handle submit izin
   const handleSubmitIzin = () => {
     if (!alasanIzin.trim()) {
-      setError('Mohon isi alasan izin/libur');
+      setError("Mohon isi alasan izin/libur");
       return;
     }
-    
+
     // Proses pengiriman izin ke backend bisa ditambahkan di sini
-    console.log('Alasan izin:', alasanIzin);
-    navigate('/loginSuccess');
+    console.log("Alasan izin:", alasanIzin);
+    navigate("/loginSuccess");
   };
 
   return (
@@ -104,13 +108,14 @@ const Absensi = () => {
             SILAHKAN MELAKUKAN ABSENSI
           </h1>
           <p className="font-montserrat text-xs text-gray-800 tracking-wide text-center mb-3">
-            Pastikan Anda berada di dalam radius 10 meter dari outlet saat melakukan absensi!
+            Pastikan Anda berada di dalam radius 10 meter dari outlet saat
+            melakukan absensi!
           </p>
 
           {/* Tambahkan gambar absen di sini */}
-          <img 
-            src={absenImage} 
-            alt="Absensi" 
+          <img
+            src={absenImage}
+            alt="Absensi"
             className="w-[130px] h-auto mb-6 mt-6" // Sesuaikan ukuran sesuai kebutuhan
           />
 
@@ -124,7 +129,7 @@ const Absensi = () => {
           {/* Buttons */}
           <button
             onClick={() => setShowIzinModal(true)}
-          className="w-full max-w-[282px] py-3.5 px-4 bg-[#FFCA42] text-black font-montserrat rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors duration-200 text-xs mb-4"
+            className="w-full max-w-[282px] py-3.5 px-4 bg-[#FFCA42] text-black font-montserrat rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors duration-200 text-xs mb-4"
           >
             IZIN / CLAIM LIBUR
           </button>
@@ -172,4 +177,4 @@ const Absensi = () => {
   );
 };
 
-export default Absensi; 
+export default Absensi;
