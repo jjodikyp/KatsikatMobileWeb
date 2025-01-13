@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import absenImage from "../assets/images/absen.png";
+import absenSound from "../assets/sound/absen.mp3"; // Import sound file
 
 const Absensi = () => {
   const navigate = useNavigate();
@@ -9,6 +10,36 @@ const Absensi = () => {
   const [showModalContent, setShowModalContent] = useState(false);
   const [alasanIzin, setAlasanIzin] = useState("");
   const [error, setError] = useState("");
+
+  // Tambahkan state untuk audio
+  const [audio] = useState(new Audio(absenSound));
+
+  // Fungsi untuk memainkan suara dengan volume yang diatur
+  const playAbsenSound = async () => {
+    try {
+      const audio = new Audio(absenSound);
+      audio.volume = 0.7; // Set ke 70%
+      
+      // Tambahkan event listener untuk debugging
+      audio.addEventListener('play', () => {
+        console.log('Audio mulai diputar');
+      });
+      
+      audio.addEventListener('error', (e) => {
+        console.error('Error audio:', e);
+      });
+
+      // Coba mainkan audio dengan await
+      try {
+        await audio.play();
+        console.log("Sound effect berhasil diputar");
+      } catch (playError) {
+        console.error("Gagal memutar sound:", playError);
+      }
+    } catch (error) {
+      console.error("Error setup audio:", error);
+    }
+  };
 
   // Handle modal animation
   useEffect(() => {
@@ -22,14 +53,14 @@ const Absensi = () => {
   }, [showIzinModal]);
 
   // Koordinat outlet
-  const OUTLET_LOCATION = {
-    lat: -6.9401128, // Latitude outlet Katsikat
-    lng: 106.9447146, // Longitude outlet Katsikat
-  };
   // const OUTLET_LOCATION = {
-  //   lat: -7.9672996,  // Latitude outlet Katsikat
-  //   lng: 112.6446889  // Longitude outlet Katsikat
+  //   lat: -6.9401128, // Latitude outlet Katsikat
+  //   lng: 106.9447146, // Longitude outlet Katsikat
   // };
+  const OUTLET_LOCATION = {
+    lat: -7.9888889,  // Latitude outlet Katsikat
+    lng: 112.6838822  // Longitude outlet Katsikat
+  };
 
   const ALLOWED_RADIUS = 10; // Radius dalam meter
 
@@ -92,10 +123,87 @@ const Absensi = () => {
     }
   };
 
+  // Fungsi untuk mengecek apakah waktu saat ini dalam rentang yang diizinkan
+  const isWithinAllowedTime = () => {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const currentTime = hours * 60 + minutes; // Konversi ke menit
+
+    // Rentang waktu pagi (08:00 - 08:30)
+    const morningStart = 8 * 60; // 08:00
+    const morningEnd = 15 * 60 + 30; // 08:30
+
+    // Rentang waktu sore (16:00 - 16:30)
+    const eveningStart = 16 * 60; // 16:00
+    const eveningEnd = 24 * 60; // 01:00
+
+    return (
+      (currentTime >= morningStart && currentTime <= morningEnd) ||
+      (currentTime >= eveningStart && currentTime <= eveningEnd)
+    );
+  };
+
   // Handle absensi hadir
   const handleHadir = () => {
     setError("");
-    checkLocation();
+    
+    if (!isWithinAllowedTime()) {
+      setError(
+        "Anda melakukan absensi di luar jam kerja (08:00-08:30 atau 16:00-16:30). Silahkan konfirmasi kehadiran kepada atasan."
+      );
+      return;
+    }
+
+    // Simpan waktu mulai kerja
+    localStorage.setItem("workStartTime", new Date().toISOString());
+    
+    // Cek lokasi dan jika berhasil, mainkan suara
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const userLat = position.coords.latitude;
+          const userLng = position.coords.longitude;
+
+          console.log("Lokasi user:", { lat: userLat, lng: userLng });
+
+          setUserLocation({ lat: userLat, lng: userLng });
+
+          // Hitung jarak ke outlet
+          const distance = calculateDistance(
+            userLat,
+            userLng,
+            OUTLET_LOCATION.lat,
+            OUTLET_LOCATION.lng
+          );
+
+          console.log("Jarak ke outlet:", distance, "meter");
+
+          if (distance <= ALLOWED_RADIUS) {
+            // User dalam radius yang diizinkan
+            try {
+              await playAbsenSound(); // Mainkan suara saat berhasil
+              console.log("Mencoba memutar suara");
+            } catch (audioError) {
+              console.error("Gagal memutar suara:", audioError);
+            }
+            navigate("/loginSuccess");
+          } else {
+            setError(
+              "Anda harus berada dalam radius 10 meter dari outlet untuk melakukan absensi!"
+            );
+          }
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          setError(
+            "Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin lokasi diberikan."
+          );
+        }
+      );
+    } else {
+      setError("Browser Anda tidak mendukung geolocation.");
+    }
   };
 
   // Handle submit izin
@@ -118,6 +226,14 @@ const Absensi = () => {
     }, 300);
   };
 
+  // Cleanup audio saat komponen unmount
+  useEffect(() => {
+    return () => {
+      audio.pause();
+      audio.currentTime = 0;
+    };
+  }, [audio]);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Container dengan padding yang responsive */}
@@ -128,8 +244,7 @@ const Absensi = () => {
             SILAHKAN MELAKUKAN ABSENSI
           </h1>
           <p className="font-montserrat text-xs text-gray-800 tracking-wide text-center mb-3">
-            Pastikan Anda berada di dalam radius 10 meter dari outlet saat
-            melakukan absensi!
+            Pastikan Anda berada di dalam radius 10 meter dari outlet dan melakukan absensi pada jam yang ditentukan!
           </p>
 
           {/* Tambahkan gambar absen di sini */}
@@ -139,9 +254,13 @@ const Absensi = () => {
             className="w-[130px] h-auto mb-6 mt-6" // Sesuaikan ukuran sesuai kebutuhan
           />
 
-          {/* Error Message */}
+          {/* Error Message dengan styling yang lebih mencolok untuk peringatan jam */}
           {error && (
-            <div className="w-full bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-sm font-montserrat text-center">
+            <div className={`w-full p-3 rounded-lg mb-4 text-sm font-montserrat text-center ${
+              error.includes("jam kerja") 
+                ? "bg-yellow-100 text-yellow-700 border border-yellow-400"
+                : "bg-red-100 text-red-700"
+            }`}>
               {error}
             </div>
           )}

@@ -7,15 +7,21 @@ const FuelCalculationModal = ({ isOpen, onClose, onConfirm, data }) => {
   useEffect(() => {
     if (isOpen) {
       setShowOverlay(true);
+      document.body.style.overflow = 'hidden';
       setTimeout(() => {
         setShowModal(true);
       }, 100);
     } else {
       setShowModal(false);
+      document.body.style.overflow = 'auto';
       setTimeout(() => {
         setShowOverlay(false);
       }, 300);
     }
+
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
   }, [isOpen]);
 
   if (!showOverlay) return null;
@@ -26,22 +32,22 @@ const FuelCalculationModal = ({ isOpen, onClose, onConfirm, data }) => {
 
   return (
     <div 
-      className={`fixed inset-0 bg-black transition-opacity duration-300 flex items-center justify-center z-50
+      className={`fixed inset-0 bg-black transition-opacity duration-300 flex items-center justify-center z-50 overflow-y-auto
         ${showOverlay ? 'bg-opacity-50' : 'bg-opacity-0'}`}
     >
       <div 
-        className={`bg-white rounded-2xl p-6 w-[90%] max-w-md transform transition-all duration-300
+        className={`bg-white rounded-2xl p-6 w-[90%] max-w-md transform transition-all duration-300 my-8
           ${showModal ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-full scale-150'}`}
       >
         <h3 className="font-bebas text-2xl mb-4">Ringkasan Penggunaan BBM</h3>
         
         <div className="space-y-3 mb-6">
           <div className="flex justify-between">
-            <span className="text-gray-600 font-montserrat">ODO Start:</span>
+            <span className="text-gray-600 font-montserrat">ODO Mulai:</span>
             <span className="font-medium font-montserrat">{data.odoStart} km</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600 font-montserrat">ODO End:</span>
+            <span className="text-gray-600 font-montserrat">ODO Selesai:</span>
             <span className="font-medium font-montserrat">{data.odoEnd} km</span>
           </div>
           <div className="flex justify-between border-t pt-2">

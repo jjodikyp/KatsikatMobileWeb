@@ -1,19 +1,55 @@
 import { useEffect, useState } from 'react';
+import akhirSound from "../assets/sound/akhir.mp3";
 
 const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
   const [showOverlay, setShowOverlay] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
+  // Fungsi untuk memainkan suara
+  const playAkhirSound = async () => {
+    try {
+      const audio = new Audio(akhirSound);
+      audio.volume = 0.7; // Set ke 70%
+      
+      // Tambahkan event listener untuk debugging
+      audio.addEventListener('play', () => {
+        console.log('Audio akhir mulai diputar');
+      });
+      
+      audio.addEventListener('error', (e) => {
+        console.error('Error audio akhir:', e);
+      });
+
+      try {
+        await audio.play();
+        console.log("Sound effect akhir berhasil diputar");
+      } catch (playError) {
+        console.error("Gagal memutar sound akhir:", playError);
+      }
+    } catch (error) {
+      console.error("Error setup audio akhir:", error);
+    }
+  };
+
+  // Modifikasi handler untuk onConfirm
+  const handleConfirm = async () => {
+    try {
+      await playAkhirSound();
+      onConfirm();
+    } catch (error) {
+      console.error("Error saat memainkan suara dan konfirmasi:", error);
+      onConfirm(); // Tetap jalankan onConfirm meskipun suara gagal
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       setShowOverlay(true);
-      // Tambah delay kecil untuk memastikan overlay muncul dulu
       setTimeout(() => {
         setShowModal(true);
       }, 100);
     } else {
       setShowModal(false);
-      // Tunggu animasi modal selesai sebelum sembunyikan overlay
       setTimeout(() => {
         setShowOverlay(false);
       }, 300);
@@ -41,7 +77,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
             Batal
           </button>
           <button
-            onClick={onConfirm}
+            onClick={handleConfirm}
             className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-all font-montserrat"
           >
             Ya

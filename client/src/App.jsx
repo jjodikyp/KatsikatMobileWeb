@@ -5,6 +5,7 @@ import Absensi from './pages/Absensi';
 import Beranda from './pages/Beranda';
 import Antrian from './pages/Antrian';
 import KurirTransport from './pages/KurirTransport';
+import AbsenAkhir from './pages/AbsenAkhir';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/absensi" element={<Absensi />} />
         <Route path="/beranda" element={<Beranda />} />
         <Route path="/kurir/transport" element={<KurirTransport />} />
+        <Route path="/absenakhir" element={<AbsenAkhir />} />
       </Routes>
     </Router>
   );

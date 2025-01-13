@@ -342,7 +342,7 @@ const Beranda = () => {
   const handleLogoutConfirm = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/login");
+    navigate("/absenakhir");
     setShowLogoutModal(false);
   };
 
@@ -506,7 +506,7 @@ const Beranda = () => {
                   estimasi: selectedEstimasi 
                 }
               })}
-              className="w-full mt-4 py-3 bg-[#FFCA42] text-white rounded-xl font-medium hover:bg-opacity-90 transition-al font-montserrat"
+              className="shadow-md text-sm w-full h-[35px] mt-4 py-3 bg-[#FFCA42] text-black rounded-xl hover:bg-opacity-90 transition-al font-montserrat flex items-center justify-center"
             >
               Buka Antrian
             </button>

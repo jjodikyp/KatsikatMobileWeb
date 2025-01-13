@@ -13,6 +13,15 @@ const KurirTransport = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [photos, setPhotos] = useState({
+    odoStart: null,
+    odoEnd: null
+  });
+  const [previews, setPreviews] = useState({
+    odoStart: null,
+    odoEnd: null
+  });
+  const [selectedPreview, setSelectedPreview] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -25,6 +34,34 @@ const KurirTransport = () => {
     }
   };
 
+  const handlePhotoChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length !== 2) {
+      setError("Harap upload 2 foto sekaligus (ODO Mulai dan ODO Selesai)");
+      return;
+    }
+
+    // Reset error message jika kedua foto berhasil diupload
+    setError("");
+
+    // Proses kedua foto
+    files.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviews(prev => ({
+          ...prev,
+          [index === 0 ? 'odoStart' : 'odoEnd']: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
+
+      setPhotos(prev => ({
+        ...prev,
+        [index === 0 ? 'odoStart' : 'odoEnd']: file
+      }));
+    });
+  };
+
   const handleSubmit = () => {
     // Validasi input
     if (!formData.odoStart || !formData.odoEnd) {
@@ -33,7 +70,7 @@ const KurirTransport = () => {
     }
 
     if (parseInt(formData.odoStart) >= parseInt(formData.odoEnd)) {
-      setError("ODO End harus lebih besar dari ODO Start");
+      setError("ODO Selesai harus lebih besar dari ODO Mulai");
       return;
     }
 
@@ -44,18 +81,19 @@ const KurirTransport = () => {
     try {
       setLoading(true);
 
-      const requestData = {
-        odoStart: Number(formData.odoStart),
-        odoEnd: Number(formData.odoEnd),
-        totalFuelCost: fuelCost,
-      };
+      const formData = new FormData();
+      formData.append('odoStart', formData.odoStart);
+      formData.append('odoEnd', formData.odoEnd);
+      formData.append('totalFuelCost', fuelCost);
+      formData.append('odoStartPhoto', photos.odoStart);
+      formData.append('odoEndPhoto', photos.odoEnd);
 
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/kurir/transport`,
-        requestData,
+        formData,
         {
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
@@ -75,33 +113,52 @@ const KurirTransport = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-white p-4">
-      <div className="max-w-md mx-auto pt-10">
-        <img
-          src={goodImage}
-          alt="Transport"
-          className="w-[130px] h-auto object-contain mx-auto mb-6"
-        />
+  const handleEditPhoto = (type) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviews(prev => ({
+            ...prev,
+            [type]: reader.result
+          }));
+          setPhotos(prev => ({
+            ...prev,
+            [type]: file
+          }));
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  };
 
-        <h1 className="text-3xl font-bebas text-center mb-2">
+  return (
+    <div className="h-screen overflow-y-auto bg-white p-4 pb-2 h-auto pb-20 flex flex-col items-center">
+      <div className="max-w-md mx-auto h-max pb-20">
+
+        <h1 className="text-3xl font-bebas text-center mb-2 mt-10">
           Pendataan Biaya Transportasi
         </h1>
 
-        <p className="font-montserrat text-center text-gray-600 mb-8">
-          Isi data sesuai dengan bukti yang akan diupload pada akhir sesi!
+        <p className="font-montserrat text-center text-gray-600 mb-4 max-w-xs mx-auto text-sm">
+          Data pada ODO Meter harus sesuai dengan bukti yang akan diupload setelahnya!
         </p>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-4 max-w-xs font-montserrat text-sm">
             {error}
           </div>
         )}
 
-        <div className="space-y-4 p-4 max-w-xs mx-auto">
+        <div className="space-y-4 p-4 max-w-xs mx-auto overflow-y-auto h-auto pb-20">
           <div>
             <label className="block font-montserrat text-sm text-gray-600 mb-1">
-              ODO Start
+              ODO Mulai
             </label>
             <input
               type="text"
@@ -116,30 +173,132 @@ const KurirTransport = () => {
 
           <div>
             <label className="block font-montserrat text-sm text-gray-600 mb-1">
-              ODO End
+              ODO Selesai
             </label>
             <input
               type="text"
               name="odoEnd"
               value={formData.odoEnd}
               onChange={handleInputChange}
-              className="h-10 w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 font-montserrat"
+              className="h-10 w-full p-3 rounded-xl border  border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 font-montserrat"
               placeholder="Masukkan jarak selesai"
               disabled={loading}
             />
           </div>
 
+          <div>
+            <label className="block font-montserrat text-sm text-gray-600 mb-1">
+              Foto ODO Mulai & Selesai
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoChange}
+              className="hidden"
+              id="odoPhotos"
+              multiple
+              required
+            />
+            <label
+              htmlFor="odoPhotos"
+              className="block w-full border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-400 transition-colors p-4"
+            >
+              <div className="grid grid-cols-2 gap-4">
+                {/* Preview ODO Start */}
+                <div className="relative h-[100px]">
+                  {previews.odoStart ? (
+                    <>
+                      <img
+                        src={previews.odoStart}
+                        alt="ODO Start Preview"
+                        className="w-full h-full object-cover rounded-lg cursor-pointer"
+                        onClick={() => setSelectedPreview(previews.odoStart)}
+                      />
+                      <button
+                        onClick={() => handleEditPhoto('odoStart')}
+                        className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </button>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full bg-gray-100 rounded-lg">
+                      <span className="text-gray-500 text-sm text-center">
+                        Foto ODO Mulai
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Preview ODO End */}
+                <div className="relative h-[100px]">
+                  {previews.odoEnd ? (
+                    <>
+                      <img
+                        src={previews.odoEnd}
+                        alt="ODO End Preview"
+                        className="w-full h-full object-cover rounded-lg cursor-pointer"
+                        onClick={() => setSelectedPreview(previews.odoEnd)}
+                      />
+                      <button
+                        onClick={() => handleEditPhoto('odoEnd')}
+                        className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </button>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full bg-gray-100 rounded-lg">
+                      <span className="text-gray-500 text-sm text-center">
+                        Foto ODO Selesai
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <p className="text-center text-sm text-gray-500 mt-2 font-montserrat">
+                Silahkan upload 2 foto sekaligus
+                (ODO Mulai & Selesai)
+              </p>
+            </label>
+          </div>
+
           <button
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || !photos.odoStart || !photos.odoEnd}
             className={`h-10 w-full py-3 bg-[#51A7D9] text-white rounded-xl font-medium transition-all mt-6 font-montserrat text-center flex items-center justify-center ${
-              loading ? "opacity-50 cursor-not-allowed" : "hover:bg-opacity-90"
+              (loading || !photos.odoStart || !photos.odoEnd) ? "opacity-50 cursor-not-allowed" : "hover:bg-opacity-90"
             }`}
           >
             {loading ? "Menyimpan..." : "Selanjutnya"}
           </button>
         </div>
       </div>
+
+      {/* Preview Modal */}
+      {selectedPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-center z-50 p-4">
+          <div className="max-w-3xl max-h-[80vh] bg-white rounded-lg overflow-hidden">
+            <img
+              src={selectedPreview}
+              alt="Preview"
+              className="w-full h-auto max-h-[70vh] object-contain"
+            />
+            <div className="p-4 bg-white flex justify-center">
+              <button
+                onClick={() => setSelectedPreview(null)}
+                className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-montserrat"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <FuelCalculationModal
         isOpen={showModal}
