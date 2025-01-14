@@ -263,12 +263,12 @@ const Antrian = () => {
                       </p>
                     </div>
                   </div>
-                  <button className="w-full h-[35px] mb-auto mt-4 bg-[#FFCA42] text-black rounded-xl flex items-center justify-center text-sm shadow-md">
+                  <button className="w-full h-[35px] mb-auto mt-4 bg-[#FFCA42] text-white rounded-xl flex items-center justify-center text-sm shadow-md font-bold">
                     Mulai Treatment
                   </button>
                 </div>
               ))
-            ) : (
+            ) : ( 
               <div className="col-span-full text-center py-8 text-gray-500">
                 Tidak ada antrian treatment untuk kategori {selectedFilter}
               </div>

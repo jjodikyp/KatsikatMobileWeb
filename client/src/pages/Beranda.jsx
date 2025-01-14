@@ -1,9 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
-import ConfirmationModal from '../components/ConfirmationModal';
+import {
+  format,
+  differenceInHours,
+  differenceInMinutes,
+  differenceInSeconds,
+  parseISO,
+  setHours,
+  setMinutes,
+  setSeconds,
+} from "date-fns";
+import ConfirmationModal from "../components/ConfirmationModal";
+import Header from "../components/Header";
 
 const Beranda = () => {
   const navigate = useNavigate();
@@ -23,18 +32,113 @@ const Beranda = () => {
     };
   });
   const [tempDateRange, setTempDateRange] = useState(() => {
-    const savedRange = localStorage.getItem('dateRange');
+    const savedRange = localStorage.getItem("dateRange");
     if (savedRange) {
       return JSON.parse(savedRange);
     }
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     return {
       startDate: today,
-      endDate: today
+      endDate: today,
     };
   });
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showSwitchRoleModal, setShowSwitchRoleModal] = useState(false);
+  const [showOvertimeWarning, setShowOvertimeWarning] = useState(false);
+  const [canTakeOvertime, setCanTakeOvertime] = useState(false);
+  const [workDuration, setWorkDuration] = useState({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+  const [showBreakWarning, setShowBreakWarning] = useState(false);
+  const [showReturnWarning, setShowReturnWarning] = useState(false);
+  const [breakCountdown, setBreakCountdown] = useState({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+  const [returnCountdown, setReturnCountdown] = useState({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+  const [currentTime, setCurrentTime] = useState('');
+
+  // Fungsi untuk mendapatkan waktu WIB
+  const getJakartaTime = () => {
+    const date = new Date();
+    return new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+  };
+
+  // Fungsi untuk testing waktu
+  const debugTime = (targetHour, targetMinute) => {
+    const testTime = new Date();
+    testTime.setHours(targetHour);
+    testTime.setMinutes(targetMinute);
+    testTime.setSeconds(0);
+    
+    // Override getJakartaTime untuk testing
+    getJakartaTime = () => testTime;
+    
+    console.log(`Testing dengan waktu: ${format(testTime, 'HH:mm:ss')}`);
+  };
+
+  // Fungsi untuk mengecek waktu istirahat
+  const checkBreakTime = () => {
+    const jakartaTime = getJakartaTime();
+    
+    // Hanya log saat pertama kali komponen dimount atau saat debug
+    // console.log('Current Jakarta time:', format(jakartaTime, 'HH:mm:ss'));
+
+    // Set target times
+    const breakTime = setHours(setMinutes(setSeconds(jakartaTime, 0), 0), 12); // 12:00:00
+    const warningTime = setHours(setMinutes(setSeconds(jakartaTime, 0), 45), 11); // 11:45:00
+    const returnTime = setHours(setMinutes(setSeconds(jakartaTime, 0), 0), 13); // 13:00:00
+
+    // Hitung countdown ke waktu istirahat
+    if (jakartaTime < breakTime) {
+      const diff = breakTime.getTime() - jakartaTime.getTime();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      setBreakCountdown({ hours, minutes, seconds });
+    }
+
+    // Hitung countdown ke waktu kembali
+    if (jakartaTime >= breakTime && jakartaTime < returnTime) {
+      const diff = returnTime.getTime() - jakartaTime.getTime();
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      setReturnCountdown({ hours, minutes, seconds });
+    }
+
+    // Tampilkan peringatan 15 menit sebelum istirahat
+    if (jakartaTime >= warningTime && jakartaTime < breakTime) {
+      setShowBreakWarning(true);
+      setShowReturnWarning(false);
+      // console.log('Break warning shown');
+    } 
+    // Tampilkan peringatan selama waktu istirahat
+    else if (jakartaTime >= breakTime && jakartaTime < returnTime) {
+      setShowBreakWarning(false);
+      setShowReturnWarning(true);
+      // console.log('Return warning shown');
+    } 
+    // Sembunyikan semua peringatan
+    else {
+      setShowBreakWarning(false);
+      setShowReturnWarning(false);
+    }
+  };
+
+  // Jalankan pengecekan waktu istirahat setiap detik
+  useEffect(() => {
+    checkBreakTime();
+    const interval = setInterval(checkBreakTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Fungsi untuk memformat tanggal ke format database (YYYY-MM-DD)
   const formatDateForDB = (dateString) => {
@@ -49,13 +153,6 @@ const Beranda = () => {
       const startDate = formatDateForDB(dateRange.startDate);
       const endDate = formatDateForDB(dateRange.endDate);
 
-      console.log("Comparing dates:", {
-        dueDate,
-        startDate,
-        endDate,
-        isInRange: dueDate >= startDate && dueDate <= endDate,
-      });
-
       return dueDate >= startDate && dueDate <= endDate;
     });
   };
@@ -67,53 +164,73 @@ const Beranda = () => {
 
     const newRange = {
       ...dateRange,
-      [name]: formattedValue
+      [name]: formattedValue,
     };
 
     // Validasi rentang
-    if (name === 'startDate' && formattedValue > dateRange.endDate) {
+    if (name === "startDate" && formattedValue > dateRange.endDate) {
       newRange.endDate = formattedValue;
-    } else if (name === 'endDate' && formattedValue < dateRange.startDate) {
+    } else if (name === "endDate" && formattedValue < dateRange.startDate) {
       newRange.startDate = formattedValue;
     }
 
-    console.log('New date range:', newRange);
-    
+    console.log("New date range:", newRange);
+
     // Update dateRange dan localStorage
     setDateRange(newRange);
-    localStorage.setItem('dateRange', JSON.stringify(newRange));
+    localStorage.setItem("dateRange", JSON.stringify(newRange));
 
     try {
-      console.log('Fetching data with new date range...');
-      const [regularResponse, sameDayResponse, nextDayResponse] = await Promise.all([
-        axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/regular`, {
-          params: {
-            startDate: newRange.startDate,
-            endDate: newRange.endDate
-          }
-        }),
-        axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/same_day`, {
-          params: {
-            startDate: newRange.startDate,
-            endDate: newRange.endDate
-          }
-        }),
-        axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/next_day`, {
-          params: {
-            startDate: newRange.startDate,
-            endDate: newRange.endDate
-          }
-        })
-      ]);
+      console.log("Fetching data with new date range...");
+      const [regularResponse, sameDayResponse, nextDayResponse] =
+        await Promise.all([
+          axios.get(
+            `${import.meta.env.VITE_API_URL}/api/order-details/process/regular`,
+            {
+              params: {
+                startDate: newRange.startDate,
+                endDate: newRange.endDate,
+              },
+            }
+          ),
+          axios.get(
+            `${
+              import.meta.env.VITE_API_URL
+            }/api/order-details/process/same_day`,
+            {
+              params: {
+                startDate: newRange.startDate,
+                endDate: newRange.endDate,
+              },
+            }
+          ),
+          axios.get(
+            `${
+              import.meta.env.VITE_API_URL
+            }/api/order-details/process/next_day`,
+            {
+              params: {
+                startDate: newRange.startDate,
+                endDate: newRange.endDate,
+              },
+            }
+          ),
+        ]);
 
-      const regularFiltered = filterByDateRange(regularResponse.data.data || []);
-      const sameDayFiltered = filterByDateRange(sameDayResponse.data.data || []);
-      const nextDayFiltered = filterByDateRange(nextDayResponse.data.data || []);
+      const regularFiltered = filterByDateRange(
+        regularResponse.data.data || []
+      );
+      const sameDayFiltered = filterByDateRange(
+        sameDayResponse.data.data || []
+      );
+      const nextDayFiltered = filterByDateRange(
+        nextDayResponse.data.data || []
+      );
 
-      console.log('Filtered data:', {
+      console.log("Filtered data:", {
         regular: regularFiltered.length,
         sameDay: sameDayFiltered.length,
-        nextDay: nextDayFiltered.length
+        nextDay: nextDayFiltered.length,
       });
 
       setAntrianData({
@@ -123,17 +240,16 @@ const Beranda = () => {
       });
 
       // Update antrian treatment sesuai filter yang aktif
-      if (selectedEstimasi === 'reguler') {
-        console.log('Setting antrian reguler:', regularFiltered);
+      if (selectedEstimasi === "reguler") {
+        console.log("Setting antrian reguler:", regularFiltered);
         setAntrianTreatment(regularFiltered);
-      } else if (selectedEstimasi === 'sameDay') {
-        console.log('Setting antrian same day:', sameDayFiltered);
+      } else if (selectedEstimasi === "sameDay") {
+        console.log("Setting antrian same day:", sameDayFiltered);
         setAntrianTreatment(sameDayFiltered);
-      } else if (selectedEstimasi === 'nextDay') {
-        console.log('Setting antrian next day:', nextDayFiltered);
+      } else if (selectedEstimasi === "nextDay") {
+        console.log("Setting antrian next day:", nextDayFiltered);
         setAntrianTreatment(nextDayFiltered);
       }
-
     } catch (error) {
       console.error("Error updating data:", error);
       // Log detail error
@@ -141,7 +257,7 @@ const Beranda = () => {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
-        config: error.config
+        config: error.config,
       });
     }
   };
@@ -151,35 +267,38 @@ const Beranda = () => {
     try {
       const formattedStartDate = formatDateForDB(range.startDate);
       const formattedEndDate = formatDateForDB(range.endDate);
-      
-      console.log('Sending request with params:', {
+
+      console.log("Sending request with params:", {
         startDate: formattedStartDate,
-        endDate: formattedEndDate
+        endDate: formattedEndDate,
       });
 
       // Gunakan VITE_API_URL dari env
-      const baseUrl = `${import.meta.env.VITE_API_URL}/api/order-details/process`;
-      
-      const [regularResponse, sameDayResponse, nextDayResponse] = await Promise.all([
-        axios.get(`${baseUrl}/regular`, {
-          params: {
-            startDate: formattedStartDate,
-            endDate: formattedEndDate
-          }
-        }),
-        axios.get(`${baseUrl}/same_day`, {
-          params: {
-            startDate: formattedStartDate,
-            endDate: formattedEndDate
-          }
-        }),
-        axios.get(`${baseUrl}/next_day`, {
-          params: {
-            startDate: formattedStartDate,
-            endDate: formattedEndDate
-          }
-        })
-      ]);
+      const baseUrl = `${
+        import.meta.env.VITE_API_URL
+      }/api/order-details/process`;
+
+      const [regularResponse, sameDayResponse, nextDayResponse] =
+        await Promise.all([
+          axios.get(`${baseUrl}/regular`, {
+            params: {
+              startDate: formattedStartDate,
+              endDate: formattedEndDate,
+            },
+          }),
+          axios.get(`${baseUrl}/same_day`, {
+            params: {
+              startDate: formattedStartDate,
+              endDate: formattedEndDate,
+            },
+          }),
+          axios.get(`${baseUrl}/next_day`, {
+            params: {
+              startDate: formattedStartDate,
+              endDate: formattedEndDate,
+            },
+          }),
+        ]);
 
       setAntrianData({
         reguler: regularResponse.data.data.length,
@@ -198,7 +317,7 @@ const Beranda = () => {
       console.error("Error details:", {
         message: error.message,
         response: error.response?.data,
-        status: error.response?.status
+        status: error.response?.status,
       });
       // Tambahkan log detail error
       console.error("Error response:", error.response?.data);
@@ -227,26 +346,29 @@ const Beranda = () => {
 
       const baseUrl = `${import.meta.env.VITE_API_URL}/api/order-details`;
       let response;
-      
-      if (estimasi === 'all') {
+
+      if (estimasi === "all") {
         response = await axios.get(baseUrl, {
           params: {
             startDate: formattedStartDate,
-            endDate: formattedEndDate
-          }
+            endDate: formattedEndDate,
+          },
         });
       } else {
-        const processTime = estimasi === 'sameDay' ? 'same_day' : 
-                           estimasi === 'nextDay' ? 'next_day' : 
-                           'regular';
+        const processTime =
+          estimasi === "sameDay"
+            ? "same_day"
+            : estimasi === "nextDay"
+            ? "next_day"
+            : "regular";
         response = await axios.get(`${baseUrl}/process/${processTime}`, {
           params: {
             startDate: formattedStartDate,
-            endDate: formattedEndDate
-          }
+            endDate: formattedEndDate,
+          },
         });
       }
-      
+
       setAntrianTreatment(response.data.data);
     } catch (error) {
       console.error("Error fetching filtered data:", error);
@@ -265,45 +387,67 @@ const Beranda = () => {
     const fetchData = async () => {
       try {
         // Log tanggal sebelum format
-        console.log('Original date range:', dateRange);
+        console.log("Original date range:", dateRange);
 
         // Format tanggal
         const formattedStartDate = formatDateForDB(dateRange.startDate);
         const formattedEndDate = formatDateForDB(dateRange.endDate);
 
         // Log tanggal setelah format
-        console.log('Formatted dates:', {
+        console.log("Formatted dates:", {
           formattedStartDate,
-          formattedEndDate
+          formattedEndDate,
         });
 
         const params = {
           startDate: formattedStartDate,
-          endDate: formattedEndDate
+          endDate: formattedEndDate,
         };
 
         // Log full request details
-        console.log('Making requests with:', {
-          url: 'http://localhost:3002/api/order-details/process/regular',
-          params
+        console.log("Making requests with:", {
+          url: "http://localhost:3002/api/order-details/process/regular",
+          params,
         });
 
-        const [regularResponse, sameDayResponse, nextDayResponse] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/regular`, { params }),
-          axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/same_day`, { params }),
-          axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/next_day`, { params })
-        ]);
+        const [regularResponse, sameDayResponse, nextDayResponse] =
+          await Promise.all([
+            axios.get(
+              `${
+                import.meta.env.VITE_API_URL
+              }/api/order-details/process/regular`,
+              { params }
+            ),
+            axios.get(
+              `${
+                import.meta.env.VITE_API_URL
+              }/api/order-details/process/same_day`,
+              { params }
+            ),
+            axios.get(
+              `${
+                import.meta.env.VITE_API_URL
+              }/api/order-details/process/next_day`,
+              { params }
+            ),
+          ]);
 
         // Log responses
-        console.log('Responses received:', {
+        console.log("Responses received:", {
           regular: regularResponse.data,
           sameDay: sameDayResponse.data,
-          nextDay: nextDayResponse.data
+          nextDay: nextDayResponse.data,
         });
 
-        const regularFiltered = filterByDateRange(regularResponse.data.data || []);
-        const sameDayFiltered = filterByDateRange(sameDayResponse.data.data || []);
-        const nextDayFiltered = filterByDateRange(nextDayResponse.data.data || []);
+        const regularFiltered = filterByDateRange(
+          regularResponse.data.data || []
+        );
+        const sameDayFiltered = filterByDateRange(
+          sameDayResponse.data.data || []
+        );
+        const nextDayFiltered = filterByDateRange(
+          nextDayResponse.data.data || []
+        );
 
         setAntrianData({
           reguler: regularFiltered.length,
@@ -311,17 +455,19 @@ const Beranda = () => {
           nextDay: nextDayFiltered.length,
         });
 
-        if (selectedEstimasi === 'reguler') setAntrianTreatment(regularFiltered);
-        else if (selectedEstimasi === 'sameDay') setAntrianTreatment(sameDayFiltered);
-        else if (selectedEstimasi === 'nextDay') setAntrianTreatment(nextDayFiltered);
-
+        if (selectedEstimasi === "reguler")
+          setAntrianTreatment(regularFiltered);
+        else if (selectedEstimasi === "sameDay")
+          setAntrianTreatment(sameDayFiltered);
+        else if (selectedEstimasi === "nextDay")
+          setAntrianTreatment(nextDayFiltered);
       } catch (error) {
         // Detailed error logging
         console.error("Error details:", {
           message: error.message,
           response: error.response?.data,
           status: error.response?.status,
-          config: error.config // This will show what was actually sent
+          config: error.config, // This will show what was actually sent
         });
       }
     };
@@ -351,85 +497,158 @@ const Beranda = () => {
     setShowSwitchRoleModal(false);
   };
 
+  // Fungsi untuk mengecek jam kerja
+  const checkWorkHours = () => {
+    const workStartTime = localStorage.getItem("workStartTime");
+    if (!workStartTime) return;
+
+    const startTime = parseISO(workStartTime);
+    const now = new Date();
+
+    const hoursWorked = differenceInHours(now, startTime);
+    const minutesWorked = differenceInMinutes(now, startTime) % 60; // Mendapatkan sisa menit
+    const secondsWorked = differenceInSeconds(now, startTime) % 60; // Mendapatkan sisa detik
+
+    setWorkDuration({
+      hours: hoursWorked,
+      minutes: minutesWorked,
+      seconds: secondsWorked,
+    });
+
+    // Cek jika sudah bekerja lebih dari 8 jam
+    if (hoursWorked >= 8) {
+      setShowOvertimeWarning(true);
+
+      // Cek apakah masih bisa ambil lembur (antara 8 jam dan 8 jam 30 menit)
+      const totalMinutesWorked = differenceInMinutes(now, startTime);
+      const canTake = totalMinutesWorked <= 8 * 60 + 30; // 8 jam 30 menit dalam menit
+      setCanTakeOvertime(canTake);
+    }
+  };
+
+  // Fungsi untuk menangani klik tombol ambil lembur
+  const handleTakeOvertime = () => {
+    setShowOvertimeWarning(false);
+
+    // Set timeout untuk menampilkan peringatan lagi setelah 1 jam
+    setTimeout(() => {
+      setShowOvertimeWarning(true);
+    }, 60 * 60 * 1000); // 1 jam dalam milidetik
+  };
+
+  // Cek jam kerja setiap detik
+  useEffect(() => {
+    checkWorkHours();
+    const interval = setInterval(checkWorkHours, 1000); // Update setiap detik
+    return () => clearInterval(interval);
+  }, []);
+
+  // Tambahkan fungsi untuk update waktu
+  const updateTime = () => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('id-ID', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZone: 'Asia/Jakarta'
+    });
+    setCurrentTime(timeString);
+  };
+
+  // Tambahkan useEffect untuk update waktu setiap detik
+  useEffect(() => {
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  
+
   return (
     <div className="h-screen overflow-y-auto bg-[#FFFFFF] font-montserrat">
-      {/* Header - Fixed at top */}
-      <header className="fixed top-0 left-0 right-0 z-10">
-        <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex justify-between items-center max-w-[390px] md:max-w-none">
-          {/* Logout Button */}
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            className="w-[41px] h-[41px] rounded-full flex items-center justify-center bg-[#FD8087] hover:bg-opacity-90 transition-all"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="white"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
-              />
-            </svg>
-          </button>
-
-          {/* User Profile Area */}
-          <div className="flex items-center gap-4 bg-[#F0F0F0] px-4 py-2 rounded-full">
-            <span className="font-bebas text-xl color-[#383838]">
-              {userData?.name 
-                ? userData.name.split(' ').slice(0, 2).join(' ')
-                : "Guest"
-              }
-            </span>
-            <div className="w-[33px] h-[33px] rounded-full bg-gray-300 overflow-hidden">
-              {userData?.photo ? (
-                <img
-                  src={userData.photo}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-300" />
-              )}
-            </div>
-          </div>
-
-          {/* Switch Role Button */}
-          <button
-            onClick={() => setShowSwitchRoleModal(true)}
-            className="w-[41px] h-[41px] rounded-full flex items-center justify-center bg-[#51A7D9] hover:bg-opacity-90 transition-all"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="white"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"
-              />
-            </svg>
-          </button>
-        </div>
-      </header>
-
+      <Header />
+      
       {/* Main Content */}
-      <main className="mx-auto px-4 md:px-10 pt-24 pb-6 min-h-screen">
+      <main className="mx-auto px-4 md:px-10 pt-36 pb-6 min-h-screen">
         <div className="max-w-[390px] md:max-w-none mx-auto">
+          {/* Peringatan Jam Kerja */}
+          {showOvertimeWarning && (
+            <div className="mb-4 bg-red-100 border border-red-400 rounded-3xl p-4 shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bebas text-red-700">
+                    Peringatan Jam Kerja
+                  </h2>
+                  <p className="text-red-600 text-sm">
+                    Anda telah bekerja lebih dari 8 jam. Silakan Absen Selesai!
+                  </p>
+                  <p className="text-red-600 text-sm mt-1">
+                    Anda sudah bekerja selama {workDuration.hours} Jam,{" "}
+                    {workDuration.minutes} Menit, dan {workDuration.seconds}{" "}
+                    Detik
+                  </p>
+                </div>
+                {canTakeOvertime && (
+                  <button
+                    onClick={handleTakeOvertime}
+                    className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 transition-colors"
+                  >
+                    Ambil Lembur
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Peringatan Waktu Istirahat */}
+          {showBreakWarning && (
+            <div className="mb-4 bg-yellow-100 border border-yellow-400 rounded-3xl p-4 shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bebas text-yellow-700">
+                    Waktu Istirahat Akan Tiba
+                  </h2>
+                  <p className="text-yellow-600 text-sm">
+                    Waktu istirahat akan dimulai dalam:
+                  </p>
+                  <p className="text-yellow-600 text-sm mt-1">
+                    {breakCountdown.hours} Jam, {breakCountdown.minutes} Menit,
+                    dan {breakCountdown.seconds} Detik
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Peringatan Kembali Kerja */}
+          {showReturnWarning && (
+            <div className="mb-4 bg-green-100 border border-green-400 rounded-3xl p-4 shadow-sm">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h2 className="text-2xl font-bebas text-green-700">
+                    Waktu Istirahat
+                  </h2>
+                  <p className="text-green-600 text-sm">
+                    Waktu kembali bekerja dalam:
+                  </p>
+                  <p className="text-green-600 text-sm mt-1">
+                    {returnCountdown.hours} Jam, {returnCountdown.minutes}{" "}
+                    Menit, dan {returnCountdown.seconds} Detik
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Date Range Picker */}
           <div className="mb-4 bg-[#F0F0F0] rounded-3xl p-4 shadow-sm">
             <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
             <div className="grid grid-cols-2 gap-4 font-montserrat">
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Dari Tanggal</label>
+                <label className="block text-sm text-gray-600 mb-1">
+                  Dari Tanggal
+                </label>
                 <input
                   type="date"
                   name="startDate"
@@ -440,7 +659,9 @@ const Beranda = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Sampai Tanggal</label>
+                <label className="block text-sm text-gray-600 mb-1">
+                  Sampai Tanggal
+                </label>
                 <input
                   type="date"
                   name="endDate"
@@ -465,10 +686,18 @@ const Beranda = () => {
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                 onClick={() => setSelectedEstimasi("reguler")}
               >
-                <h3 className={selectedEstimasi === "reguler" ? "text-white" : "text-gray-600"}>
+                <h3
+                  className={
+                    selectedEstimasi === "reguler"
+                      ? "text-white"
+                      : "text-gray-600"
+                  }
+                >
                   Reguler
                 </h3>
-                <p className="text-3xl font-bold">{antrianData?.reguler || 0}</p>
+                <p className="text-3xl font-bold">
+                  {antrianData?.reguler || 0}
+                </p>
               </div>
               <div
                 className={`${
@@ -478,10 +707,18 @@ const Beranda = () => {
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                 onClick={() => setSelectedEstimasi("sameDay")}
               >
-                <h3 className={selectedEstimasi === "sameDay" ? "text-white" : "text-gray-600"}>
+                <h3
+                  className={
+                    selectedEstimasi === "sameDay"
+                      ? "text-white"
+                      : "text-gray-600"
+                  }
+                >
                   Same Day
                 </h3>
-                <p className="text-3xl font-bold">{antrianData?.sameDay || 0}</p>
+                <p className="text-3xl font-bold">
+                  {antrianData?.sameDay || 0}
+                </p>
               </div>
               <div
                 className={`${
@@ -491,22 +728,32 @@ const Beranda = () => {
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                 onClick={() => setSelectedEstimasi("nextDay")}
               >
-                <h3 className={selectedEstimasi === "nextDay" ? "text-white" : "text-gray-600"}>
+                <h3
+                  className={
+                    selectedEstimasi === "nextDay"
+                      ? "text-white"
+                      : "text-gray-600"
+                  }
+                >
                   Next Day
                 </h3>
-                <p className="text-3xl font-bold">{antrianData?.nextDay || 0}</p>
+                <p className="text-3xl font-bold">
+                  {antrianData?.nextDay || 0}
+                </p>
               </div>
             </div>
-            
+
             {/* Button Buka Antrian */}
             <button
-              onClick={() => navigate(`/antrian/${selectedEstimasi}`, { 
-                state: { 
-                  dateRange,
-                  estimasi: selectedEstimasi 
-                }
-              })}
-              className="shadow-md text-sm w-full h-[35px] mt-4 py-3 bg-[#FFCA42] text-black rounded-xl hover:bg-opacity-90 transition-al font-montserrat flex items-center justify-center"
+              onClick={() =>
+                navigate(`/antrian/${selectedEstimasi}`, {
+                  state: {
+                    dateRange,
+                    estimasi: selectedEstimasi,
+                  },
+                })
+              }
+              className="shadow-xl text-sm w-full h-[35px] mt-4 py-3 bg-[#FFCA42] text-white rounded-xl hover:bg-opacity-90 transition-al font-montserrat flex items-center justify-center font-bold"
             >
               Buka Antrian
             </button>
