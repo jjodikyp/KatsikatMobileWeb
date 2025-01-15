@@ -13,6 +13,7 @@ import {
 } from "date-fns";
 import ConfirmationModal from "../components/ConfirmationModal";
 import Header from "../components/Header";
+import SwitchRoleTeknisi from '../components/SwitchRoleTeknisi';
 
 const Beranda = () => {
   const navigate = useNavigate();
@@ -570,8 +571,10 @@ const Beranda = () => {
       <Header />
       
       {/* Main Content */}
-      <main className="mx-auto px-4 md:px-10 pt-36 pb-6 min-h-screen">
+      <main className="mx-auto px-4 md:px-10 pt-20 pb-6 min-h-screen">
         <div className="max-w-[390px] md:max-w-none mx-auto">
+          <SwitchRoleTeknisi />
+          
           {/* Peringatan Jam Kerja */}
           {showOvertimeWarning && (
             <div className="mb-4 bg-red-100 border border-red-400 rounded-3xl p-4 shadow-sm">
@@ -581,12 +584,9 @@ const Beranda = () => {
                     Peringatan Jam Kerja
                   </h2>
                   <p className="text-red-600 text-sm">
-                    Anda telah bekerja lebih dari 8 jam. Silakan Absen Selesai!
-                  </p>
-                  <p className="text-red-600 text-sm mt-1">
-                    Anda sudah bekerja selama {workDuration.hours} Jam,{" "}
+                    Anda telah bekerja lebih dari 8 jam. Total jam kerja, {workDuration.hours} Jam,{" "}
                     {workDuration.minutes} Menit, dan {workDuration.seconds}{" "}
-                    Detik
+                    Detik. Silakan Absen Selesai!
                   </p>
                 </div>
                 {canTakeOvertime && (
@@ -642,7 +642,7 @@ const Beranda = () => {
           )}
 
           {/* Date Range Picker */}
-          <div className="mb-4 bg-[#F0F0F0] rounded-3xl p-4 shadow-sm">
+          <div className="mb-4 bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-10">
             <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
             <div className="grid grid-cols-2 gap-4 font-montserrat">
               <div>

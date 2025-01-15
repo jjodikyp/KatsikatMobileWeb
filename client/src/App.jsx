@@ -6,6 +6,8 @@ import Beranda from './pages/Beranda';
 import Antrian from './pages/Antrian';
 import KurirTransport from './pages/KurirTransport';
 import AbsenAkhir from './pages/AbsenAkhir';
+import BerandaKurir from './pages/BerandaKurir';
+import BerandaKasir from './pages/BerandaKasir';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
         <Route path="/beranda" element={<Beranda />} />
         <Route path="/kurir/transport" element={<KurirTransport />} />
         <Route path="/absenakhir" element={<AbsenAkhir />} />
+        <Route path="/berandakurir" element={<BerandaKurir />} />
+        <Route path="/berandakasir" element={<BerandaKasir />} />
       </Routes>
     </Router>
   );

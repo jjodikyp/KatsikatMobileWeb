@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import LoadingDots from '../components/LoadingDots';
 
 const Antrian = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Antrian = () => {
   const [repairCount, setRepairCount] = useState(0);
   const [selectedImage, setSelectedImage] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   useEffect(() => {
     const userDataFromStorage = localStorage.getItem("user");
@@ -112,6 +114,19 @@ const Antrian = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/login");
+  };
+
+  const getThumbnailUrl = (originalUrl) => {
+    // Jika menggunakan Cloudinary
+    if (originalUrl.includes('cloudinary')) {
+      return originalUrl.replace('/upload/', '/upload/w_200,h_200,c_fill/');
+    }
+    // Jika menggunakan ImageKit
+    if (originalUrl.includes('imagekit')) {
+      return originalUrl + '?tr=w-200,h-200';
+    }
+    // Jika tidak menggunakan CDN, gunakan URL original
+    return originalUrl;
   };
 
   return (
@@ -234,12 +249,16 @@ const Antrian = () => {
                       }}
                     >
                       {item.shoes_photos && item.shoes_photos.length > 0 ? (
-                        <img
-                          src={item.shoes_photos[0].url_photo}
-                          alt="Shoes"
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                        />
+                        <>
+                          {imageLoading && <LoadingDots />}
+                          <img
+                            src={getThumbnailUrl(item.shoes_photos[0].url_photo)}
+                            alt="Shoes"
+                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            onLoad={() => setImageLoading(false)}
+                          />
+                        </>
                       ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                           <span className="text-gray-400 text-sm">No Image</span>
