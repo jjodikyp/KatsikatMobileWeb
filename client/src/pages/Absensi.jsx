@@ -235,88 +235,73 @@ const Absensi = () => {
   }, [audio]);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Container dengan padding yang responsive */}
-      <div className="max-w-[390px] mx-auto px-4 sm:px-6 md:px-10 py-8 min-h-screen flex flex-col items-center justify-center">
-        <div className="w-full max-w-[282px] flex flex-col items-center">
-          {/* Title */}
-          <h1 className="font-bebas text-2xl text-gray-800 tracking-wide text-center mb-3">
+    <div className="min-h-[100dvh] flex flex-col justify-center items-center bg-white px-10 sm:px-0">
+      <div className="w-full sm:w-[380px] p-8 sm:p-8 my-auto bg-white rounded-3xl shadow-2xl shadow-grey opacity-100 outline outline-2 outline-white">
+        {/* Illustration */}
+        <div className="flex justify-center mb-6">
+          <img src={absenImage} alt="Absen" className="w-32 h-32" />
+        </div>
+
+        {/* Title & Description */}
+        <h1 className="font-bebas text-2xl text-gray-800 tracking-wide text-center mb-3">
           PLEASE TAKE YOUR ATTENDANCE
-          </h1>
-          <p className="font-montserrat text-xs text-gray-800 tracking-wide text-center mb-3">
+        </h1>
+        <p className="font-montserrat text-sm text-gray-800 tracking-wide text-center mb-3">
           Make sure you are within 10 meters radius from the outlet and take attendance at the specified time!
-          </p>
+        </p>
 
-          {/* Tambahkan gambar absen di sini */}
-          <img
-            src={absenImage}
-            alt="Absensi"
-            className="w-[130px] h-auto mb-6 mt-6" // Sesuaikan ukuran sesuai kebutuhan
-          />
-
-          {/* Error Message dengan styling yang lebih mencolok untuk peringatan jam */}
-          {error && (
-            <div className={`w-full p-3 rounded-lg mb-4 text-sm font-montserrat text-center ${
-              error.includes("jam kerja") 
-                ? "bg-yellow-100 text-yellow-700 border border-yellow-400"
-                : "bg-red-100 text-red-700"
-            }`}>
-              {error}
-            </div>
-          )}
-
-          {/* Buttons */}
+        {/* Buttons */}
+        <div className="flex flex-col gap-3 mt-6">
           <button
             onClick={() => setShowIzinModal(true)}
-            className="w-full max-w-[282px] py-3.5 px-4 bg-[#FFCA42] text-black font-montserrat rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors duration-200 text-xs mb-4"
+            className="font-semibold w-full py-3 px-4 bg-[#E6EFF9] text-gray-600 font-montserrat rounded-xl text-sm shadow shadow-black opacity-100 outline outline-2 outline-white"
           >
             LEAVE / CLAIM DAY OFF
           </button>
-
           <button
             onClick={handleHadir}
-            className="w-full max-w-[282px] py-3.5 px-4 font-montserrat rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-colors duration-200 text-xs bg-[#51A7D9] hover:bg-[#2F82B2] active:bg-[#2F82B2] text-white"
+            className="font-semibold w-full py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm shadow shadow-black opacity-100 outline outline-2 outline-white"
           >
             PRESENT
           </button>
+        </div>
 
-          {/* Modal Izin dengan animasi */}
-          {showIzinModal && (
+        {/* Modal */}
+        {showIzinModal && (
+          <div 
+            className={`fixed inset-0 bg-black transition-opacity duration-300 flex items-center justify-center p-4 z-50
+              ${showModalContent ? 'bg-opacity-50' : 'bg-opacity-0'}`}
+          >
             <div 
-              className={`fixed inset-0 bg-black transition-opacity duration-300 flex items-center justify-center p-4 z-50
-                ${showModalContent ? 'bg-opacity-50' : 'bg-opacity-0'}`}
+              className={`bg-white rounded-xl p-6 w-full max-w-[320px] mx-4 sm:mx-auto transform transition-all duration-300
+                ${showModalContent ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-full scale-150'}`}
             >
-              <div 
-                className={`bg-white rounded-xl p-6 w-full max-w-[320px] mx-4 sm:mx-auto transform transition-all duration-300
-                  ${showModalContent ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-full scale-150'}`}
-              >
-                <h2 className="font-bebas text-2xl mb-4 text-center">
+              <h2 className="font-bebas text-2xl mb-4 text-center">
                 REASON FOR LEAVE / DAY OFF
-                </h2>
-                <textarea
-                  value={alasanIzin}
-                  onChange={(e) => setAlasanIzin(e.target.value)}
-                  placeholder="Write your reason for leave/day off here..."
-                  className="w-full h-24 p-3 border border-gray-200 rounded-lg mb-4 font-montserrat text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleCloseModal}
-                    className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-montserrat rounded-xl text-xs hover:bg-gray-200 transition-colors"
-                  >
-                    CANCEL
-                  </button>
-                  <button
-                    onClick={handleSubmitIzin}
-                    className="flex-1 py-3 px-4 bg-[#51A7D9] text-white font-montserrat rounded-xl text-xs hover:bg-opacity-90 transition-colors"
-                  >
-                    SEND
-                  </button>
-                </div>
+              </h2>
+              <textarea
+                value={alasanIzin}
+                onChange={(e) => setAlasanIzin(e.target.value)}
+                placeholder="Write your reason for leave/day off here..."
+                className="w-full h-24 p-3 border border-gray-200 rounded-lg mb-4 font-montserrat text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCloseModal}
+                  className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-montserrat rounded-xl text-xs hover:bg-gray-200 transition-colors"
+                >
+                  CANCEL
+                </button>
+                <button
+                  onClick={handleSubmitIzin}
+                  className="flex-1 py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-xs hover:bg-opacity-90 transition-colors"
+                >
+                  SEND
+                </button>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

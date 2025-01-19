@@ -177,7 +177,7 @@ const Antrian = () => {
         </div>
 
         {/* Filter Section */}
-        <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex justify-between items-center max-w-[390px] md:max-w-none bg-white shadow-lg">
+        <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex justify-between items-center w-full md:max-w-none bg-white shadow-lg">
           <h1 className="text-2xl font-bebas">
             {" "}
             {estimasi === "sameDay"
@@ -194,8 +194,8 @@ const Antrian = () => {
                 onClick={() => handleFilterChange("cleaning")}
                 className={`ml-4 px-4 py-2 rounded-lg transition-all ${
                   selectedFilter === "cleaning"
-                    ? "bg-[#51A7D9] text-white"
-                    : "bg-gray-200 text-gray-700"
+                    ? " bg-[#57AEFF] text-white shadow shadow-current opacity-100 outline outline-2 outline-white"
+                    : " bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                 }`}
               >
                 Cleaning
@@ -211,8 +211,8 @@ const Antrian = () => {
                 onClick={() => handleFilterChange("repair")}
                 className={`ml-2 px-4 py-2 rounded-lg transition-all ${
                   selectedFilter === "repair"
-                    ? "bg-[#51A7D9] text-white"
-                    : "bg-gray-200 text-gray-700"
+                    ? " bg-[#57AEFF] text-white shadow shadow-current opacity-100 outline outline-2 outline-white"
+                    : " bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                 }`}
               >
                 Repair
@@ -236,7 +236,7 @@ const Antrian = () => {
               antrianTreatment.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-[#F4FBFF] rounded-2xl p-4 outline outline-2 outline-[#E3E3E3]"
+                  className="bg-[#E2F2FF] rounded-3xl p-4 shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
                 >
                   <div className="flex items-start gap-4">
                     <div 
@@ -282,7 +282,7 @@ const Antrian = () => {
                       </p>
                     </div>
                   </div>
-                  <button className="w-full h-[35px] mb-auto mt-4 bg-[#FFCA42] text-white rounded-xl flex items-center justify-center text-sm shadow-md font-bold">
+                  <button className="w-full h-[35px] mb-auto mt-4 rounded-xl flex items-center justify-center text-sm shadow-md font-semibold bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-2xl shadow-white opacity-100 outline outline-1 outline-white">
                     Mulai Treatment
                   </button>
                 </div>

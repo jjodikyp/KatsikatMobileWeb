@@ -22,10 +22,10 @@ const PilihRole = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF] font-montserrat p-10">
-      <div className="max-w-[390px] mx-auto pt-4">
+    <div className="min-h-[100dvh] flex flex-col justify-center items-center bg-white px-10 py-10">
+      <div className="w-full sm:w-[380px] p-6 sm:p-8 my-auto bg-white rounded-3xl shadow-2xl shadow-grey opacity-100 outline outline-2 outline-white">
         <h1 className="text-2xl font-bebas text-center mb-2">SELECT YOUR ROLE</h1>
-        <p className="text-center text-gray-600 mb-8 text-xs">
+        <p className="text-center text-gray-600 mb-8 text-sm font-montserrat">
           Please select a role according to your job position
         </p>
 
@@ -35,7 +35,7 @@ const PilihRole = () => {
             onClick={() => handleRoleSelect('teknisi')}
             className={`w-full p-3 rounded-xl border transition-all flex items-center gap-3 hover:shadow-md ${
               selectedRole === 'teknisi'
-                ? 'border-[#51A7D9] bg-gradient-to-r from-blue-50 to-white shadow-sm'
+                ? 'border-[#57AEFF] bg-gradient-to-r from-blue-50 to-white shadow-sm'
                 : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
             }`}
           >
@@ -45,7 +45,7 @@ const PilihRole = () => {
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={2}
-                stroke={selectedRole === 'teknisi' ? '#51A7D9' : 'currentColor'}
+                stroke={selectedRole === 'teknisi' ? '#57AEFF' : 'currentColor'}
                 className="w-4 h-4"
               >
                 <path
@@ -55,8 +55,8 @@ const PilihRole = () => {
                 />
               </svg>
             </div>
-            <div className="text-left">
-              <h3 className="font-semibold text-xs">Technician</h3>
+            <div className="text-left font-montserrat">
+              <h3 className="font-semibold text-sm">Technician</h3>
               <p className="text-[10px] text-gray-500">Role for service technician</p>
             </div>
           </button>
@@ -66,7 +66,7 @@ const PilihRole = () => {
             onClick={() => handleRoleSelect('kasir')}
             className={`w-full p-3 rounded-xl border transition-all flex items-center gap-3 hover:shadow-md ${
               selectedRole === 'kasir'
-                ? 'border-[#51A7D9] bg-gradient-to-r from-blue-50 to-white shadow-sm'
+                ? 'border-[#57AEFF] bg-gradient-to-r from-blue-50 to-white shadow-sm'
                 : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
             }`}
           >
@@ -76,7 +76,7 @@ const PilihRole = () => {
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={2}
-                stroke={selectedRole === 'kasir' ? '#51A7D9' : 'currentColor'}
+                stroke={selectedRole === 'kasir' ? '#57AEFF' : 'currentColor'}
                 className="w-4 h-4"
               >
                 <path
@@ -86,8 +86,8 @@ const PilihRole = () => {
                 />
               </svg>
             </div>
-            <div className="text-left">
-              <h3 className="font-semibold text-xs">Cashier</h3>
+            <div className="text-left font-montserrat">
+              <h3 className="font-semibold text-sm">Cashier</h3>
               <p className="text-[10px] text-gray-500">Role for cashier operations</p>
             </div>
           </button>
@@ -97,7 +97,7 @@ const PilihRole = () => {
             onClick={() => handleRoleSelect('kurir')}
             className={`w-full p-3 rounded-xl border transition-all flex items-center gap-3 hover:shadow-md ${
               selectedRole === 'kurir'
-                ? 'border-[#51A7D9] bg-gradient-to-r from-blue-50 to-white shadow-sm'
+                ? 'border-[#57AEFF] bg-gradient-to-r from-blue-50 to-white shadow-sm'
                 : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
             }`}
           >
@@ -107,7 +107,7 @@ const PilihRole = () => {
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={2}
-                stroke={selectedRole === 'kurir' ? '#51A7D9' : 'currentColor'}
+                stroke={selectedRole === 'kurir' ? '#57AEFF' : 'currentColor'}
                 className="w-4 h-4"
               >
                 <path
@@ -117,8 +117,8 @@ const PilihRole = () => {
                 />
               </svg>
             </div>
-            <div className="text-left">
-              <h3 className="font-semibold text-xs">Courier</h3>
+            <div className="text-left font-montserrat">
+              <h3 className="font-semibold text-sm">Courier</h3>
               <p className="text-[10px] text-gray-500">Role for delivery services</p>
             </div>
           </button>
@@ -126,7 +126,7 @@ const PilihRole = () => {
 
         <button
           onClick={handleContinue}
-          className="font-semibold mt-6 w-full py-3 px-4 bg-[#51A7D9] hover:bg-[#2F82B2] active:bg-[#2F82B2] text-white font-montserrat rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-colors duration-200 text-xs"
+          className="w-full py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm font-semibold hover:bg-opacity-90 transition-colors shadow-2xl shadow-white opacity-100 outline outline-1 outline-white mt-6"
         >
           Continue
         </button>

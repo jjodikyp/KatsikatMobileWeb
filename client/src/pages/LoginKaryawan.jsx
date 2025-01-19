@@ -57,7 +57,7 @@ const LoginKaryawan = () => {
 
   return (
     <div className="h-[100dvh] flex flex-col justify-center items-center bg-white px-10 sm:px-0 overflow-y-auto">
-      <div className="w-full sm:w-[380px] p-6 sm:p-8 bg-gray-50 rounded-3xl shadow-lg my-auto">
+      <div className="w-full sm:w-[380px] p-6 sm:p-8 my-auto bg-white rounded-3xl p-4 shadow-2xl shadow-grey opacity-100 outline outline-2 outline-white">
         <div className="text-center mb-6">
           <h2 className="text-2xl sm:text-3xl font-bebas font-normal text-gray-800 tracking-wide">
           LOGIN AS EMPLOYEE
@@ -82,7 +82,7 @@ const LoginKaryawan = () => {
               type="email"
               name="email"
               id="email"
-              className="block w-full pl-12 pr-3 py-3 sm:py-3.5 border border-gray-200 rounded-xl bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base font-montserrat"
+              className="block w-full pl-12 pr-3 py-3 sm:py-3.5 border border-gray-200 rounded-xl bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base placeholder:text-sm font-montserrat"
               placeholder="Enter Email"
               value={formData.email}
               onChange={handleChange}
@@ -112,7 +112,7 @@ const LoginKaryawan = () => {
               type="password"
               name="password"
               id="password"
-              className="block w-full pl-12 pr-3 py-3 sm:py-3.5 border border-gray-200 rounded-xl bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base font-montserrat"
+              className="placeholder:text-sm block w-full pl-12 pr-3 py-3 sm:py-3.5 border border-gray-200 rounded-xl bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base font-montserrat"
               placeholder="Enter Password"
               value={formData.password}
               onChange={handleChange}
@@ -123,9 +123,9 @@ const LoginKaryawan = () => {
 
           <button
             type="submit"
-            className="w-full py-3 sm:py-3.5 px-4 mt-2 bg-[#51A7D9] hover:bg-[#2F82B2] active:bg-[#2F82B2] text-white font-montserrat rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-colors duration-200 text-sm sm:text-base"
+            className="w-full h-[40px] py-3 sm:py-3.5 px-4 mt-2 bg-[#57AEFF] text-white rounded-xl shadow-2xl shadow-white opacity-100 outline outline-1 outline-white font-montserrat font-semibold flex items-center justify-center"
           >
-            Masuk
+            Login
           </button>
         </form>
       </div>

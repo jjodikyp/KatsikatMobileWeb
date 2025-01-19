@@ -45,7 +45,7 @@ const Header = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowLogoutModal(true)}
-                className="w-[41px] h-[41px] rounded-full flex items-center justify-center bg-[#FD8087] transition-all"
+                className="w-[41px] h-[41px] rounded-full flex items-center justify-center bg-[#FD8087] transition-all shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -83,8 +83,8 @@ const Header = () => {
             </div>
 
             {/* User Name */}
-            <div className="bg-[#F0F0F0] px-4 py-2 rounded-full">
-              <span className="font-bebas text-xl text-[#383838]">
+            <div className="bg-[#57AEFF] px-4 py-2 rounded-full shadow-2xl shadow-white opacity-100 outline outline-1 outline-white">
+              <span className="font-bebas text-xl text-white">
                 {userData?.name 
                   ? userData.name.split(' ').slice(0, 2).join(' ')
                   : "Guest"

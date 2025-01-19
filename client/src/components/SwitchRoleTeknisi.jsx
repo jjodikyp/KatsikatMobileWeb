@@ -36,7 +36,7 @@ const SwitchRoleTeknisi = () => {
         {/* Kurir Button */}
         <button
           onClick={handleSwitchToKurir}
-          className="flex-1 bg-black hover:bg-opacity-90 text-white py-2 px-4 rounded-full flex items-center justify-center gap-2 transition-all"
+          className="flex-1 bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white py-2 px-4 rounded-full flex items-center justify-center gap-2 transition-all"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -58,7 +58,7 @@ const SwitchRoleTeknisi = () => {
         {/* Kasir Button */}
         <button
           onClick={handleSwitchToKasir}
-          className="flex-1 bg-black hover:bg-opacity-90 text-white py-2 px-4 rounded-full flex items-center justify-center gap-2 transition-all"
+          className="flex-1 bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white py-2 px-4 rounded-full flex items-center justify-center gap-2 transition-all"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

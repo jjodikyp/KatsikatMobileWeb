@@ -118,7 +118,7 @@ const BerandaKurir = () => {
   }, []);
 
   return (
-    <div className="h-screen overflow-y-auto bg-[#FFFFFF] font-montserrat">
+    <div className="h-screen overflow-y-auto bg-[#E6EFF9] font-montserrat">
       <Header />
       
       {/* Main Content */}
@@ -129,7 +129,7 @@ const BerandaKurir = () => {
           <BreakTimeAlert />
           
           {/* Date Range Picker */}
-          <div className="mb-2 bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-4">
+          <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-2xl mt-4 shadow-white opacity-100 outline outline-1 outline-white">
             <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
             <div className="grid grid-cols-2 gap-4 font-montserrat">
               <div>
@@ -142,7 +142,7 @@ const BerandaKurir = () => {
                   value={dateRange.startDate}
                   onChange={handleDateInputChange}
                   max={dateRange.endDate}
-                  className="w-full p-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
                 />
               </div>
               <div>
@@ -155,40 +155,72 @@ const BerandaKurir = () => {
                   value={dateRange.endDate}
                   onChange={handleDateInputChange}
                   min={dateRange.startDate}
-                  className="w-full p-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
                 />
               </div>
             </div>
           </div>
 
           {/* Detail Antrian Card */}
-          <div className="bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-4 mb-2">
-            <h2 className="text-2xl font-bebas mb-2">Detail Antrian Transport</h2>
+          <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-2xl mt-4 shadow-white opacity-100 outline outline-1 outline-white">
+            <h2 className="text-2xl font-bebas mb-2">Delivery Queue Details</h2>
             <div className="grid grid-cols-2 gap-2 font-['Montserrat']">
               <div
                 className={`${
                   selectedEstimasi === "pickup"
-                    ? "bg-[#51A7D9] text-white"
-                    : "bg-[#E2E2E3] text-gray-600"
+                    ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
+                    : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                 onClick={() => filterTransport("pickup")}
               >
-                <h3 className={selectedEstimasi === "pickup" ? "text-white" : "text-gray-600"}>
-                  Pick Up
-                </h3>
+                <div className="flex items-center gap-2 mb-1">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    strokeWidth={1.5} 
+                    stroke="currentColor" 
+                    className="w-5 h-5"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0l-3-3m3 3l3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" 
+                    />
+                  </svg>
+                  <h3 className={selectedEstimasi === "pickup" ? "text-white" : "text-gray-600"}>
+                    Pick Up
+                  </h3>
+                </div>
                 <p className="text-3xl font-bold">{antrianData?.pickup || 0}</p>
               </div>
               <div
                 className={`${
                   selectedEstimasi === "delivery"
-                    ? "bg-[#51A7D9] text-white"
-                    : "bg-[#E2E2E3] text-gray-600"
+                    ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
+                    : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                 onClick={() => filterTransport("delivery")}
               >
-                <h3 className={selectedEstimasi === "delivery" ? "text-white" : "text-gray-600"}>
-                  Delivery
-                </h3>
+                <div className="flex items-center gap-2 mb-1">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    strokeWidth={1.5} 
+                    stroke="currentColor" 
+                    className="w-5 h-5"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" 
+                    />
+                  </svg>
+                  <h3 className={selectedEstimasi === "delivery" ? "text-white" : "text-gray-600"}>
+                    Delivery
+                  </h3>
+                </div>
                 <p className="text-3xl font-bold">{antrianData?.delivery || 0}</p>
               </div>
             </div>
@@ -203,9 +235,9 @@ const BerandaKurir = () => {
                   },
                 })
               }
-              className="shadow-xl text-sm w-full h-[35px] mt-4 py-3 bg-[#FFCA42] text-white rounded-xl hover:bg-opacity-90 transition-all font-montserrat flex items-center justify-center font-bold"
+              className="shadow-xl shadow-white opacity-100 outline outline-1 outline-white text-sm w-full h-[35px] mt-4 py-3 bg-[#AED6FA] text-white rounded-xl hover:bg-opacity-90 transition-al font-montserrat flex items-center justify-center font-bold"
             >
-              Buka Antrian
+              Open Queue
             </button>
           </div>
         </div>

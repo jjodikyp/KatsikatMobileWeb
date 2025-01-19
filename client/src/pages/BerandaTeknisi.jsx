@@ -521,7 +521,7 @@ const BerandaTeknisi = () => {
   }, []);
 
   return (
-    <div className="h-screen overflow-y-auto bg-[#FFFFFF] font-montserrat">
+    <div className="h-screen overflow-y-auto bg-[#E6EFF9] font-montserrat">
       <Header />
       
       {/* Main Content */}
@@ -532,7 +532,7 @@ const BerandaTeknisi = () => {
           <BreakTimeAlert />
           
           {/* Date Range Picker */}
-          <div className="mb-2 bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-4">
+          <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-2xl mt-4 shadow-white opacity-100 outline outline-1 outline-white">
             <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
             <div className="grid grid-cols-2 gap-4 font-montserrat">
               <div>
@@ -545,7 +545,7 @@ const BerandaTeknisi = () => {
                   value={dateRange.startDate}
                   onChange={handleDateInputChange}
                   max={dateRange.endDate}
-                  className="w-full p-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
                 />
               </div>
               <div>
@@ -558,21 +558,21 @@ const BerandaTeknisi = () => {
                   value={dateRange.endDate}
                   onChange={handleDateInputChange}
                   min={dateRange.startDate}
-                  className="w-full p-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  className="bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
                 />
               </div>
-            </div>
+            </div>  
           </div>
 
           {/* Detail Antrian Card dengan Button Buka Antrian */}
-          <div className="bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-4 mb-2">
+          <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-2xl mt-4 shadow-white opacity-100 outline outline-1 outline-white">
             <h2 className="text-2xl font-bebas mb-2">Detail Antrian Treatment</h2>
             <div className="grid grid-cols-3 gap-2 font-['Montserrat']">
               <div
                 className={`${
                   selectedEstimasi === "reguler"
-                    ? "bg-[#51A7D9] text-white"
-                    : "bg-[#E2E2E3] text-gray-600"
+                    ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
+                    : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                 onClick={() => setSelectedEstimasi("reguler")}
               >
@@ -592,8 +592,8 @@ const BerandaTeknisi = () => {
               <div
                 className={`${
                   selectedEstimasi === "sameDay"
-                    ? "bg-[#51A7D9] text-white"
-                    : "bg-[#E2E2E3] text-gray-600"
+                    ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
+                    : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                 onClick={() => setSelectedEstimasi("sameDay")}
               >
@@ -613,8 +613,8 @@ const BerandaTeknisi = () => {
               <div
                 className={`${
                   selectedEstimasi === "nextDay"
-                    ? "bg-[#51A7D9] text-white"
-                    : "bg-[#E2E2E3] text-gray-600"
+                    ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
+                    : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                 onClick={() => setSelectedEstimasi("nextDay")}
               >
@@ -643,7 +643,7 @@ const BerandaTeknisi = () => {
                   },
                 })
               }
-              className="shadow-xl text-sm w-full h-[35px] mt-4 py-3 bg-[#FFCA42] text-white rounded-xl hover:bg-opacity-90 transition-al font-montserrat flex items-center justify-center font-bold"
+              className="shadow-xl shadow-white opacity-100 outline outline-1 outline-white text-sm w-full h-[35px] mt-4 py-3 bg-[#AED6FA] text-white rounded-xl hover:bg-opacity-90 transition-al font-montserrat flex items-center justify-center font-bold"
             >
               Buka Antrian
             </button>

@@ -40,7 +40,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
         ${showOverlay ? 'bg-opacity-50' : 'bg-opacity-0'}`}
     >
       <div 
-        className={`bg-white rounded-2xl p-6 w-[90%] max-w-md transform transition-all duration-300
+        className={`bg-[#E2F2FF] rounded-3xl p-4 shadow-sm shadow-white opacity-100 outline outline-2 outline-white rounded-2xl p-6 w-[90%] max-w-md transform transition-all duration-300
           ${showModal ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-full scale-150'}`}
       >
         <h3 className="text-2xl font-bebas mb-4">{title}</h3>
@@ -48,13 +48,13 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all font-montserrat"
+            className="px-4 py-2 rounded-lg bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white transition-all font-montserrat"
           >
             Batal
           </button>
           <button
             onClick={handleConfirm}
-            className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-all font-montserrat"
+            className="px-4 py-2 rounded-lg bg-[#57AEFF] text-white shadow shadow-current opacity-100 outline outline-2 outline-white transition-all font-montserrat"
           >
             Ya
           </button>

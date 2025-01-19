@@ -16,38 +16,32 @@ const LoginSuccess = () => {
   };
 
   return (
-    <div className="h-[100dvh] flex flex-col justify-center items-center bg-white px-10 sm:px-0">
-      <div className="w-full sm:w-[380px] p-6 sm:p-8 flex flex-col items-center">
+    <div className="min-h-[100dvh] flex flex-col justify-center items-center bg-white px-10 sm:px-0">
+      <div className="w-full sm:w-[380px] p-8 sm:p-8 my-auto bg-white rounded-3xl shadow-2xl shadow-grey opacity-100 outline outline-2 outline-white">
         {/* Illustration */}
-        <img 
-          src={loginDone} 
-          alt="Login Success" 
-          className="w-[130px] h-auto mb-8 animate-scale"
-        />
+        <div className="flex justify-center mb-6">
+          <img 
+            src={loginDone} 
+            alt="Login Success" 
+            className="w-[100px] h-auto animate-scale"
+          />
+        </div>
 
         {/* Success Message */}
         <h1 className="font-bebas text-2xl text-gray-800 tracking-wide text-center mb-3">
-        ATTENDANCE SUCCESS
+          ATTENDANCE SUCCESS
         </h1>
 
         {/* Welcome Message */}
-        <p className="font-montserrat text-xs text-gray-600 text-center mb-8">
-        Have a great day! Stay focused and give your best!
+        <p className="font-montserrat text-sm text-gray-600 text-center mb-8">
+          Have a great day! Stay focused and give your best!
         </p>
-
-        {/* Treatment Info */}
-        <div className="w-full rounded-xl border border-gray-200 py-4 px-6 mb-6">
-          <p className="font-montserrat text-xs text-center text-gray-800">
-            Anda perlu menyelesaikan {treatmentData.count} treatment yang belum selesai sejak{' '}
-            <span className="font-semibold">{treatmentData.date}</span>
-          </p>
-        </div>
 
         {/* Continue Button */}
         <button
           type="button"
           onClick={handleContinue}
-          className="w-full py-3.5 px-4 bg-[#51A7D9] hover:bg-[#2F82B2] active:bg-[#2F82B2] text-white font-montserrat rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-colors duration-200 text-xs"
+          className="h-[40px] w-full py-3.5 px-4 shadow-xl shadow-white opacity-100 outline outline-1 outline-white text-sm bg-[#AED6FA] text-white rounded-xl font-montserrat flex items-center justify-center font-semibold"
         >
           Continue
         </button>
