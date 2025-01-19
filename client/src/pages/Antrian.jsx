@@ -228,7 +228,7 @@ const Antrian = () => {
       </header>
 
       {/* Main Content - Dengan padding top yang disesuaikan */}
-      <main className="mx-auto px-4 md:px-10 pt-[170px] pb-6">
+      <main className="mx-auto px-4 md:px-10 pt-[170px] pb-24">
         <div className="max-w-[390px] md:max-w-none mx-auto">
           {/* Treatment Cards Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

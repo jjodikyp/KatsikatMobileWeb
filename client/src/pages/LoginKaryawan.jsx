@@ -60,10 +60,10 @@ const LoginKaryawan = () => {
       <div className="w-full sm:w-[380px] p-6 sm:p-8 bg-gray-50 rounded-3xl shadow-lg my-auto">
         <div className="text-center mb-6">
           <h2 className="text-2xl sm:text-3xl font-bebas font-normal text-gray-800 tracking-wide">
-            MASUK SEBAGAI KARYAWAN
+          LOGIN AS EMPLOYEE
           </h2>
           <p className="mt-2 text-xs text-gray-600 px-1 font-montserrat">
-            Silahkan masukan data dibawah untuk masuk akun anda!
+          Please enter your data below to access your account!
           </p>
         </div>
 
@@ -83,7 +83,7 @@ const LoginKaryawan = () => {
               name="email"
               id="email"
               className="block w-full pl-12 pr-3 py-3 sm:py-3.5 border border-gray-200 rounded-xl bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base font-montserrat"
-              placeholder="Masukan email"
+              placeholder="Enter Email"
               value={formData.email}
               onChange={handleChange}
               required
@@ -113,7 +113,7 @@ const LoginKaryawan = () => {
               name="password"
               id="password"
               className="block w-full pl-12 pr-3 py-3 sm:py-3.5 border border-gray-200 rounded-xl bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base font-montserrat"
-              placeholder="Masukan Password"
+              placeholder="Enter Password"
               value={formData.password}
               onChange={handleChange}
               required

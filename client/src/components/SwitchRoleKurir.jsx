@@ -21,7 +21,7 @@ const SwitchRoleKurir = () => {
   };
 
   const handleTeknisiConfirm = () => {
-    navigate("/beranda");
+    navigate("/berandateknisi");
     setShowSwitchTeknisiModal(false);
   };
 

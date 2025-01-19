@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Header from "../components/Header";
 import SwitchRoleKurir from '../components/SwitchRoleKurir';
+import WorkTimeAlert from '../components/WorkTimeAlert';
+import BreakTimeAlert from '../components/BreakTimeAlert';
 
 const BerandaKurir = () => {
   const navigate = useNavigate();
@@ -123,9 +125,11 @@ const BerandaKurir = () => {
       <main className="mx-auto px-4 md:px-10 pt-20 pb-6 min-h-screen">
         <div className="max-w-[390px] md:max-w-none mx-auto">
           <SwitchRoleKurir />
+          <WorkTimeAlert />
+          <BreakTimeAlert />
           
           {/* Date Range Picker */}
-          <div className="mb-4 bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-10">
+          <div className="mb-2 bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-4">
             <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
             <div className="grid grid-cols-2 gap-4 font-montserrat">
               <div>
@@ -158,8 +162,8 @@ const BerandaKurir = () => {
           </div>
 
           {/* Detail Antrian Card */}
-          <div className="bg-[#F0F0F0] rounded-3xl p-4 shadow-sm">
-            <h2 className="text-2xl font-bebas mb-2">Detail Antrian</h2>
+          <div className="bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-4 mb-2">
+            <h2 className="text-2xl font-bebas mb-2">Detail Antrian Transport</h2>
             <div className="grid grid-cols-2 gap-2 font-['Montserrat']">
               <div
                 className={`${

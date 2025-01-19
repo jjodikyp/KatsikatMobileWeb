@@ -241,10 +241,10 @@ const Absensi = () => {
         <div className="w-full max-w-[282px] flex flex-col items-center">
           {/* Title */}
           <h1 className="font-bebas text-2xl text-gray-800 tracking-wide text-center mb-3">
-            SILAHKAN MELAKUKAN ABSENSI
+          PLEASE TAKE YOUR ATTENDANCE
           </h1>
           <p className="font-montserrat text-xs text-gray-800 tracking-wide text-center mb-3">
-            Pastikan Anda berada di dalam radius 10 meter dari outlet dan melakukan absensi pada jam yang ditentukan!
+          Make sure you are within 10 meters radius from the outlet and take attendance at the specified time!
           </p>
 
           {/* Tambahkan gambar absen di sini */}
@@ -270,14 +270,14 @@ const Absensi = () => {
             onClick={() => setShowIzinModal(true)}
             className="w-full max-w-[282px] py-3.5 px-4 bg-[#FFCA42] text-black font-montserrat rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors duration-200 text-xs mb-4"
           >
-            IZIN / CLAIM LIBUR
+            LEAVE / CLAIM DAY OFF
           </button>
 
           <button
             onClick={handleHadir}
             className="w-full max-w-[282px] py-3.5 px-4 font-montserrat rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-colors duration-200 text-xs bg-[#51A7D9] hover:bg-[#2F82B2] active:bg-[#2F82B2] text-white"
           >
-            HADIR
+            PRESENT
           </button>
 
           {/* Modal Izin dengan animasi */}
@@ -291,12 +291,12 @@ const Absensi = () => {
                   ${showModalContent ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-full scale-150'}`}
               >
                 <h2 className="font-bebas text-2xl mb-4 text-center">
-                  ALASAN IZIN / LIBUR
+                REASON FOR LEAVE / DAY OFF
                 </h2>
                 <textarea
                   value={alasanIzin}
                   onChange={(e) => setAlasanIzin(e.target.value)}
-                  placeholder="Tuliskan alasan izin/libur Anda di sini..."
+                  placeholder="Write your reason for leave/day off here..."
                   className="w-full h-24 p-3 border border-gray-200 rounded-lg mb-4 font-montserrat text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
                 <div className="flex gap-3">
@@ -304,13 +304,13 @@ const Absensi = () => {
                     onClick={handleCloseModal}
                     className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-montserrat rounded-xl text-xs hover:bg-gray-200 transition-colors"
                   >
-                    BATAL
+                    CANCEL
                   </button>
                   <button
                     onClick={handleSubmitIzin}
                     className="flex-1 py-3 px-4 bg-[#51A7D9] text-white font-montserrat rounded-xl text-xs hover:bg-opacity-90 transition-colors"
                   >
-                    KIRIM
+                    SEND
                   </button>
                 </div>
               </div>

@@ -12,7 +12,7 @@ const LoginSuccess = () => {
   };
 
   const handleContinue = () => {
-    navigate('/beranda');
+    navigate('/pilih-role');
   };
 
   return (
@@ -26,13 +26,13 @@ const LoginSuccess = () => {
         />
 
         {/* Success Message */}
-        <h1 className="font-bebas text-[23px] text-gray-800 tracking-wide text-center mb-3">
-          ANDA BERHASIL ABSEN
+        <h1 className="font-bebas text-2xl text-gray-800 tracking-wide text-center mb-3">
+        ATTENDANCE SUCCESS
         </h1>
 
         {/* Welcome Message */}
         <p className="font-montserrat text-xs text-gray-600 text-center mb-8">
-          Selamat bekerja! Fokus dalam bekerja dan berikan yang terbaik!
+        Have a great day! Stay focused and give your best!
         </p>
 
         {/* Treatment Info */}
@@ -49,7 +49,7 @@ const LoginSuccess = () => {
           onClick={handleContinue}
           className="w-full py-3.5 px-4 bg-[#51A7D9] hover:bg-[#2F82B2] active:bg-[#2F82B2] text-white font-montserrat rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition-colors duration-200 text-xs"
         >
-          Lanjutkan
+          Continue
         </button>
       </div>
     </div>

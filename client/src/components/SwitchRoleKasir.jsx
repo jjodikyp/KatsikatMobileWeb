@@ -21,7 +21,7 @@ const SwitchRoleKasir = () => {
   };
 
   const handleTeknisiConfirm = () => {
-    navigate("/beranda");
+    navigate("/berandateknisi");
     setShowSwitchRoleModal(false);
   };
 

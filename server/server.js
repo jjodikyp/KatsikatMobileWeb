@@ -7,9 +7,9 @@ const path = require("path");
 const sequelize = require("./src/config/database");
 const routes = require("./src/routes");
 const allowedOrigins = [
-  "http://192.168.18.182:5173",
+  "http://192.168.18.223:5173",
   "http://localhost:5173",
-  "http://192.168.18.182:3002",
+  "http://192.168.18.223:3002",
   "capacitor://localhost",
   "http://localhost",
 ];

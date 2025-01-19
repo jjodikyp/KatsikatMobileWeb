@@ -14,8 +14,10 @@ import {
 import ConfirmationModal from "../components/ConfirmationModal";
 import Header from "../components/Header";
 import SwitchRoleTeknisi from '../components/SwitchRoleTeknisi';
+import WorkTimeAlert from '../components/WorkTimeAlert';
+import BreakTimeAlert from '../components/BreakTimeAlert';
 
-const Beranda = () => {
+const BerandaTeknisi = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [selectedEstimasi, setSelectedEstimasi] = useState("reguler");
@@ -498,52 +500,6 @@ const Beranda = () => {
     setShowSwitchRoleModal(false);
   };
 
-  // Fungsi untuk mengecek jam kerja
-  const checkWorkHours = () => {
-    const workStartTime = localStorage.getItem("workStartTime");
-    if (!workStartTime) return;
-
-    const startTime = parseISO(workStartTime);
-    const now = new Date();
-
-    const hoursWorked = differenceInHours(now, startTime);
-    const minutesWorked = differenceInMinutes(now, startTime) % 60; // Mendapatkan sisa menit
-    const secondsWorked = differenceInSeconds(now, startTime) % 60; // Mendapatkan sisa detik
-
-    setWorkDuration({
-      hours: hoursWorked,
-      minutes: minutesWorked,
-      seconds: secondsWorked,
-    });
-
-    // Cek jika sudah bekerja lebih dari 8 jam
-    if (hoursWorked >= 8) {
-      setShowOvertimeWarning(true);
-
-      // Cek apakah masih bisa ambil lembur (antara 8 jam dan 8 jam 30 menit)
-      const totalMinutesWorked = differenceInMinutes(now, startTime);
-      const canTake = totalMinutesWorked <= 8 * 60 + 30; // 8 jam 30 menit dalam menit
-      setCanTakeOvertime(canTake);
-    }
-  };
-
-  // Fungsi untuk menangani klik tombol ambil lembur
-  const handleTakeOvertime = () => {
-    setShowOvertimeWarning(false);
-
-    // Set timeout untuk menampilkan peringatan lagi setelah 1 jam
-    setTimeout(() => {
-      setShowOvertimeWarning(true);
-    }, 60 * 60 * 1000); // 1 jam dalam milidetik
-  };
-
-  // Cek jam kerja setiap detik
-  useEffect(() => {
-    checkWorkHours();
-    const interval = setInterval(checkWorkHours, 1000); // Update setiap detik
-    return () => clearInterval(interval);
-  }, []);
-
   // Tambahkan fungsi untuk update waktu
   const updateTime = () => {
     const now = new Date();
@@ -564,8 +520,6 @@ const Beranda = () => {
     return () => clearInterval(interval);
   }, []);
 
-  
-
   return (
     <div className="h-screen overflow-y-auto bg-[#FFFFFF] font-montserrat">
       <Header />
@@ -574,75 +528,11 @@ const Beranda = () => {
       <main className="mx-auto px-4 md:px-10 pt-20 pb-6 min-h-screen">
         <div className="max-w-[390px] md:max-w-none mx-auto">
           <SwitchRoleTeknisi />
+          <WorkTimeAlert />
+          <BreakTimeAlert />
           
-          {/* Peringatan Jam Kerja */}
-          {showOvertimeWarning && (
-            <div className="mb-4 bg-red-100 border border-red-400 rounded-3xl p-4 shadow-sm">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-2xl font-bebas text-red-700">
-                    Peringatan Jam Kerja
-                  </h2>
-                  <p className="text-red-600 text-sm">
-                    Anda telah bekerja lebih dari 8 jam. Total jam kerja, {workDuration.hours} Jam,{" "}
-                    {workDuration.minutes} Menit, dan {workDuration.seconds}{" "}
-                    Detik. Silakan Absen Selesai!
-                  </p>
-                </div>
-                {canTakeOvertime && (
-                  <button
-                    onClick={handleTakeOvertime}
-                    className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600 transition-colors"
-                  >
-                    Ambil Lembur
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Peringatan Waktu Istirahat */}
-          {showBreakWarning && (
-            <div className="mb-4 bg-yellow-100 border border-yellow-400 rounded-3xl p-4 shadow-sm">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-2xl font-bebas text-yellow-700">
-                    Waktu Istirahat Akan Tiba
-                  </h2>
-                  <p className="text-yellow-600 text-sm">
-                    Waktu istirahat akan dimulai dalam:
-                  </p>
-                  <p className="text-yellow-600 text-sm mt-1">
-                    {breakCountdown.hours} Jam, {breakCountdown.minutes} Menit,
-                    dan {breakCountdown.seconds} Detik
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Peringatan Kembali Kerja */}
-          {showReturnWarning && (
-            <div className="mb-4 bg-green-100 border border-green-400 rounded-3xl p-4 shadow-sm">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-2xl font-bebas text-green-700">
-                    Waktu Istirahat
-                  </h2>
-                  <p className="text-green-600 text-sm">
-                    Waktu kembali bekerja dalam:
-                  </p>
-                  <p className="text-green-600 text-sm mt-1">
-                    {returnCountdown.hours} Jam, {returnCountdown.minutes}{" "}
-                    Menit, dan {returnCountdown.seconds} Detik
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Date Range Picker */}
-          <div className="mb-4 bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-10">
+          <div className="mb-2 bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-4">
             <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
             <div className="grid grid-cols-2 gap-4 font-montserrat">
               <div>
@@ -675,8 +565,8 @@ const Beranda = () => {
           </div>
 
           {/* Detail Antrian Card dengan Button Buka Antrian */}
-          <div className="bg-[#F0F0F0] rounded-3xl p-4 shadow-sm">
-            <h2 className="text-2xl font-bebas mb-2">Detail Antrian</h2>
+          <div className="bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-4 mb-2">
+            <h2 className="text-2xl font-bebas mb-2">Detail Antrian Treatment</h2>
             <div className="grid grid-cols-3 gap-2 font-['Montserrat']">
               <div
                 className={`${
@@ -780,4 +670,4 @@ const Beranda = () => {
   );
 };
 
-export default Beranda;
+export default BerandaTeknisi;
