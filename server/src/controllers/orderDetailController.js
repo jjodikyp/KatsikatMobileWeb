@@ -12,13 +12,14 @@ const orderDetailController = {
   getByProcessTimeAndDateRange: async (req, res) => {
     try {
       const { processTime } = req.params;
-      const { startDate, endDate, serviceType } = req.query;
+      const { startDate, endDate, serviceType, searchQuery } = req.query;
 
       console.log("Received request:", {
         processTime,
         startDate,
         endDate,
         serviceType,
+        searchQuery
       });
 
       // Definisikan ID treatment untuk masing-masing kategori
@@ -49,19 +50,31 @@ const orderDetailController = {
                 model: Customer,
                 as: "customer",
                 attributes: ["name"],
+                where: searchQuery ? {
+                  name: {
+                    [Op.like]: `%${searchQuery}%`
+                  }
+                } : {}
               },
             ],
           },
           {
             model: Treatment,
             as: "treatment",
-            where: serviceType
-              ? {
+            where: {
+              [Op.and]: [
+                serviceType ? {
                   id: {
                     [Op.in]: treatmentCategories[serviceType],
-                  },
-                }
-              : {},
+                  }
+                } : {},
+                searchQuery ? {
+                  name: {
+                    [Op.like]: `%${searchQuery}%`
+                  }
+                } : {}
+              ]
+            },
             attributes: ["id", "name", "type_service"],
           },
           {
@@ -105,6 +118,7 @@ const orderDetailController = {
           filters: {
             processTime,
             serviceType,
+            searchQuery,
             treatmentIds: serviceType ? treatmentCategories[serviceType] : null,
             dateRange: {
               start: startDate,
