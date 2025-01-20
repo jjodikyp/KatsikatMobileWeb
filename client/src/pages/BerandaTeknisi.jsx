@@ -521,132 +521,134 @@ const BerandaTeknisi = () => {
   }, []);
 
   return (
-    <div className="h-screen overflow-y-auto bg-[#E6EFF9] font-montserrat">
+    <div className="h-[100dvh] flex flex-col overflow-hidden bg-[#E6EFF9] font-montserrat">
       <Header />
       
-      {/* Main Content */}
-      <main className="mx-auto px-4 md:px-10 pt-20 pb-6 min-h-screen">
-        <div className="max-w-[390px] md:max-w-none mx-auto">
-          <SwitchRoleTeknisi />
-          <WorkTimeAlert />
-          <BreakTimeAlert />
-          
-          {/* Date Range Picker */}
-          <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-2xl mt-4 shadow-white opacity-100 outline outline-1 outline-white">
-            <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
-            <div className="grid grid-cols-2 gap-4 font-montserrat">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Dari Tanggal
-                </label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={dateRange.startDate}
-                  onChange={handleDateInputChange}
-                  max={dateRange.endDate}
-                  className="bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Sampai Tanggal
-                </label>
-                <input
-                  type="date"
-                  name="endDate"
-                  value={dateRange.endDate}
-                  onChange={handleDateInputChange}
-                  min={dateRange.startDate}
-                  className="bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
-                />
-              </div>
-            </div>  
-          </div>
-
-          {/* Detail Antrian Card dengan Button Buka Antrian */}
-          <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-2xl mt-4 shadow-white opacity-100 outline outline-1 outline-white">
-            <h2 className="text-2xl font-bebas mb-2">Detail Antrian Treatment</h2>
-            <div className="grid grid-cols-3 gap-2 font-['Montserrat']">
-              <div
-                className={`${
-                  selectedEstimasi === "reguler"
-                    ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
-                    : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
-                } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                onClick={() => setSelectedEstimasi("reguler")}
-              >
-                <h3
-                  className={
-                    selectedEstimasi === "reguler"
-                      ? "text-white"
-                      : "text-gray-600"
-                  }
-                >
-                  Reguler
-                </h3>
-                <p className="text-3xl font-bold">
-                  {antrianData?.reguler || 0}
-                </p>
-              </div>
-              <div
-                className={`${
-                  selectedEstimasi === "sameDay"
-                    ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
-                    : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
-                } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                onClick={() => setSelectedEstimasi("sameDay")}
-              >
-                <h3
-                  className={
-                    selectedEstimasi === "sameDay"
-                      ? "text-white"
-                      : "text-gray-600"
-                  }
-                >
-                  Same Day
-                </h3>
-                <p className="text-3xl font-bold">
-                  {antrianData?.sameDay || 0}
-                </p>
-              </div>
-              <div
-                className={`${
-                  selectedEstimasi === "nextDay"
-                    ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
-                    : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
-                } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                onClick={() => setSelectedEstimasi("nextDay")}
-              >
-                <h3
-                  className={
-                    selectedEstimasi === "nextDay"
-                      ? "text-white"
-                      : "text-gray-600"
-                  }
-                >
-                  Next Day
-                </h3>
-                <p className="text-3xl font-bold">
-                  {antrianData?.nextDay || 0}
-                </p>
-              </div>
+      {/* Main Content dengan overflow scroll */}
+      <main className="flex-1 overflow-y-auto pb-10">
+        <div className="mx-auto px-4 md:px-10 pt-20 pb-6">
+          <div className="max-w-[390px] md:max-w-none mx-auto">
+            <SwitchRoleTeknisi />
+            <WorkTimeAlert />
+            <BreakTimeAlert />
+            
+            {/* Date Range Picker */}
+            <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
+              <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
+              <div className="grid grid-cols-2 gap-4 font-montserrat">
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Dari Tanggal
+                  </label>
+                  <input
+                    type="date"
+                    name="startDate"
+                    value={dateRange.startDate}
+                    onChange={handleDateInputChange}
+                    max={dateRange.endDate}
+                    className="bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Sampai Tanggal
+                  </label>
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={dateRange.endDate}
+                    onChange={handleDateInputChange}
+                    min={dateRange.startDate}
+                    className="bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
+                  />
+                </div>
+              </div>  
             </div>
 
-            {/* Button Buka Antrian */}
-            <button
-              onClick={() =>
-                navigate(`/antrian/${selectedEstimasi}`, {
-                  state: {
-                    dateRange,
-                    estimasi: selectedEstimasi,
-                  },
-                })
-              }
-              className="shadow-xl shadow-white opacity-100 outline outline-1 outline-white text-sm w-full h-[35px] mt-4 py-3 bg-[#AED6FA] text-white rounded-xl hover:bg-opacity-90 transition-al font-montserrat flex items-center justify-center font-bold"
-            >
-              Buka Antrian
-            </button>
+            {/* Detail Antrian Card dengan Button Buka Antrian */}
+            <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
+              <h2 className="text-2xl font-bebas mb-2">Detail Antrian Treatment</h2>
+              <div className="grid grid-cols-3 gap-2 font-['Montserrat']">
+                <div
+                  className={`${
+                    selectedEstimasi === "reguler"
+                      ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
+                      : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                  } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
+                  onClick={() => setSelectedEstimasi("reguler")}
+                >
+                  <h3
+                    className={
+                      selectedEstimasi === "reguler"
+                        ? "text-white"
+                        : "text-gray-600"
+                    }
+                  >
+                    Reguler
+                  </h3>
+                  <p className="text-3xl font-bold">
+                    {antrianData?.reguler || 0}
+                  </p>
+                </div>
+                <div
+                  className={`${
+                    selectedEstimasi === "sameDay"
+                      ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
+                      : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                  } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
+                  onClick={() => setSelectedEstimasi("sameDay")}
+                >
+                  <h3
+                    className={
+                      selectedEstimasi === "sameDay"
+                        ? "text-white"
+                        : "text-gray-600"
+                    }
+                  >
+                    Same Day
+                  </h3>
+                  <p className="text-3xl font-bold">
+                    {antrianData?.sameDay || 0}
+                  </p>
+                </div>
+                <div
+                  className={`${
+                    selectedEstimasi === "nextDay"
+                      ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
+                      : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                  } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
+                  onClick={() => setSelectedEstimasi("nextDay")}
+                >
+                  <h3
+                    className={
+                      selectedEstimasi === "nextDay"
+                        ? "text-white"
+                        : "text-gray-600"
+                    }
+                  >
+                    Next Day
+                  </h3>
+                  <p className="text-3xl font-bold">
+                    {antrianData?.nextDay || 0}
+                  </p>
+                </div>
+              </div>
+
+              {/* Button Buka Antrian */}
+              <button
+                onClick={() =>
+                  navigate(`/antrian/${selectedEstimasi}`, {
+                    state: {
+                      dateRange,
+                      estimasi: selectedEstimasi,
+                    },
+                  })
+                }
+                className="shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm w-full h-[35px] mt-4 py-3 bg-[#AED6FA] text-white rounded-xl hover:bg-opacity-90 transition-al font-montserrat flex items-center justify-center font-bold"
+              >
+                Buka Antrian
+              </button>
+            </div>
           </div>
         </div>
       </main>
@@ -655,16 +657,16 @@ const BerandaTeknisi = () => {
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
         onConfirm={handleLogoutConfirm}
-        title="Konfirmasi Logout"
-        message="Apakah Anda yakin ingin keluar? Keluar dari aplikasi direkomendasikan saat jam kerja sudah selesai."
+        title="Logout Confirmation"
+        message="Are you sure you want to logout? Logging out is recommended when work hours are finished."
       />
 
       <ConfirmationModal
         isOpen={showSwitchRoleModal}
         onClose={() => setShowSwitchRoleModal(false)}
         onConfirm={handleSwitchRoleConfirm}
-        title="Konfirmasi Ganti Role"
-        message="Apakah Anda yakin ingin beralih ke halaman kurir?"
+        title="Switch Role Confirmation"
+        message="Are you sure you want to switch to courier page?"
       />
     </div>
   );

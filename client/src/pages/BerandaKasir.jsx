@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import SwitchRoleKasir from '../components/SwitchRoleKasir';
 import WorkTimeAlert from '../components/WorkTimeAlert';
 import BreakTimeAlert from '../components/BreakTimeAlert';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const BerandaKasir = () => {
   const navigate = useNavigate();
@@ -21,6 +22,9 @@ const BerandaKasir = () => {
       endDate: today,
     };
   });
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showSwitchRoleModal, setShowSwitchRoleModal] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
 
   // Fungsi untuk memformat tanggal ke format database (YYYY-MM-DD)
   const formatDateForDB = (dateString) => {
@@ -71,112 +75,141 @@ const BerandaKasir = () => {
     fetchAntrianData();
   }, []);
 
+  const handleLogoutConfirm = () => {
+    // Implementasi log out
+  };
+
+  const handleSwitchRoleConfirm = () => {
+    // Implementasi switch role
+  };
+
   return (
-    <div className="h-screen overflow-y-auto bg-[#FFFFFF] font-montserrat">
-      <Header />
+    <div className="h-[100dvh] flex flex-col overflow-hidden bg-[#E6EFF9] font-montserrat">
+      <Header 
+        title="CASHIER DASHBOARD"
+        showLogoutButton={true}
+        onLogoutClick={() => setShowLogoutModal(true)}
+        showSwitchRole={true}
+        onSwitchRoleClick={() => setShowSwitchRoleModal(true)}
+        currentTime={currentTime}
+      />
       
-      {/* Main Content */}
-      <main className="mx-auto px-4 md:px-10 pt-20 pb-6 min-h-screen">
-        <div className="max-w-[390px] md:max-w-none mx-auto">
-          <SwitchRoleKasir />
-          <WorkTimeAlert />
-          <BreakTimeAlert />
-          
-          {/* Date Range Picker */}
-          <div className="mb-2 bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-4">
-            <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
-            <div className="grid grid-cols-2 gap-4 font-montserrat">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Dari Tanggal
-                </label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={dateRange.startDate}
-                  onChange={handleDateInputChange}
-                  max={dateRange.endDate}
-                  className="w-full p-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Sampai Tanggal
-                </label>
-                <input
-                  type="date"
-                  name="endDate"
-                  value={dateRange.endDate}
-                  onChange={handleDateInputChange}
-                  min={dateRange.startDate}
-                  className="w-full p-2 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Detail Antrian Card */}
-          <div className="bg-[#F0F0F0] rounded-3xl p-4 shadow-sm mt-4 mb-2">
-            <h2 className="text-2xl font-bebas mb-2">Detail Antrian Quality Check</h2>
-            <div className="grid grid-cols-3 gap-2 font-['Montserrat']">
-              <div
-                className={`${
-                  selectedEstimasi === "reguler"
-                    ? "bg-[#51A7D9] text-white"
-                    : "bg-[#E2E2E3] text-gray-600"
-                } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                onClick={() => setSelectedEstimasi("reguler")}
-              >
-                <h3 className={selectedEstimasi === "reguler" ? "text-white" : "text-gray-600"}>
-                  Reguler
-                </h3>
-                <p className="text-3xl font-bold">{antrianData?.reguler || 0}</p>
-              </div>
-              <div
-                className={`${
-                  selectedEstimasi === "sameDay"
-                    ? "bg-[#51A7D9] text-white"
-                    : "bg-[#E2E2E3] text-gray-600"
-                } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                onClick={() => setSelectedEstimasi("sameDay")}
-              >
-                <h3 className={selectedEstimasi === "sameDay" ? "text-white" : "text-gray-600"}>
-                  Same Day
-                </h3>
-                <p className="text-3xl font-bold">{antrianData?.sameDay || 0}</p>
-              </div>
-              <div
-                className={`${
-                  selectedEstimasi === "nextDay"
-                    ? "bg-[#51A7D9] text-white"
-                    : "bg-[#E2E2E3] text-gray-600"
-                } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                onClick={() => setSelectedEstimasi("nextDay")}
-              >
-                <h3 className={selectedEstimasi === "nextDay" ? "text-white" : "text-gray-600"}>
-                  Next Day
-                </h3>
-                <p className="text-3xl font-bold">{antrianData?.nextDay || 0}</p>
+      {/* Main Content dengan overflow scroll */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="mx-auto px-4 md:px-10 pt-20 pb-6">
+          <div className="max-w-[390px] md:max-w-none mx-auto">
+            <SwitchRoleKasir />
+            <WorkTimeAlert />
+            <BreakTimeAlert />
+            
+            {/* Date Range Card */}
+            <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
+              <h2 className="text-2xl font-bebas mb-2">Date Range</h2>
+              <div className="grid grid-cols-2 gap-4 font-montserrat">
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">From Date</label>
+                  <input
+                    type="date"
+                    name="startDate"
+                    value={dateRange.startDate}
+                    onChange={handleDateInputChange}
+                    max={dateRange.endDate}
+                    className="bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">To Date</label>
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={dateRange.endDate}
+                    onChange={handleDateInputChange}
+                    min={dateRange.startDate}
+                    className="bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Button Buka Antrian */}
-            <button
-              onClick={() =>
-                navigate(`/kasir/antrian/${selectedEstimasi}`, {
-                  state: {
-                    dateRange,
-                    estimasi: selectedEstimasi,
-                  },
-                })
-              }
-              className="shadow-xl text-sm w-full h-[35px] mt-4 py-3 bg-[#FFCA42] text-white rounded-xl hover:bg-opacity-90 transition-all font-montserrat flex items-center justify-center font-bold"
-            >
-              Buka Antrian
-            </button>
+            {/* Quality Check Queue Details Card */}
+            <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
+              <h2 className="text-2xl font-bebas mb-2">Quality Check Queue Details</h2>
+              <div className="grid grid-cols-3 gap-2 font-['Montserrat']">
+                <div
+                  className={`${
+                    selectedEstimasi === "reguler"
+                      ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
+                      : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                  } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
+                  onClick={() => setSelectedEstimasi("reguler")}
+                >
+                  <h3 className={selectedEstimasi === "reguler" ? "text-white" : "text-gray-600"}>
+                    Regular
+                  </h3>
+                  <p className="text-3xl font-bold">{antrianData?.reguler || 0}</p>
+                </div>
+                <div
+                  className={`${
+                    selectedEstimasi === "sameDay"
+                      ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
+                      : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                  } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
+                  onClick={() => setSelectedEstimasi("sameDay")}
+                >
+                  <h3 className={selectedEstimasi === "sameDay" ? "text-white" : "text-gray-600"}>
+                    Same Day
+                  </h3>
+                  <p className="text-3xl font-bold">{antrianData?.sameDay || 0}</p>
+                </div>
+                <div
+                  className={`${
+                    selectedEstimasi === "nextDay"
+                      ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
+                      : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                  } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
+                  onClick={() => setSelectedEstimasi("nextDay")}
+                >
+                  <h3 className={selectedEstimasi === "nextDay" ? "text-white" : "text-gray-600"}>
+                    Next Day
+                  </h3>
+                  <p className="text-3xl font-bold">{antrianData?.nextDay || 0}</p>
+                </div>
+              </div>
+
+              {/* Open Queue Button */}
+              <button
+                onClick={() =>
+                  navigate(`/kasir/antrian/${selectedEstimasi}`, {
+                    state: {
+                      dateRange,
+                      estimasi: selectedEstimasi,
+                    },
+                  })
+                }
+                className="shadow-[4px_4px_10px_rgba(0,0,0,0.15)] text-sm w-full h-[35px] mt-4 py-3 bg-[#AED6FA] text-white rounded-xl hover:bg-opacity-90 transition-all font-montserrat flex items-center justify-center font-bold outline outline-1 outline-white"
+              >
+                Open Queue
+              </button>
+            </div>
           </div>
         </div>
       </main>
+
+      <ConfirmationModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogoutConfirm}
+        title="Logout Confirmation"
+        message="Are you sure you want to logout? Logging out is recommended when work hours are finished."
+      />
+
+      <ConfirmationModal
+        isOpen={showSwitchRoleModal}
+        onClose={() => setShowSwitchRoleModal(false)}
+        onConfirm={handleSwitchRoleConfirm}
+        title="Switch Role Confirmation"
+        message="Are you sure you want to switch to courier page?"
+      />
     </div>
   );
 };

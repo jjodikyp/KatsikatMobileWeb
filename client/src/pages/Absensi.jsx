@@ -254,13 +254,13 @@ const Absensi = () => {
         <div className="flex flex-col gap-3 mt-6">
           <button
             onClick={() => setShowIzinModal(true)}
-            className="font-semibold w-full py-3 px-4 bg-[#E6EFF9] text-gray-600 font-montserrat rounded-xl text-sm shadow shadow-black opacity-100 outline outline-2 outline-white"
+            className="font-semibold w-full py-3 px-4 bg-[#E6EFF9] text-gray-600 font-montserrat rounded-xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-2 outline-white"
           >
             LEAVE / CLAIM DAY OFF
           </button>
           <button
             onClick={handleHadir}
-            className="font-semibold w-full py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm shadow shadow-black opacity-100 outline outline-2 outline-white"
+            className="font-semibold w-full py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-2 outline-white"
           >
             PRESENT
           </button>
@@ -288,13 +288,13 @@ const Absensi = () => {
               <div className="flex gap-3">
                 <button
                   onClick={handleCloseModal}
-                  className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-montserrat rounded-xl text-xs hover:bg-gray-200 transition-colors"
+                  className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-montserrat rounded-xl text-sm hover:bg-gray-200 transition-colors font-semibold"
                 >
                   CANCEL
                 </button>
                 <button
                   onClick={handleSubmitIzin}
-                  className="flex-1 py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-xs hover:bg-opacity-90 transition-colors"
+                  className="flex-1 py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm hover:bg-opacity-90 transition-colors font-semibold"
                 >
                   SEND
                 </button>

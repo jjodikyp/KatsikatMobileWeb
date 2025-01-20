@@ -30,13 +30,19 @@ const FuelCalculationModal = ({ isOpen, onClose, onConfirm, data }) => {
   const fuelUsage = distance / 45; // Liter
   const fuelCost = fuelUsage * 10000; // Rupiah
 
+  const handleConfirm = () => {
+    onConfirm(fuelCost);
+    navigate('/login');
+    onClose();
+  };
+
   return (
     <div 
       className={`fixed inset-0 bg-black transition-opacity duration-300 flex items-center justify-center z-50 overflow-y-auto
         ${showOverlay ? 'bg-opacity-50' : 'bg-opacity-0'}`}
     >
       <div 
-        className={`bg-white rounded-2xl p-6 w-[90%] max-w-md transform transition-all duration-300 my-8
+        className={`bg-white rounded-2xl p-6 w-[90%] max-w-md transform transition-all duration-300 my-8 outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]
           ${showModal ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-full scale-150'}`}
       >
         <h3 className="font-bebas text-2xl mb-4">Ringkasan Penggunaan BBM</h3>
@@ -71,13 +77,13 @@ const FuelCalculationModal = ({ isOpen, onClose, onConfirm, data }) => {
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all font-montserrat"
+            className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all font-montserrat outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]"
           >
             Batal
           </button>
           <button
             onClick={() => onConfirm(fuelCost)}
-            className="px-4 py-2 rounded-lg bg-[#51A7D9] text-white hover:bg-opacity-90 transition-all font-montserrat"
+            className="px-4 py-2 rounded-lg bg-[#57AEFF] text-white hover:bg-opacity-90 transition-all font-montserrat outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]"
           >
             Kirim
           </button>

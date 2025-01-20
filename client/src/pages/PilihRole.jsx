@@ -126,7 +126,7 @@ const PilihRole = () => {
 
         <button
           onClick={handleContinue}
-          className="w-full py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm font-semibold hover:bg-opacity-90 transition-colors shadow-2xl shadow-white opacity-100 outline outline-1 outline-white mt-6"
+          className="w-full py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm font-semibold hover:bg-opacity-90 transition-colors shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white mt-6"
         >
           Continue
         </button>

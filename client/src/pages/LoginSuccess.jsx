@@ -41,7 +41,7 @@ const LoginSuccess = () => {
         <button
           type="button"
           onClick={handleContinue}
-          className="h-[40px] w-full py-3.5 px-4 shadow-xl shadow-white opacity-100 outline outline-1 outline-white text-sm bg-[#AED6FA] text-white rounded-xl font-montserrat flex items-center justify-center font-semibold"
+          className="h-[40px] w-full py-3.5 px-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm bg-[#AED6FA] text-white rounded-xl font-montserrat flex items-center justify-center font-semibold"
         >
           Continue
         </button>

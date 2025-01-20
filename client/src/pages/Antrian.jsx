@@ -4,6 +4,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import LoadingDots from '../components/LoadingDots';
+import AntrianHeader from '../components/AntrianHeader';
 
 const Antrian = () => {
   const navigate = useNavigate();
@@ -130,54 +131,13 @@ const Antrian = () => {
   };
 
   return (
-    <div className="h-screen overflow-y-auto bg-[#FFFFFF] font-montserrat">
+    <div className="h-screen overflow-y-auto bg-[#E6EFF9] font-montserrat">
       {/* Header - Fixed at top */}
-      <header className="fixed top-0 left-0 right-0 z-10 bg-white">
-        <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex justify-between items-center max-w-[390px] md:max-w-none">
-          {/* Back Button */}
-          <button
-            onClick={() => navigate(-1)}
-            className="w-[41px] h-[41px] rounded-full flex items-center justify-center bg-[#51A7D9] hover:bg-opacity-90 transition-all"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="white"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 19.5L8.25 12l7.5-7.5"
-              />
-            </svg>
-          </button>
-
-          {/* User Profile Area */}
-          <div className="flex items-center gap-4 bg-[#F0F0F0] px-4 py-2 rounded-full">
-            <span className="font-bebas text-xl color-[#383838]">
-              {userData?.name
-                ? userData.name.split(" ").slice(0, 2).join(" ")
-                : "Guest"}
-            </span>
-            <div className="w-[33px] h-[33px] rounded-full bg-gray-300 overflow-hidden">
-              {userData?.photo ? (
-                <img
-                  src={userData.photo}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gray-300" />
-              )}
-            </div>
-          </div>
-        </div>
+      <header className="fixed top-0 left-0 right-0 z-10 bg-[#E6EFF9]">
+        <AntrianHeader />
 
         {/* Filter Section */}
-        <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex justify-between items-center w-full md:max-w-none bg-white shadow-lg">
+        <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex justify-between items-center w-full md:max-w-none bg-[#E6EFF9] shadow-lg">
           <h1 className="text-2xl font-bebas">
             {" "}
             {estimasi === "sameDay"
@@ -192,36 +152,64 @@ const Antrian = () => {
             <div className="relative">
               <button
                 onClick={() => handleFilterChange("cleaning")}
-                className={`ml-4 px-4 py-2 rounded-lg transition-all ${
+                className={`ml-4 px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${
                   selectedFilter === "cleaning"
-                    ? " bg-[#57AEFF] text-white shadow shadow-current opacity-100 outline outline-2 outline-white"
-                    : " bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                    ? "bg-[#57AEFF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-2 outline-white"
+                    : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                 }`}
               >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  strokeWidth={1.5} 
+                  stroke="currentColor" 
+                  className="w-5 h-5"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" 
+                  />
+                </svg>
                 Cleaning
+                {cleaningCount > 0 && (
+                  <div className="absolute -top-2 -right-2 bg-[#FD8087] text-white rounded-full w-6 h-6 flex items-center justify-center font-montserrat text-xs">
+                    {cleaningCount}
+                  </div>
+                )}
               </button>
-              {cleaningCount > 0 && (
-                <div className="absolute -top-2 -right-2 bg-[#FD8087] text-white rounded-full w-6 h-6 flex items-center justify-center font-montserrat text-xs">
-                  {cleaningCount}
-                </div>
-              )}
             </div>
             <div className="relative">
               <button
                 onClick={() => handleFilterChange("repair")}
-                className={`ml-2 px-4 py-2 rounded-lg transition-all ${
+                className={`ml-2 px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${
                   selectedFilter === "repair"
-                    ? " bg-[#57AEFF] text-white shadow shadow-current opacity-100 outline outline-2 outline-white"
-                    : " bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                    ? "bg-[#57AEFF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-2 outline-white"
+                    : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                 }`}
               >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  strokeWidth={1.5} 
+                  stroke="currentColor" 
+                  className="w-5 h-5"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" 
+                  />
+                </svg>
                 Repair
+                {repairCount > 0 && (
+                  <div className="absolute -top-2 -right-2 bg-[#FD8087] text-white rounded-full w-6 h-6 flex items-center justify-center font-montserrat text-xs">
+                    {repairCount}
+                  </div>
+                )}
               </button>
-              {repairCount > 0 && (
-                <div className="absolute -top-2 -right-2 bg-[#FD8087] text-white rounded-full w-6 h-6 flex items-center justify-center font-montserrat text-xs">
-                  {repairCount}
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -236,7 +224,7 @@ const Antrian = () => {
               antrianTreatment.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-[#E2F2FF] rounded-3xl p-4 shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
+                  className="bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
                 >
                   <div className="flex items-start gap-4">
                     <div 
@@ -282,7 +270,7 @@ const Antrian = () => {
                       </p>
                     </div>
                   </div>
-                  <button className="w-full h-[35px] mb-auto mt-4 rounded-xl flex items-center justify-center text-sm shadow-md font-semibold bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-2xl shadow-white opacity-100 outline outline-1 outline-white">
+                  <button className="w-full h-[35px] mb-auto mt-4 rounded-xl flex items-center justify-center text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] font-semibold bg-[#57AEFF] text-white opacity-100 outline outline-1 outline-white">
                     Mulai Treatment
                   </button>
                 </div>

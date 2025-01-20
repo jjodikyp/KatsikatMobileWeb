@@ -129,7 +129,7 @@ const BerandaKurir = () => {
           <BreakTimeAlert />
           
           {/* Date Range Picker */}
-          <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-2xl mt-4 shadow-white opacity-100 outline outline-1 outline-white">
+          <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 mt-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white">
             <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
             <div className="grid grid-cols-2 gap-4 font-montserrat">
               <div>
@@ -162,13 +162,13 @@ const BerandaKurir = () => {
           </div>
 
           {/* Detail Antrian Card */}
-          <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-2xl mt-4 shadow-white opacity-100 outline outline-1 outline-white">
+          <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 mt-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white">
             <h2 className="text-2xl font-bebas mb-2">Delivery Queue Details</h2>
             <div className="grid grid-cols-2 gap-2 font-['Montserrat']">
               <div
                 className={`${
                   selectedEstimasi === "pickup"
-                    ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
+                    ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
                     : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                 onClick={() => filterTransport("pickup")}
@@ -197,7 +197,7 @@ const BerandaKurir = () => {
               <div
                 className={`${
                   selectedEstimasi === "delivery"
-                    ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-2xl shadow-white opacity-100 outline outline-1 outline-white"
+                    ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
                     : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                 } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                 onClick={() => filterTransport("delivery")}
@@ -235,7 +235,7 @@ const BerandaKurir = () => {
                   },
                 })
               }
-              className="shadow-xl shadow-white opacity-100 outline outline-1 outline-white text-sm w-full h-[35px] mt-4 py-3 bg-[#AED6FA] text-white rounded-xl hover:bg-opacity-90 transition-al font-montserrat flex items-center justify-center font-bold"
+              className="shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm w-full h-[35px] mt-4 py-3 bg-[#AED6FA] text-white rounded-xl transition-al font-montserrat flex items-center justify-center font-bold"
             >
               Open Queue
             </button>

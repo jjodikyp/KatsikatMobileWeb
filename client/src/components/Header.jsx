@@ -1,43 +1,42 @@
 import { Twirl as Hamburger } from 'hamburger-react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 import { useState, useEffect } from "react";
 import ConfirmationModal from './ConfirmationModal';
 
-const Header = () => {
+const Header = ({ title, showLogoutButton, onLogoutClick, showSwitchRole, onSwitchRoleClick }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isOpen, setOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [userData] = useState(JSON.parse(localStorage.getItem("user")));
-  const [currentTime, setCurrentTime] = useState('');
-
-  const updateTime = () => {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('id-ID', {
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      timeZone: 'Asia/Jakarta'
-    });
-    setCurrentTime(timeString);
-  };
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   const handleLogoutConfirm = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/absenakhir");
+
+    if (location.pathname === "/berandakurir") {
+      navigate("/kurir/transport");
+    } else {
+      navigate("/absenakhir");
+    }
+
     setShowLogoutModal(false);
   };
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-10">
+      <header className="fixed top-0 left-0 right-0 z-10 bg-[#E6EFF9] font-montserrat">
         <div className="mx-auto px-4 py-4 md:px-10">
           {/* Top Section */}
           <div className="flex justify-between items-center">
@@ -77,7 +76,7 @@ const Header = () => {
                   <line x1="12" y1="12" x2="16" y2="12" stroke="black" strokeWidth="2" />
                 </svg>
                 <span className="font-bebas text-xl text-[#383838]">
-                  {currentTime}
+                  {format(currentTime, "HH:mm:ss", { locale: id })}
                 </span>
               </div>
             </div>

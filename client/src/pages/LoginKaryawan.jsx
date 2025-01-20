@@ -123,7 +123,7 @@ const LoginKaryawan = () => {
 
           <button
             type="submit"
-            className="w-full h-[40px] py-3 sm:py-3.5 px-4 mt-2 bg-[#57AEFF] text-white rounded-xl shadow-2xl shadow-white opacity-100 outline outline-1 outline-white font-montserrat font-semibold flex items-center justify-center"
+            className="w-full h-[40px] py-3 sm:py-3.5 px-4 mt-2 bg-[#57AEFF] text-white rounded-xl shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white font-montserrat font-semibold flex items-center justify-center"
           >
             Login
           </button>

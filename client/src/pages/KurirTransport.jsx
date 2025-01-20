@@ -138,7 +138,7 @@ const KurirTransport = () => {
   };
 
   return (
-    <div className="h-screen overflow-y-auto bg-white p-4 pb-2 h-auto pb-20 flex flex-col items-center">
+    <div className="h-screen overflow-y-auto bg-[#E6EFF9] p-4 pb-2 h-auto pb-20 flex flex-col items-center">
       <div className="max-w-md mx-auto h-max pb-20">
 
         <h1 className="text-3xl font-bebas text-center mb-2 mt-10">
@@ -155,9 +155,9 @@ const KurirTransport = () => {
           </div>
         )}
 
-        <div className="space-y-4 p-4 max-w-xs mx-auto overflow-y-auto h-auto pb-20">
+        <div className="space-y-4 p-4 max-w-xs mx-auto overflow-y-auto h-auto pb-14">
           <div>
-            <label className="block font-montserrat text-sm text-gray-600 mb-1">
+            <label className="block font-montserrat text-sm text-gray-600 mb-2 font-semibold">
               ODO Mulai
             </label>
             <input
@@ -165,14 +165,14 @@ const KurirTransport = () => {
               name="odoStart"
               value={formData.odoStart}
               onChange={handleInputChange}
-              className="h-10 w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 font-montserrat"
+              className="h-10 w-full p-3 rounded-xl font-montserrat outline outline-1 outline-white bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] placeholder:text-sm"
               placeholder="Masukkan jarak mulai"
               disabled={loading}
             />
           </div>
 
           <div>
-            <label className="block font-montserrat text-sm text-gray-600 mb-1">
+            <label className="block font-montserrat text-sm text-gray-600 mb-2 font-semibold mt-6">
               ODO Selesai
             </label>
             <input
@@ -180,14 +180,14 @@ const KurirTransport = () => {
               name="odoEnd"
               value={formData.odoEnd}
               onChange={handleInputChange}
-              className="h-10 w-full p-3 rounded-xl border  border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 font-montserrat"
+              className="h-10 w-full p-3 rounded-xl outline outline-1 outline-white bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] placeholder:text-sm font-montserrat"
               placeholder="Masukkan jarak selesai"
               disabled={loading}
             />
           </div>
 
           <div>
-            <label className="block font-montserrat text-sm text-gray-600 mb-1">
+            <label className="block font-montserrat text-sm text-gray-600 mb-2 font-semibold mt-6">
               Foto ODO Mulai & Selesai
             </label>
             <input
@@ -201,7 +201,7 @@ const KurirTransport = () => {
             />
             <label
               htmlFor="odoPhotos"
-              className="block w-full border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-400 transition-colors p-4"
+              className="block w-full border-2 border-dashed border-blue-400 rounded-xl cursor-pointer hover:border-blue-400 transition-colors p-4"
             >
               <div className="grid grid-cols-2 gap-4">
                 {/* Preview ODO Start */}
@@ -224,7 +224,7 @@ const KurirTransport = () => {
                       </button>
                     </>
                   ) : (
-                    <div className="flex items-center justify-center h-full bg-gray-100 rounded-lg">
+                    <div className="flex items-center justify-center h-full bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] rounded-lg outline outline-1 outline-white p-2 font-montserrat">
                       <span className="text-gray-500 text-sm text-center">
                         Foto ODO Mulai
                       </span>
@@ -252,7 +252,7 @@ const KurirTransport = () => {
                       </button>
                     </>
                   ) : (
-                    <div className="flex items-center justify-center h-full bg-gray-100 rounded-lg">
+                    <div className="flex items-center justify-center h-full rounded-lg bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white p-2 font-montserrat">
                       <span className="text-gray-500 text-sm text-center">
                         Foto ODO Selesai
                       </span>
@@ -260,7 +260,7 @@ const KurirTransport = () => {
                   )}
                 </div>
               </div>
-              <p className="text-center text-sm text-gray-500 mt-2 font-montserrat">
+              <p className="text-center text-sm text-gray-500 mt-4 font-montserrat">
                 Silahkan upload 2 foto sekaligus
                 (ODO Mulai & Selesai)
               </p>
@@ -270,7 +270,7 @@ const KurirTransport = () => {
           <button
             onClick={handleSubmit}
             disabled={loading || !photos.odoStart || !photos.odoEnd}
-            className={`h-10 w-full py-3 bg-[#51A7D9] text-white rounded-xl font-medium transition-all mt-6 font-montserrat text-center flex items-center justify-center ${
+            className={`h-10 w-full py-3 bg-[#57AEFF] text-white rounded-xl font-semibold transition-all mt-6 font-montserrat text-center text-sm flex items-center justify-center shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white ${
               (loading || !photos.odoStart || !photos.odoEnd) ? "opacity-50 cursor-not-allowed" : "hover:bg-opacity-90"
             }`}
           >
@@ -282,7 +282,7 @@ const KurirTransport = () => {
       {/* Preview Modal */}
       {selectedPreview && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex flex-col items-center justify-center z-50 p-4">
-          <div className="max-w-3xl max-h-[80vh] bg-white rounded-lg overflow-hidden">
+          <div className="max-w-3xl max-h-[80vh] bg-white rounded-3xl overflow-hidden outline outline-2 outline-white">
             <img
               src={selectedPreview}
               alt="Preview"
@@ -291,7 +291,7 @@ const KurirTransport = () => {
             <div className="p-4 bg-white flex justify-center">
               <button
                 onClick={() => setSelectedPreview(null)}
-                className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-montserrat"
+                className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-montserrat text-sm outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]"
               >
                 Tutup
               </button>
