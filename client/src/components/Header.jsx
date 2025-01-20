@@ -1,11 +1,18 @@
-import { Twirl as Hamburger } from 'hamburger-react';
+import { Twirl as Hamburger } from "hamburger-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { useState, useEffect } from "react";
-import ConfirmationModal from './ConfirmationModal';
+import ConfirmationModal from "./ConfirmationModal";
+import LordIcon from "./LordIcon";
 
-const Header = ({ title, showLogoutButton, onLogoutClick, showSwitchRole, onSwitchRoleClick }) => {
+const Header = ({
+  title,
+  showLogoutButton,
+  onLogoutClick,
+  showSwitchRole,
+  onSwitchRoleClick,
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isOpen, setOpen] = useState(false);
@@ -63,18 +70,12 @@ const Header = ({ title, showLogoutButton, onLogoutClick, showSwitchRole, onSwit
               </button>
 
               <div className="flex items-center gap-2 outline outline-1 outline-black px-4 py-2 rounded-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="black"
-                  className="w-5 h-5"
-                >
-                  <circle cx="12" cy="12" r="10" stroke="black" strokeWidth="2" />
-                  <line x1="12" y1="12" x2="12" y2="8" stroke="black" strokeWidth="2" />
-                  <line x1="12" y1="12" x2="16" y2="12" stroke="black" strokeWidth="2" />
-                </svg>
+                <LordIcon
+                  src="https://cdn.lordicon.com/warimioc.json"
+                  trigger="loop"
+                  state="loop-oscillate"
+                  style={{ width: "25px", height: "25px" }}
+                />
                 <span className="font-bebas text-xl text-[#383838]">
                   {format(currentTime, "HH:mm:ss", { locale: id })}
                 </span>
@@ -84,10 +85,9 @@ const Header = ({ title, showLogoutButton, onLogoutClick, showSwitchRole, onSwit
             {/* User Name */}
             <div className="bg-[#57AEFF] px-4 py-2 rounded-full shadow-2xl shadow-white opacity-100 outline outline-1 outline-white">
               <span className="font-bebas text-xl text-white">
-                {userData?.name 
-                  ? userData.name.split(' ').slice(0, 2).join(' ')
-                  : "Guest"
-                }
+                {userData?.name
+                  ? userData.name.split(" ").slice(0, 2).join(" ")
+                  : "Guest"}
               </span>
             </div>
           </div>
@@ -105,4 +105,4 @@ const Header = ({ title, showLogoutButton, onLogoutClick, showSwitchRole, onSwit
   );
 };
 
-export default Header; 
+export default Header;

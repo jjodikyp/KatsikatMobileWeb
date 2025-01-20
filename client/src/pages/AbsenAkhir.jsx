@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import seeImage from "../assets/images/see.png";
+import LordIcon from "../components/LordIcon";
 
 const AbsenAkhir = () => {
   const navigate = useNavigate();
@@ -50,13 +51,18 @@ const AbsenAkhir = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4">
-      <div className="max-w-[390px] w-full flex flex-col items-center">
+    <div className="min-h-screen bg-[#E6EFF9] flex items-center justify-center">
+      <div className="max-w-[390px] w-full flex flex-col items-center ">
         {/* Gambar */}
-        <img src={seeImage} alt="Thank You" className="w-[180px] h-auto mb-6" />
+        <LordIcon
+          src="https://cdn.lordicon.com/gdowkrjt.json"
+          trigger="loop"
+          state="loop-oscillate"
+          style={{ width: "180px", height: "180px", marginTop: "-50px" }}
+        />
 
         {/* Teks Terima Kasih */}
-        <h2 className="text-3xl sm:text-3xl font-bebas font-normal text-gray-800 tracking-wide mb-2">
+        <h2 className="text-3xl sm:text-3xl font-bebas font-normal text-gray-800 tracking-wide mb-2 mt-4">
           TERIMA KASIH
         </h2>
 
@@ -66,7 +72,7 @@ const AbsenAkhir = () => {
         </p>
 
         {/* Durasi Kerja dengan detik */}
-        <div className="bg-gray-50 rounded-3xl p-2 w-full mb-6 max-w-xs shadow-xl">
+        <div className="bg-[#E6EFF9] rounded-2xl p-2 w-full mb-6 max-w-xs shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white">
           <p className="font-montserrat text-lg text-center text-gray-800">
             {workDuration.hours} Jam {workDuration.minutes} Menit{" "}
             {workDuration.seconds} Detik
@@ -76,7 +82,7 @@ const AbsenAkhir = () => {
         {/* Button Selesai */}
         <button
           onClick={handleSelesaiKerja}
-          className="w-max-sm py-3 px-6 bg-[#51A7D9] text-white font-montserrat rounded-3xl 
+          className="w-max-sm py-3 px-6 bg-[#57AEFF] text-white font-montserrat font-semibold rounded-2xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white
           hover:bg-[#2F82B2] transition-colors duration-200 text-sm shadow-xl"
         >
           Absen Selesai

@@ -644,7 +644,7 @@ const BerandaTeknisi = () => {
                     },
                   })
                 }
-                className="shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm w-full h-[35px] mt-4 py-3 bg-[#AED6FA] text-white rounded-xl hover:bg-opacity-90 transition-al font-montserrat flex items-center justify-center font-bold"
+                className="shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm w-full h-[35px] mt-4 py-3 bg-[#57AEFF] text-white rounded-xl hover:bg-opacity-90 transition-al font-montserrat flex items-center justify-center font-bold"
               >
                 Buka Antrian
               </button>

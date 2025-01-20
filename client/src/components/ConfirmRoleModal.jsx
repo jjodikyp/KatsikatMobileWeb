@@ -69,13 +69,13 @@ const ConfirmRoleModal = ({ isOpen, onClose, selectedRole }) => {
         <div className="flex gap-4">
           <button
             onClick={onClose}
-            className="flex-1 py-2 px-4 rounded-xl bg-gray-200 hover:bg-gray-300 transition-colors font-montserrat"
+            className="flex-1 py-2 px-4 rounded-xl bg-gray-200 hover:bg-gray-300 transition-colors font-montserrat text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white items-center justify-center"
           >
             Back
           </button>
           <button
             onClick={handleConfirm}
-            className="flex-1 py-2 px-4 rounded-xl bg-[#51A7D9] text-white hover:bg-opacity-90 transition-colors font-montserrat"
+            className="flex-1 py-2 px-4 rounded-xl bg-[#57AEFF] text-white hover:bg-opacity-90 transition-colors font-montserrat text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white items-center justify-center"
           >
             Continue
           </button>
