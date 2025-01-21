@@ -138,7 +138,7 @@ const CekAbsen = () => {
               className="w-5 h-5"
             />
           </button>
-          <h1 className="text-2xl font-bebas">Cek Absen Bulanan</h1>
+          <h1 className="text-2xl font-bebas">Daftar Kehadiran</h1>
         </div>
         
         {/* Month Year Picker */}
@@ -192,9 +192,9 @@ const CekAbsen = () => {
                         <td className="p-2">{formatTime(absen.clockOut)}</td>
                         <td className="p-2">
                           <span className={`px-2 py-1 rounded-full text-sm ${
-                            absen.status === 'hadir' ? 'bg-green-100 text-green-800' :
-                            absen.status === 'izin' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-red-100 text-red-800'
+                            absen.status === 'hadir' ? 'bg-green-100 text-green-800 outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]' :
+                            absen.status === 'izin' ? 'bg-yellow-100 text-yellow-800 outline outline-1 outline-white shadow-inner shadow-[4px_4px_10px_rgba(0,0,0,0.15)]' :
+                            'bg-red-100 text-red-800 outline outline-1 outline-white shadow-inner shadow-[4px_4px_10px_rgba(0,0,0,0.15)]'
                           }`}>
                             {absen.status}
                           </span>
@@ -225,19 +225,19 @@ const CekAbsen = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-[#E6EFF9] p-4 rounded-xl shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white">
                 <div className="text-sm text-gray-600">Total Kehadiran</div>
-                <div className="text-2xl font-bold text-green-600">{summary?.totalHadir} Hari</div>
+                <div className="text-2xl font-semibold text-[#2E7CF6]">{summary?.totalHadir} Hari</div>
               </div>
-              <div className="bg-[#E6EFF9] p-4 rounded-xl shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white">
+              <div className="bg-[#E6EFF9] p-4 rounded-xl shadow-inner shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white">
                 <div className="text-sm text-gray-600">Total Alpha</div>
-                <div className="text-2xl font-bold text-red-600">{summary?.totalAlpha} Hari</div>
+                <div className="text-2xl font-semibold text-[#2E7CF6]">{summary?.totalAlpha} Hari</div>
               </div>
-              <div className="bg-[#E6EFF9] p-4 rounded-xl shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white">
+              <div className="bg-[#E6EFF9] p-4 rounded-xl shadow-inner shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white">
                 <div className="text-sm text-gray-600">Total Izin</div>
-                <div className="text-2xl font-bold text-yellow-600">{summary?.totalIzin} Hari</div>
+                <div className="text-2xl font-semibold text-[#2E7CF6]">{summary?.totalIzin} Hari</div>
               </div>
               <div className="bg-[#E6EFF9] p-4 rounded-xl shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white">
                 <div className="text-sm text-gray-600">Total Jam Kerja</div>
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-semibold text-[#2E7CF6]">
                   {summary?.totalJamKerja.toFixed(1)} Jam
                 </div>
               </div>

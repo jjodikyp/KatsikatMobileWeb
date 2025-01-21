@@ -6,18 +6,18 @@ const NavigationModal = ({ isOpen, onClose }) => {
 
   const menuItems = [
     { 
-      name: 'Cek Absen', 
+      name: 'Daftar Kehadiran', 
       path: '/cekabsen',
       icon: "/src/assets/images/calender.png"
     },
     { 
-      name: 'Cek Gaji', 
-      path: '/cek-gaji',
+      name: 'Penghasilan & Slip Gaji', 
+      path: '/cekgaji',
       icon: "/src/assets/images/salary.png"
     },
     { 
-      name: 'Kontrol Kerja', 
-      path: '/kontrol-kerja',
+      name: 'Kontrol Kinerja & SP', 
+      path: '/kontrolkerja',
       icon: "/src/assets/images/chart.png"
     },
   ];
