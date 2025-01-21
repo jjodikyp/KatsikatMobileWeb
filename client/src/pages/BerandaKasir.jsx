@@ -83,6 +83,15 @@ const BerandaKasir = () => {
     // Implementasi switch role
   };
 
+  const handleOpenQueue = () => {
+    navigate(`/berandakasir/antriankasir/${selectedEstimasi}`, {
+      state: {
+        dateRange,
+        estimasi: selectedEstimasi,
+      },
+    });
+  };
+
   return (
     <div className="h-[100dvh] flex flex-col overflow-hidden bg-[#E6EFF9] font-montserrat">
       <Header 
@@ -178,14 +187,7 @@ const BerandaKasir = () => {
 
               {/* Open Queue Button */}
               <button
-                onClick={() =>
-                  navigate(`/kasir/antrian/${selectedEstimasi}`, {
-                    state: {
-                      dateRange,
-                      estimasi: selectedEstimasi,
-                    },
-                  })
-                }
+                onClick={handleOpenQueue}
                 className="shadow-[4px_4px_10px_rgba(0,0,0,0.15)] text-sm w-full h-[35px] mt-4 py-3 bg-[#57AEFF] text-white rounded-xl hover:bg-opacity-90 transition-all font-montserrat flex items-center justify-center font-bold outline outline-1 outline-white"
               >
                 Open Queue

@@ -43,7 +43,7 @@ const KontrolKerja = () => {
   }, [month, year]);
 
   const handleBack = () => {
-    navigate('/pilihrole');
+    navigate('/pilih-role');
   };
 
   const handleSetCurrentDate = () => {
