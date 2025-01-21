@@ -5,6 +5,7 @@ import { id } from "date-fns/locale";
 import { useState, useEffect } from "react";
 import ConfirmationModal from "./ConfirmationModal";
 import LordIcon from "./LordIcon";
+import NavigationModal from "./NavigationModal";
 
 const Header = ({
   title,
@@ -19,6 +20,7 @@ const Header = ({
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [userData] = useState(JSON.parse(localStorage.getItem("user")));
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showNavModal, setShowNavModal] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -69,7 +71,7 @@ const Header = ({
                 </svg>
               </button>
 
-              <div className="flex items-center gap-2 outline outline-1 outline-black px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2 outline outline-1 outline-black px-4 py-2 rounded-full h-[41px]">
                 <LordIcon
                   src="https://cdn.lordicon.com/warimioc.json"
                   trigger="loop"
@@ -83,12 +85,27 @@ const Header = ({
             </div>
 
             {/* User Name */}
-            <div className="bg-[#57AEFF] px-4 py-2 rounded-full shadow-2xl shadow-white opacity-100 outline outline-1 outline-white">
-              <span className="font-bebas text-xl text-white">
+            <div className="bg-[#57AEFF] px-4 py-2 rounded-full shadow-2xl shadow-white opacity-100 outline outline-1 outline-white gap-1 flex items-center h-[41px]">
+              <span className="font-bebas text-xl text-white flex items-center justify-center h-full w-full text-center mb-[-2px]">
                 {userData?.name
                   ? userData.name.split(" ").slice(0, 2).join(" ")
                   : "Guest"}
               </span>
+              <div className="flex items-center justify-center mr-[-10px] ml-[-5px]">
+                <Hamburger
+                  toggled={isOpen}
+                  toggle={setOpen}
+                  size={17}
+                  color="white"
+                onToggle={(toggled) => {
+                  if (toggled) {
+                    setShowNavModal(true);
+                  } else {
+                    setShowNavModal(false);
+                  }
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -100,6 +117,14 @@ const Header = ({
         onConfirm={handleLogoutConfirm}
         title="Konfirmasi Logout"
         message="Apakah Anda yakin ingin keluar?"
+      />
+
+      <NavigationModal 
+        isOpen={showNavModal}
+        onClose={() => {
+          setShowNavModal(false);
+          setOpen(false);
+        }}
       />
     </>
   );

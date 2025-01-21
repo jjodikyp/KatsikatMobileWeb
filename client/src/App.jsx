@@ -9,6 +9,9 @@ import AbsenAkhir from './pages/AbsenAkhir';
 import BerandaKurir from './pages/BerandaKurir';
 import BerandaKasir from './pages/BerandaKasir';
 import PilihRole from './pages/PilihRole';
+import CekAbsen from './pages/CekAbsen';
+import CekGaji from './pages/CekGaji';
+import KontrolKerja from './pages/KontrolKerja';
 
 function App() {
   return (
@@ -28,6 +31,9 @@ function App() {
         <Route path="/absenakhir" element={<AbsenAkhir />} />
         <Route path="/berandakurir" element={<BerandaKurir />} />
         <Route path="/berandakasir" element={<BerandaKasir />} />
+        <Route path="/cekabsen" element={<CekAbsen/>} />
+        <Route path="/cekgaji" element={<CekGaji/>} />
+        <Route path="/kontrolkerja" element={<KontrolKerja/>} />
       </Routes>
     </Router>
   );
