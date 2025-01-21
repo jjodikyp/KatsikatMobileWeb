@@ -10,6 +10,8 @@ const AbsenAkhir = () => {
     minutes: 0,
     seconds: 0,
   });
+  const [deskripsi, setDeskripsi] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     // Ambil waktu mulai kerja dari localStorage
@@ -44,10 +46,17 @@ const AbsenAkhir = () => {
   }, []);
 
   const handleSelesaiKerja = () => {
+    // Validasi deskripsi
+    const wordCount = deskripsi.trim().split(/\s+/).length;
+    if (wordCount < 3) {
+      setError("Deskripsi harus minimal 3 kata!");
+      return;
+    }
+    
     // Hapus waktu mulai kerja dari localStorage
     localStorage.removeItem("workStartTime");
     // Arahkan ke halaman login
-    navigate("/login");
+    navigate("/");
   };
 
   return (
@@ -72,17 +81,33 @@ const AbsenAkhir = () => {
         </p>
 
         {/* Durasi Kerja dengan detik */}
-        <div className="bg-[#E6EFF9] rounded-2xl p-2 w-full mb-6 max-w-xs shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white">
+        <div className="bg-[#E6EFF9] rounded-2xl p-2 w-full mb-6 max-w-xs shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white">
           <p className="font-montserrat text-lg text-center text-gray-800">
             {workDuration.hours} Jam {workDuration.minutes} Menit{" "}
             {workDuration.seconds} Detik
           </p>
         </div>
 
+        {/* Area Input Deskripsi */}
+        <div className="w-full max-w-xs mb-6">
+          <textarea
+            value={deskripsi}
+            onChange={(e) => {
+              setDeskripsi(e.target.value);
+              setError("");
+            }}
+            placeholder="Masukkan hasil evaluasi harian Anda! (min. 3 kata)"
+            className="shadow-inner w-full p-4 font-montserrat text-lg rounded-2xl shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white resize-none h-32 bg-[#E6EFF9] text-gray-600"
+          />
+          {error && (
+            <p className="text-red-500 text-xs mt-1 font-montserrat">{error}</p>
+          )}
+        </div>
+
         {/* Button Selesai */}
         <button
           onClick={handleSelesaiKerja}
-          className="w-max-sm py-3 px-6 bg-[#57AEFF] text-white font-montserrat font-semibold rounded-2xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white
+          className="max-w-xs w-full py-3 px-6 bg-[#57AEFF] text-white font-montserrat font-semibold rounded-2xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white
           hover:bg-[#2F82B2] transition-colors duration-200 text-sm shadow-xl"
         >
           Absen Selesai

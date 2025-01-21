@@ -13,6 +13,8 @@ import CekAbsen from './pages/CekAbsen';
 import CekGaji from './pages/CekGaji';
 import KontrolKerja from './pages/KontrolKerja';
 import AntrianKasir from './pages/AntrianKasir';
+import AntrianKurir from './pages/AntrianKurir';
+
 function App() {
   return (
     <Router>
@@ -20,7 +22,7 @@ function App() {
         <Route path="/pilih-role" element={<PilihRole />} />
         <Route path="/berandateknisi" element={<BerandaTeknisi />} />
         <Route path="/antrian/:estimasi" element={<Antrian />} />
-        <Route path="/login" element={<LoginKaryawan />} />
+        <Route path="/" element={<LoginKaryawan />} />
         <Route 
           path="/loginSuccess" 
           element={<LoginSuccess />} 
@@ -35,6 +37,7 @@ function App() {
         <Route path="/cekabsen" element={<CekAbsen/>} />
         <Route path="/cekgaji" element={<CekGaji/>} />
         <Route path="/kontrolkerja" element={<KontrolKerja/>} />
+        <Route path="/kurir/:type" element={<AntrianKurir />} />
       </Routes>
     </Router>
   );

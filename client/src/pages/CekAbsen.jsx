@@ -36,11 +36,15 @@ const CekAbsen = () => {
         randomClockOut.setHours(16 + Math.floor(Math.random() * 2));
         randomClockOut.setMinutes(Math.floor(Math.random() * 60));
 
+        // Menambahkan status persetujuan
+        const approvalStatus = Math.random() > 0.5 ? 'Disetujui' : 'Pengecekan';
+
         return {
           date: date.toISOString(),
           clockIn: randomStatus === 'hadir' ? randomClockIn.toISOString() : null,
           clockOut: randomStatus === 'hadir' ? randomClockOut.toISOString() : null,
-          status: randomStatus
+          status: randomStatus,
+          approval: approvalStatus
         };
       });
 
@@ -67,9 +71,7 @@ const CekAbsen = () => {
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
+      day: 'numeric'
     });
   };
 
@@ -179,9 +181,10 @@ const CekAbsen = () => {
                   <thead className="sticky top-0 bg-[#E2F2FF]">
                     <tr className="text-left">
                       <th className="p-2">Tanggal</th>
-                      <th className="p-2">Jam Masuk</th>
-                      <th className="p-2">Jam Selesai</th>
+                      <th className="p-2">Masuk</th>
+                      <th className="p-2">Keluar</th>
                       <th className="p-2">Status</th>
+                      <th className="p-2">Keterangan</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -197,6 +200,15 @@ const CekAbsen = () => {
                             'bg-red-100 text-red-800 outline outline-1 outline-white shadow-inner shadow-[4px_4px_10px_rgba(0,0,0,0.15)]'
                           }`}>
                             {absen.status}
+                          </span>
+                        </td>
+                        <td className="p-2">
+                          <span className={`px-2 py-1 rounded-full text-sm ${
+                            absen.approval === 'Disetujui' 
+                              ? 'bg-blue-100 text-blue-800' 
+                              : 'bg-gray-100 text-gray-800'
+                          } outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]`}>
+                            {absen.approval}
                           </span>
                         </td>
                       </tr>
