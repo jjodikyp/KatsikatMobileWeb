@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Header from "../components/Com Header/Header";
-import WorkTimeAlert from "../components/WorkTimeAlert";
-import BreakTimeAlert from "../components/BreakTimeAlert";
-import AnimatedButton from "../components/Design/AnimatedButton";
-const BerandaKurir = () => {
+import Header from "../../components/Com Header/Header";
+import WorkTimeAlert from "../../components/WorkTimeAlert";
+import BreakTimeAlert from "../../components/BreakTimeAlert";
+import ConfirmationModal from "../../components/Modal/ConfirmationModal";
+import AnimatedButton from "../../components/Design/AnimatedButton";
+
+const BerandaKasir = () => {
   const navigate = useNavigate();
-  const [selectedEstimasi, setSelectedEstimasi] = useState("pickup");
+  const [selectedEstimasi, setSelectedEstimasi] = useState("reguler");
   const [antrianData, setAntrianData] = useState(null);
-  const [antrianTransport, setAntrianTransport] = useState([]);
   const [dateRange, setDateRange] = useState(() => {
     const savedRange = localStorage.getItem("dateRange");
     if (savedRange) {
@@ -21,6 +22,11 @@ const BerandaKurir = () => {
       endDate: today,
     };
   });
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showSwitchRoleModal, setShowSwitchRoleModal] = useState(false);
+  const [currentTime, setCurrentTime] = useState(
+    new Date().toLocaleTimeString()
+  );
   const [isFromIzin, setIsFromIzin] = useState(false);
   const [isFromPresent, setIsFromPresent] = useState(false);
 
@@ -40,7 +46,6 @@ const BerandaKurir = () => {
       [name]: formattedValue,
     };
 
-    // Validasi rentang
     if (name === "startDate" && formattedValue > dateRange.endDate) {
       newRange.endDate = formattedValue;
     } else if (name === "endDate" && formattedValue < dateRange.startDate) {
@@ -55,62 +60,18 @@ const BerandaKurir = () => {
   // Fungsi untuk mengambil data antrian
   const fetchAntrianData = async (range = dateRange) => {
     try {
-      const formattedStartDate = formatDateForDB(range.startDate);
-      const formattedEndDate = formatDateForDB(range.endDate);
-
-      const baseUrl = `${import.meta.env.VITE_API_URL}/api/transport`;
-
-      const [pickupResponse, deliveryResponse] = await Promise.all([
-        axios.get(`${baseUrl}/pickup`, {
-          params: {
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
-          },
-        }),
-        axios.get(`${baseUrl}/delivery`, {
-          params: {
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
-          },
-        }),
-      ]);
-
-      setAntrianData({
-        pickup: pickupResponse.data.data.length,
-        delivery: deliveryResponse.data.data.length,
-      });
-
-      if (selectedEstimasi === "pickup") {
-        setAntrianTransport(pickupResponse.data.data);
-      } else {
-        setAntrianTransport(deliveryResponse.data.data);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  // Filter antrian berdasarkan tipe
-  const filterTransport = async (type) => {
-    setSelectedEstimasi(type);
-    try {
-      const formattedStartDate = formatDateForDB(dateRange.startDate);
-      const formattedEndDate = formatDateForDB(dateRange.endDate);
-
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/transport/${type}`,
+        `${import.meta.env.VITE_API_URL}/api/antrian/count`,
         {
           params: {
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
+            startDate: formatDateForDB(range.startDate),
+            endDate: formatDateForDB(range.endDate),
           },
         }
       );
-
-      setAntrianTransport(response.data.data);
+      setAntrianData(response.data.data);
     } catch (error) {
-      console.error("Error filtering data:", error);
-      setAntrianTransport([]);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -122,29 +83,55 @@ const BerandaKurir = () => {
       setIsFromIzin(true);
     }
 
-    // Cek status presensi dari session storage
+    // Cek apakah user datang dari halaman pilih-role setelah login
     const fromPresent = sessionStorage.getItem("fromPresent");
     if (fromPresent === "true") {
       setIsFromPresent(true);
     }
   }, []);
 
+  const handleLogoutConfirm = () => {
+    // Implementasi log out
+  };
+
+  const handleSwitchRoleConfirm = () => {
+    // Implementasi switch role
+  };
+
+  const handleOpenQueue = () => {
+    navigate(`/berandakasir/antriankasir/${selectedEstimasi}`, {
+      state: {
+        dateRange,
+        estimasi: selectedEstimasi,
+      },
+    });
+  };
+
   return (
     <div className="h-[100dvh] flex flex-col overflow-hidden bg-[#E6EFF9] font-montserrat">
-      <Header />
-      <main className="flex-1 overflow-y-auto pb-10">
+      <Header
+        title="CASHIER DASHBOARD"
+        showLogoutButton={true}
+        onLogoutClick={() => setShowLogoutModal(true)}
+        showSwitchRole={true}
+        onSwitchRoleClick={() => setShowSwitchRoleModal(true)}
+        currentTime={currentTime}
+      />
+
+      {/* Main Content dengan overflow scroll */}
+      <main className="flex-1 overflow-y-auto">
         <div className="mx-auto px-4 md:px-10 pt-20 pb-6">
           <div className="max-w-[390px] md:max-w-none mx-auto mt-[120px]">
             <WorkTimeAlert />
             <BreakTimeAlert />
 
-            {/* Date Range Picker */}
+            {/* Date Range Card */}
             <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
-              <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
+              <h2 className="text-2xl font-bebas mb-2">Date Range</h2>
               <div className="grid grid-cols-2 gap-4 font-montserrat">
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">
-                    Dari Tanggal
+                    From Date
                   </label>
                   <input
                     type="date"
@@ -157,7 +144,7 @@ const BerandaKurir = () => {
                 </div>
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">
-                    Sampai Tanggal
+                    To Date
                   </label>
                   <input
                     type="date"
@@ -171,91 +158,82 @@ const BerandaKurir = () => {
               </div>
             </div>
 
-            {/* Detail Antrian Card */}
+            {/* Quality Check Queue Details Card */}
             <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
               <h2 className="text-2xl font-bebas mb-2">
-                Delivery Queue Details
+                Quality Check Queue Details
               </h2>
-              <div className="grid grid-cols-2 gap-2 font-['Montserrat']">
-                <AnimatedButton 
+              <div className="grid grid-cols-3 gap-2 font-['Montserrat']">
+                <AnimatedButton
                   className={`${
-                    selectedEstimasi === "pickup"
+                    selectedEstimasi === "reguler"
                       ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
                       : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                   } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                  onClick={() => filterTransport("pickup")}
+                  onClick={() => setSelectedEstimasi("reguler")}
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-5 h-5"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0l-3-3m3 3l3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
-                      />
-                    </svg>
-                    <h3
-                      className={
-                        selectedEstimasi === "pickup"
-                          ? "text-white"
-                          : "text-gray-600"
-                      }
-                    >
-                      Pick Up
-                    </h3>
-                  </div>
+                  <h3
+                    className={
+                      selectedEstimasi === "reguler"
+                        ? "text-white"
+                        : "text-gray-600"
+                    }
+                  >
+                    Regular
+                  </h3>
                   <p className="text-3xl font-bold">
-                    {antrianData?.pickup || 0}
+                    {antrianData?.reguler || 0}
                   </p>
                 </AnimatedButton>
-                <AnimatedButton 
+
+                <AnimatedButton
                   className={`${
-                    selectedEstimasi === "delivery"
+                    selectedEstimasi === "sameDay"
                       ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
                       : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
                   } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                  onClick={() => filterTransport("delivery")}
+                  onClick={() => setSelectedEstimasi("sameDay")}
                 >
-                  <div className="flex items-center gap-2 mb-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-5 h-5"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
-                      />
-                    </svg>
-                    <h3
-                      className={
-                        selectedEstimasi === "delivery"
-                          ? "text-white"
-                          : "text-gray-600"
-                      }
-                    >
-                      Delivery
-                    </h3>
-                  </div>
+                  <h3
+                    className={
+                      selectedEstimasi === "sameDay"
+                        ? "text-white"
+                        : "text-gray-600"
+                    }
+                  >
+                    Same Day
+                  </h3>
                   <p className="text-3xl font-bold">
-                    {antrianData?.delivery || 0}
+                    {antrianData?.sameDay || 0}
+                  </p>
+                </AnimatedButton>
+
+                <AnimatedButton
+                  className={`${
+                    selectedEstimasi === "nextDay"
+                      ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
+                      : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                  } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
+                  onClick={() => setSelectedEstimasi("nextDay")}
+                >
+                  <h3
+                    className={
+                      selectedEstimasi === "nextDay"
+                        ? "text-white"
+                        : "text-gray-600"
+                    }
+                  >
+                    Next Day
+                  </h3>
+                  <p className="text-3xl font-bold">
+                    {antrianData?.nextDay || 0}
                   </p>
                 </AnimatedButton>
               </div>
 
-              {/* Button Buka Antrian */}
+              {/* Open Queue Button */}
               <AnimatedButton
-                onClick={() => navigate(`/kurir/${selectedEstimasi}`)}
+                onClick={handleOpenQueue}
                 disabled={isFromIzin || !isFromPresent}
                 className={`shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm w-full h-[35px] mt-4 py-3 rounded-xl hover:bg-opacity-90 transition-all font-montserrat flex items-center justify-center font-bold
                   ${
@@ -273,8 +251,24 @@ const BerandaKurir = () => {
           </div>
         </div>
       </main>
+
+      <ConfirmationModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogoutConfirm}
+        title="Logout Confirmation"
+        message="Are you sure you want to logout? Logging out is recommended when work hours are finished."
+      />
+
+      <ConfirmationModal
+        isOpen={showSwitchRoleModal}
+        onClose={() => setShowSwitchRoleModal(false)}
+        onConfirm={handleSwitchRoleConfirm}
+        title="Switch Role Confirmation"
+        message="Are you sure you want to switch to courier page?"
+      />
     </div>
   );
 };
 
-export default BerandaKurir;
+export default BerandaKasir;

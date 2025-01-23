@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Header from "../components/Com Header/Header";
-import MonthYearPicker from "../components/MonthYearPicker";
+import Header from "../../components/Com Header/Header";
+import MonthYearPicker from "../../components/MonthYearPicker";
 import { useNavigate } from "react-router-dom";
-import LordIcon from "../components/Design/LordIcon";
+import LordIcon from "../../components/Design/LordIcon";
 import { useLocation } from 'react-router-dom';
-import AnimatedButton from "../components/Design/AnimatedButton";
+import AnimatedButton from "../../components/Design/AnimatedButton";
 
 const CekAbsen = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode }) => {
   const [month, setMonth] = useState(new Date().getMonth() + 1);

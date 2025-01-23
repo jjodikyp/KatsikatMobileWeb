@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import Header from '../components/Com Header/Header';
+import Header from '../../components/Com Header/Header';
 import { useNavigate } from 'react-router-dom';
-import LordIcon from '../components/Design/LordIcon';
-import AnimatedButton from '../components/Design/AnimatedButton';
+import LordIcon from '../../components/Design/LordIcon';
+import AnimatedButton from '../../components/Design/AnimatedButton';
 
 const CekGaji = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode }) => {
   const navigate = useNavigate();

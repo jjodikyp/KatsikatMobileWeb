@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import AntrianHeader from '../components/Header Antrian/AntrianHeader';
-import AntrianKurirContent from '../components/AntrianKurirContent';
-import AnimatedButton from '../components/Design/AnimatedButton';
-import WhatsAppFormatter from '../components/WhatsAppMessage/WhatsAppFormatter';
+import AntrianHeader from '../../components/Header Antrian/AntrianHeader';
+import AntrianKurirContent from '../../components/AntrianKurirContent';
+import AnimatedButton from '../../components/Design/AnimatedButton';
+import WhatsAppFormatter from '../../components/WhatsAppMessage/WhatsAppFormatter';
 
 const AntrianKurir = () => {
   const { type } = useParams();

@@ -3,11 +3,11 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import LoadingDots from '../components/Design/LoadingDots';
-import AntrianHeader from '../components/Header Antrian/AntrianHeader';
-import LordIcon from "../components/Design/LordIcon";
-import FilterAndSearch from '../components/Header Antrian/FilterAndSearch';
-import AnimatedButton from '../components/Design/AnimatedButton';
+import LoadingDots from '../../components/Design/LoadingDots';
+import AntrianHeader from '../../components/Header Antrian/AntrianHeader';
+import LordIcon from "../../components/Design/LordIcon";
+import FilterAndSearch from '../../components/Header Antrian/FilterAndSearch';
+import AnimatedButton from '../../components/Design/AnimatedButton';
 
 const Antrian = () => {
   const navigate = useNavigate();

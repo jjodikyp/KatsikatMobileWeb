@@ -11,11 +11,11 @@ import {
   setMinutes,
   setSeconds,
 } from "date-fns";
-import ConfirmationModal from "../components/Modal/ConfirmationModal";
-import Header from "../components/Com Header/Header";
-import WorkTimeAlert from "../components/WorkTimeAlert";
-import BreakTimeAlert from "../components/BreakTimeAlert";
-import AnimatedButton from "../components/Design/AnimatedButton";
+import ConfirmationModal from "../../components/Modal/ConfirmationModal";
+import Header from "../../components/Com Header/Header";
+import WorkTimeAlert from "../../components/WorkTimeAlert";
+import BreakTimeAlert from "../../components/BreakTimeAlert";
+import AnimatedButton from "../../components/Design/AnimatedButton";
 
 const BerandaTeknisi = () => {
   const navigate = useNavigate();

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import absenImage from "../assets/images/absen.png";
-import absenSound from "../assets/sound/absen.mp3"; // Import sound file
+import absenImage from "../../assets/images/absen.png";
+import absenSound from "../../assets/sound/absen.mp3"; // Import sound file
 import { FaMedkit, FaCalendarDay, FaUserClock } from "react-icons/fa";
-import AnimatedButton from "../components/Design/AnimatedButton";
+import AnimatedButton from "../../components/Design/AnimatedButton";
 
 const Absensi = () => {
   const navigate = useNavigate();

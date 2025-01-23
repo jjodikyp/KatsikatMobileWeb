@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import goodImage from "../assets/images/good.png";
 import axios from "axios";
-import FuelCalculationModal from "../components/FuelCalculationModal";
+import FuelCalculationModal from "../../components/FuelCalculationModal";
 
 const KurirTransport = () => {
   const navigate = useNavigate();

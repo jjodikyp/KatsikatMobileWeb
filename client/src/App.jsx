@@ -1,21 +1,20 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginKaryawan from './pages/LoginKaryawan';
-import LoginSuccess from './pages/LoginSuccess';
-import Absensi from './pages/Absensi';
-import BerandaTeknisi from './pages/BerandaTeknisi';
-import Antrian from './pages/Antrian';
-import KurirTransport from './pages/KurirTransport';
-import AbsenAkhir from './pages/AbsenAkhir';
-import BerandaKurir from './pages/BerandaKurir';
-import BerandaKasir from './pages/BerandaKasir';
-import PilihRole from './pages/PilihRole';
-import CekAbsen from './pages/CekAbsen';
-import CekGaji from './pages/CekGaji';
-import KontrolKerja from './pages/KontrolKerja';
-import AntrianKasir from './pages/AntrianKasir';
-import AntrianKurir from './pages/AntrianKurir';
-import IzinSuccess from './pages/IzinSuccess';
-import AnalisisKinerja from './pages/AnalisisKinerja';
+import LoginKaryawan from './pages/PERTAMA/LoginKaryawan';
+import LoginSuccess from './pages/PERTAMA/LoginSuccess';
+import Absensi from './pages/ABSEN/AbsenAwal';
+import BerandaTeknisi from './pages/BERANDA/BerandaTeknisi';
+import Antrian from './pages/BERANDA/Antrian';
+import KurirTransport from './pages/ABSEN/KurirTransport';
+import AbsenAkhir from './pages/ABSEN/AbsenAkhir';
+import BerandaKurir from './pages/BERANDA/BerandaKurir';
+import BerandaKasir from './pages/BERANDA/BerandaKasir';
+import PilihRole from './pages/PERTAMA/PilihRole';
+import CekAbsen from './pages/ANALISIS/CekAbsen';
+import CekGaji from './pages/ANALISIS/CekGaji';
+import KontrolKerja from './pages/ANALISIS/KontrolKerja';
+import AntrianKasir from './pages/BERANDA/AntrianKasir';
+import AntrianKurir from './pages/BERANDA/AntrianKurir';
+import IzinSuccess from './pages/PERTAMA/IzinSuccess';
 
 function App() {
   return (
@@ -41,7 +40,6 @@ function App() {
         <Route path="/kontrolkerja" element={<KontrolKerja/>} />
         <Route path="/kurir/:type" element={<AntrianKurir />} />
         <Route path="/izin-success" element={<IzinSuccess />} />
-        <Route path="/analisis-kinerja" element={<AnalisisKinerja />} />
       </Routes>
     </Router>
   );

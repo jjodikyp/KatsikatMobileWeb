@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import AntrianHeader from '../components/Header Antrian/AntrianHeader';
-import LoadingDots from '../components/Design/LoadingDots';
-import LordIcon from '../components/Design/LordIcon';
-import FilterAndSearch from '../components/Header Antrian/FilterAndSearch';
-import QualityCheckModal from '../components/Modal/QualityCheckModal';
+import AntrianHeader from '../../components/Header Antrian/AntrianHeader';
+import LoadingDots from '../../components/Design/LoadingDots';
+import LordIcon from '../../components/Design/LordIcon';
+import FilterAndSearch from '../../components/Header Antrian/FilterAndSearch';
+import QualityCheckModal from '../../components/Modal/QualityCheckModal';
 
 const AntrianKasir = () => {
   const { estimasi } = useParams();

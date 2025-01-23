@@ -1,22 +1,18 @@
-import { useNavigate } from 'react-router-dom';
-import loginDone from '../assets/images/login.png';
-import AnimatedButton from '../components/Design/AnimatedButton';
-import '../LoginSuccess.css';
+import { useNavigate } from "react-router-dom";
+import AnimatedButton from "../../components/Design/AnimatedButton";
+import LordIcon from "../../components/Design/LordIcon";
 
 const LoginSuccess = () => {
   const navigate = useNavigate();
 
-  // Cek apakah user datang dari halaman pilih-role maka button buka antrian akan tampil
-
-
   // Data dummy untuk treatment (nantinya akan diganti dengan data dari database)
   const treatmentData = {
     count: 2,
-    date: "Selasa, 25 Juni 2024"
+    date: "Selasa, 25 Juni 2024",
   };
 
   const handleContinue = () => {
-    navigate('/pilih-role');
+    navigate("/pilih-role");
   };
 
   return (
@@ -24,10 +20,10 @@ const LoginSuccess = () => {
       <div className="w-full sm:w-[380px] p-8 sm:p-8 my-auto bg-white rounded-3xl shadow-2xl shadow-grey opacity-100 outline outline-2 outline-white">
         {/* Illustration */}
         <div className="flex justify-center mb-6">
-          <img 
-            src={loginDone} 
-            alt="Login Success" 
-            className="w-[100px] h-auto animate-scale"
+          <LordIcon
+            src="https://cdn.lordicon.com/dhmavvpz.json"
+            trigger="loop"
+            style={{ width: '120px', height: '120px' }}
           />
         </div>
 
@@ -54,4 +50,4 @@ const LoginSuccess = () => {
   );
 };
 
-export default LoginSuccess; 
+export default LoginSuccess;

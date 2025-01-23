@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import ConfirmRoleModal from '../components/Modal/ConfirmRoleModal';
-import AnimatedButton from '../components/Design/AnimatedButton';
+import ConfirmRoleModal from '../../components/Modal/ConfirmRoleModal';
+import AnimatedButton from '../../components/Design/AnimatedButton';
 
 const PilihRole = () => {
   const [selectedRole, setSelectedRole] = useState('');

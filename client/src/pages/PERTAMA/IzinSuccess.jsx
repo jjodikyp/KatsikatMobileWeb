@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import LordIcon from '../components/Design/LordIcon';
-import AnimatedButton from '../components/Design/AnimatedButton';
+import LordIcon from '../../components/Design/LordIcon';
+import AnimatedButton from '../../components/Design/AnimatedButton';
 
 const IzinSuccess = () => {
   const navigate = useNavigate();

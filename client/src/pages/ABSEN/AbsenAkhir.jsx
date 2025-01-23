@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import seeImage from "../assets/images/see.png";
-import LordIcon from "../components/Design/LordIcon";
+import LordIcon from "../../components/Design/LordIcon";
 
 const AbsenAkhir = () => {
   const navigate = useNavigate();
