@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import AnimatedButton from "../components/Design/AnimatedButton";
 
 const LoginKaryawan = () => {
   const navigate = useNavigate();
@@ -53,6 +54,9 @@ const LoginKaryawan = () => {
       console.error("Error:", error);
       setError(error.response?.data?.message || "Terjadi kesalahan saat login");
     }
+
+    sessionStorage.removeItem("fromIzin");
+    sessionStorage.removeItem("fromPresent");
   };
 
   return (
@@ -121,12 +125,12 @@ const LoginKaryawan = () => {
             />
           </div>
 
-          <button
+          <AnimatedButton
             type="submit"
             className="w-full h-[40px] py-3 sm:py-3.5 px-4 mt-2 bg-[#57AEFF] text-white rounded-xl shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white font-montserrat font-semibold flex items-center justify-center"
           >
             Login
-          </button>
+          </AnimatedButton>
         </form>
       </div>
     </div>

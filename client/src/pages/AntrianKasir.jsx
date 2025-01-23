@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import AntrianHeader from '../components/AntrianHeader';
-import LoadingDots from '../components/LoadingDots';
-import LordIcon from '../components/LordIcon';
+import AntrianHeader from '../components/Header Antrian/AntrianHeader';
+import LoadingDots from '../components/Design/LoadingDots';
+import LordIcon from '../components/Design/LordIcon';
+import FilterAndSearch from '../components/Header Antrian/FilterAndSearch';
+import QualityCheckModal from '../components/Modal/QualityCheckModal';
 
 const AntrianKasir = () => {
   const { estimasi } = useParams();
@@ -21,6 +23,9 @@ const AntrianKasir = () => {
   const [filteredAntrian, setFilteredAntrian] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [showQCModal, setShowQCModal] = useState(false);
+  const [selectedQCType, setSelectedQCType] = useState(null);
+  const [selectedItemId, setSelectedItemId] = useState(null);
 
   useEffect(() => {
     fetchDummyData();
@@ -75,8 +80,17 @@ const AntrianKasir = () => {
   };
 
   const handleStatusUpdate = (id, status) => {
-    // Handle status update logic here
-    console.log(`Update item ${id} to status: ${status}`);
+    setSelectedItemId(id);
+    setSelectedQCType(status);
+    setShowQCModal(true);
+  };
+
+  const handleQCSubmit = (result) => {
+    console.log('QC Result for item', selectedItemId, ':', result);
+    // Implementasi logika update status
+    setShowQCModal(false);
+    setSelectedQCType(null);
+    setSelectedItemId(null);
   };
 
   return (
@@ -84,59 +98,15 @@ const AntrianKasir = () => {
       {/* Header - Fixed at top */}
       <header className="fixed top-0 left-0 right-0 z-10 bg-[#E6EFF9]">
         <AntrianHeader />
-
-        {/* Filter Section */}
-        <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex flex-col gap-4 w-full md:max-w-none bg-[#E6EFF9] shadow-lg">
-          {/* Title dan Filter Buttons */}
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bebas">
-              {estimasi === "sameDay" ? "Same Day" : estimasi === "nextDay" ? "Next Day" : "Regular"}
-            </h1>
-
-            {/* Filter Buttons */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleFilterChange("cleaning")}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold ${
-                  selectedFilter === "cleaning"
-                    ? "bg-[#57AEFF] text-white"
-                    : "bg-[#E6EFF9] text-gray-600"
-                } shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white`}
-              >
-                Cleaning ({cleaningCount})
-              </button>
-              <button
-                onClick={() => handleFilterChange("repair")}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold ${
-                  selectedFilter === "repair"
-                    ? "bg-[#57AEFF] text-white"
-                    : "bg-[#E6EFF9] text-gray-600"
-                } shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white`}
-              >
-                Repair ({repairCount})
-              </button>
-            </div>
-          </div>
-
-          {/* Search Input */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search by customer name or treatment..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-[#57AEFF] text-gray-700 placeholder-gray-400 placeholder:text-sm"
-            />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <LordIcon
-                src="https://cdn.lordicon.com/wjyqkiew.json"
-                trigger="loop"
-                state="loop-oscillate"
-                style={{ width: "25px", height: "25px" }}
-              />
-            </div>
-          </div>
-        </div>
+        <FilterAndSearch 
+          estimasi={estimasi}
+          selectedFilter={selectedFilter}
+          handleFilterChange={handleFilterChange}
+          cleaningCount={cleaningCount}
+          repairCount={repairCount}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
       </header>
 
       {/* Main Content */}
@@ -186,7 +156,7 @@ const AntrianKasir = () => {
                   <div className="flex gap-2 mt-4">
                     <button 
                       onClick={() => handleStatusUpdate(item.id, 'failed')}
-                      className="flex-1 h-[35px] rounded-xl flex items-center justify-center text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] font-semibold bg-red-500 text-white opacity-100 outline outline-1 outline-white"
+                      className="flex-1 h-[35px] rounded-xl flex items-center justify-center text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] font-semibold bg-[#FD8087] text-white opacity-100 outline outline-1 outline-white"
                     >
                       Tidak Lolos
                     </button>
@@ -244,6 +214,18 @@ const AntrianKasir = () => {
           </div>
         </div>
       )}
+
+      {/* Quality Check Modal */}
+      <QualityCheckModal
+        isOpen={showQCModal}
+        onClose={() => {
+          setShowQCModal(false);
+          setSelectedQCType(null);
+          setSelectedItemId(null);
+        }}
+        type={selectedQCType}
+        onSubmit={handleQCSubmit}
+      />
     </div>
   );
 };

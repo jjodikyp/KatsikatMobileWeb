@@ -3,9 +3,11 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import LoadingDots from '../components/LoadingDots';
-import AntrianHeader from '../components/AntrianHeader';
-import LordIcon from "../components/LordIcon";
+import LoadingDots from '../components/Design/LoadingDots';
+import AntrianHeader from '../components/Header Antrian/AntrianHeader';
+import LordIcon from "../components/Design/LordIcon";
+import FilterAndSearch from '../components/Header Antrian/FilterAndSearch';
+import AnimatedButton from '../components/Design/AnimatedButton';
 
 const Antrian = () => {
   const navigate = useNavigate();
@@ -162,105 +164,15 @@ const Antrian = () => {
       {/* Header - Fixed at top */}
       <header className="fixed top-0 left-0 right-0 z-10 bg-[#E6EFF9]">
         <AntrianHeader />
-
-        {/* Filter Section */}
-        <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex flex-col gap-4 w-full md:max-w-none bg-[#E6EFF9] shadow-lg">
-          {/* Title dan Filter Buttons */}
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bebas">
-              {estimasi === "sameDay"
-                ? "Same Day"
-                : estimasi === "nextDay"
-                ? "Next Day"
-                : "Regular"}
-            </h1>
-
-            {/* Filter Buttons */}
-            <div className="flex gap-2">
-              <div className="relative">
-                <button
-                  onClick={() => handleFilterChange("cleaning")}
-                  className={`ml-4 px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${
-                    selectedFilter === "cleaning"
-                      ? "bg-[#57AEFF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-2 outline-white"
-                      : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
-                  }`}
-                >
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    strokeWidth={1.5} 
-                    stroke="currentColor" 
-                    className="w-5 h-5"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" 
-                    />
-                  </svg>
-                  Cleaning
-                  {cleaningCount > 0 && (
-                    <div className="absolute -top-2 -right-2 bg-[#FD8087] text-white rounded-full w-6 h-6 flex items-center justify-center font-montserrat text-xs">
-                      {cleaningCount}
-                    </div>
-                  )}
-                </button>
-              </div>
-              <div className="relative">
-                <button
-                  onClick={() => handleFilterChange("repair")}
-                  className={`ml-2 px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${
-                    selectedFilter === "repair"
-                      ? "bg-[#57AEFF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-2 outline-white"
-                      : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
-                  }`}
-                >
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    strokeWidth={1.5} 
-                    stroke="currentColor" 
-                    className="w-5 h-5"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 11-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 004.486-6.336l-3.276 3.277a3.004 3.004 0 01-2.25-2.25l3.276-3.276a4.5 4.5 0 00-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437l1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008z" 
-                    />
-                  </svg>
-                  Repair
-                  {repairCount > 0 && (
-                    <div className="absolute -top-2 -right-2 bg-[#FD8087] text-white rounded-full w-6 h-6 flex items-center justify-center font-montserrat text-xs">
-                      {repairCount}
-                    </div>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Search Bar */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search by customer name or treatment..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 rounded-xl bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-[#57AEFF] text-gray-700 placeholder-gray-400 placeholder:text-sm"
-            />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center">
-              <LordIcon
-                src="https://cdn.lordicon.com/wjyqkiew.json"
-                trigger="loop"
-                state="loop-oscillate"
-                style={{ width: "25px", height: "25px" }}
-              />
-            </div>
-          </div>
-        </div>
+        <FilterAndSearch 
+          estimasi={estimasi}
+          selectedFilter={selectedFilter}
+          handleFilterChange={handleFilterChange}
+          cleaningCount={cleaningCount}
+          repairCount={repairCount}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
       </header>
 
       {/* Main Content - Dengan padding top yang disesuaikan */}
@@ -318,9 +230,11 @@ const Antrian = () => {
                       </p>
                     </div>
                   </div>
-                  <button className="w-full h-[35px] mb-auto mt-4 rounded-xl flex items-center justify-center text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] font-semibold bg-[#57AEFF] text-white opacity-100 outline outline-1 outline-white">
+                  <AnimatedButton
+                    className="w-full h-[35px] mb-auto mt-4 rounded-xl flex items-center justify-center text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] font-semibold bg-[#57AEFF] text-white opacity-100 outline outline-1 outline-white"
+                  >
                     Mulai Treatment
-                  </button>
+                  </AnimatedButton>
                 </div>
               ))
             ) : (

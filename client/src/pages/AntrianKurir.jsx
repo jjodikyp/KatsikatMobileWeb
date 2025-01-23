@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import AntrianHeader from '../components/AntrianHeader';
+import AntrianHeader from '../components/Header Antrian/AntrianHeader';
 import AntrianKurirContent from '../components/AntrianKurirContent';
+import AnimatedButton from '../components/Design/AnimatedButton';
+import WhatsAppFormatter from '../components/WhatsAppMessage/WhatsAppFormatter';
 
 const AntrianKurir = () => {
   const { type } = useParams();
@@ -71,11 +73,8 @@ const AntrianKurir = () => {
     
     const item = antrianData.find(item => item.id === id);
     if (item) {
-      const message = type === 'pickup' 
-        ? 'Menjemput' 
-        : 'Mengantar';
-      handleWhatsApp(item.phone, `Halo kak! 
-        Saya driver dari Katsikat yang akan ${message} item kakak! Mohon ditunggu ya kak, Terima kasih!`);
+      const message = WhatsAppFormatter.formatStartDeliveryMessage(type);
+      handleWhatsApp(item.phone, message);
     }
   };
 
@@ -88,6 +87,12 @@ const AntrianKurir = () => {
   };
 
   const handleCompleteDelivery = (id) => {
+    const item = antrianData.find(item => item.id === id);
+    if (item) {
+      const message = WhatsAppFormatter.formatCompletionMessage();
+      handleWhatsApp(item.phone, message);
+    }
+    
     setAntrianData(prevData => 
       prevData.filter(item => item.id !== id)
     );
@@ -108,7 +113,7 @@ const AntrianKurir = () => {
                 placeholder="Cari nama atau alamat..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 rounded-xl bg-[#E6EFF9] text-gray-600 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white"
+                className="w-full px-4 py-2 rounded-xl bg-[#E6EFF9] text-gray-600 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white placeholder:text-gray-400 placeholder:text-sm"
               />
             </div>
           </div>

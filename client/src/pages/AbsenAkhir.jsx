@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import seeImage from "../assets/images/see.png";
-import LordIcon from "../components/LordIcon";
+import LordIcon from "../components/Design/LordIcon";
 
 const AbsenAkhir = () => {
   const navigate = useNavigate();
@@ -55,6 +55,8 @@ const AbsenAkhir = () => {
     
     // Hapus waktu mulai kerja dari localStorage
     localStorage.removeItem("workStartTime");
+    sessionStorage.removeItem('fromPresent');
+    sessionStorage.removeItem('fromIzin')
     // Arahkan ke halaman login
     navigate("/");
   };

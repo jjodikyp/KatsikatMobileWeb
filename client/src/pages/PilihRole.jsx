@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import ConfirmRoleModal from '../components/ConfirmRoleModal';
+import ConfirmRoleModal from '../components/Modal/ConfirmRoleModal';
+import AnimatedButton from '../components/Design/AnimatedButton';
 
 const PilihRole = () => {
   const [selectedRole, setSelectedRole] = useState('');
@@ -124,12 +125,12 @@ const PilihRole = () => {
           </button>
         </div>
 
-        <button
+        <AnimatedButton
           onClick={handleContinue}
           className="w-full py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm font-semibold hover:bg-opacity-90 transition-colors shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white mt-6"
         >
           Continue
-        </button>
+        </AnimatedButton>
       </div>
 
       <ConfirmRoleModal

@@ -11,11 +11,11 @@ import {
   setMinutes,
   setSeconds,
 } from "date-fns";
-import ConfirmationModal from "../components/ConfirmationModal";
-import Header from "../components/Header";
-import SwitchRoleTeknisi from '../components/SwitchRoleTeknisi';
-import WorkTimeAlert from '../components/WorkTimeAlert';
-import BreakTimeAlert from '../components/BreakTimeAlert';
+import ConfirmationModal from "../components/Modal/ConfirmationModal";
+import Header from "../components/Com Header/Header";
+import WorkTimeAlert from "../components/WorkTimeAlert";
+import BreakTimeAlert from "../components/BreakTimeAlert";
+import AnimatedButton from "../components/Design/AnimatedButton";
 
 const BerandaTeknisi = () => {
   const navigate = useNavigate();
@@ -66,12 +66,14 @@ const BerandaTeknisi = () => {
     minutes: 0,
     seconds: 0,
   });
-  const [currentTime, setCurrentTime] = useState('');
+  const [currentTime, setCurrentTime] = useState("");
+  const [isFromIzin, setIsFromIzin] = useState(false);
+  const [isFromPresent, setIsFromPresent] = useState(false);
 
   // Fungsi untuk mendapatkan waktu WIB
   const getJakartaTime = () => {
     const date = new Date();
-    return new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+    return new Date(date.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
   };
 
   // Fungsi untuk testing waktu
@@ -80,23 +82,26 @@ const BerandaTeknisi = () => {
     testTime.setHours(targetHour);
     testTime.setMinutes(targetMinute);
     testTime.setSeconds(0);
-    
+
     // Override getJakartaTime untuk testing
     getJakartaTime = () => testTime;
-    
-    console.log(`Testing dengan waktu: ${format(testTime, 'HH:mm:ss')}`);
+
+    console.log(`Testing dengan waktu: ${format(testTime, "HH:mm:ss")}`);
   };
 
   // Fungsi untuk mengecek waktu istirahat
   const checkBreakTime = () => {
     const jakartaTime = getJakartaTime();
-    
+
     // Hanya log saat pertama kali komponen dimount atau saat debug
     // console.log('Current Jakarta time:', format(jakartaTime, 'HH:mm:ss'));
 
     // Set target times
     const breakTime = setHours(setMinutes(setSeconds(jakartaTime, 0), 0), 12); // 12:00:00
-    const warningTime = setHours(setMinutes(setSeconds(jakartaTime, 0), 45), 11); // 11:45:00
+    const warningTime = setHours(
+      setMinutes(setSeconds(jakartaTime, 0), 45),
+      11
+    ); // 11:45:00
     const returnTime = setHours(setMinutes(setSeconds(jakartaTime, 0), 0), 13); // 13:00:00
 
     // Hitung countdown ke waktu istirahat
@@ -122,13 +127,13 @@ const BerandaTeknisi = () => {
       setShowBreakWarning(true);
       setShowReturnWarning(false);
       // console.log('Break warning shown');
-    } 
+    }
     // Tampilkan peringatan selama waktu istirahat
     else if (jakartaTime >= breakTime && jakartaTime < returnTime) {
       setShowBreakWarning(false);
       setShowReturnWarning(true);
       // console.log('Return warning shown');
-    } 
+    }
     // Sembunyikan semua peringatan
     else {
       setShowBreakWarning(false);
@@ -333,7 +338,18 @@ const BerandaTeknisi = () => {
 
   useEffect(() => {
     fetchAntrianData();
-  }, [navigate]);
+    // Cek apakah user datang dari halaman izin-success
+    const fromIzin = sessionStorage.getItem("fromIzin");
+    if (fromIzin === "true") {
+      setIsFromIzin(true);
+    }
+
+    // Cek apakah user datang dari halaman pilih-role setelah login
+    const fromPresent = sessionStorage.getItem("fromPresent");
+    if (fromPresent === "true") {
+      setIsFromPresent(true);
+    }
+  }, []);
 
   // Debug state changes
   useEffect(() => {
@@ -503,12 +519,12 @@ const BerandaTeknisi = () => {
   // Tambahkan fungsi untuk update waktu
   const updateTime = () => {
     const now = new Date();
-    const timeString = now.toLocaleTimeString('id-ID', {
+    const timeString = now.toLocaleTimeString("id-ID", {
       hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      timeZone: 'Asia/Jakarta'
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      timeZone: "Asia/Jakarta",
     });
     setCurrentTime(timeString);
   };
@@ -523,15 +539,14 @@ const BerandaTeknisi = () => {
   return (
     <div className="h-[100dvh] flex flex-col overflow-hidden bg-[#E6EFF9] font-montserrat">
       <Header />
-      
+
       {/* Main Content dengan overflow scroll */}
       <main className="flex-1 overflow-y-auto pb-10">
         <div className="mx-auto px-4 md:px-10 pt-20 pb-6">
-          <div className="max-w-[390px] md:max-w-none mx-auto">
-            <SwitchRoleTeknisi />
+          <div className="max-w-[390px] md:max-w-none mx-auto mt-[120px]">
             <WorkTimeAlert />
             <BreakTimeAlert />
-            
+
             {/* Date Range Picker */}
             <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
               <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
@@ -562,14 +577,16 @@ const BerandaTeknisi = () => {
                     className="bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
                   />
                 </div>
-              </div>  
+              </div>
             </div>
 
             {/* Detail Antrian Card dengan Button Buka Antrian */}
             <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
-              <h2 className="text-2xl font-bebas mb-2">Detail Antrian Treatment</h2>
+              <h2 className="text-2xl font-bebas mb-2">
+                Detail Antrian Treatment
+              </h2>
               <div className="grid grid-cols-3 gap-2 font-['Montserrat']">
-                <div
+                <AnimatedButton 
                   className={`${
                     selectedEstimasi === "reguler"
                       ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
@@ -589,8 +606,8 @@ const BerandaTeknisi = () => {
                   <p className="text-3xl font-bold">
                     {antrianData?.reguler || 0}
                   </p>
-                </div>
-                <div
+                </AnimatedButton>
+                <AnimatedButton 
                   className={`${
                     selectedEstimasi === "sameDay"
                       ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
@@ -610,8 +627,8 @@ const BerandaTeknisi = () => {
                   <p className="text-3xl font-bold">
                     {antrianData?.sameDay || 0}
                   </p>
-                </div>
-                <div
+                </AnimatedButton>
+                <AnimatedButton 
                   className={`${
                     selectedEstimasi === "nextDay"
                       ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
@@ -631,11 +648,11 @@ const BerandaTeknisi = () => {
                   <p className="text-3xl font-bold">
                     {antrianData?.nextDay || 0}
                   </p>
-                </div>
+                </AnimatedButton>
               </div>
 
               {/* Button Buka Antrian */}
-              <button
+              <AnimatedButton
                 onClick={() =>
                   navigate(`/antrian/${selectedEstimasi}`, {
                     state: {
@@ -644,10 +661,19 @@ const BerandaTeknisi = () => {
                     },
                   })
                 }
-                className="shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm w-full h-[35px] mt-4 py-3 bg-[#57AEFF] text-white rounded-xl hover:bg-opacity-90 transition-al font-montserrat flex items-center justify-center font-bold"
+                disabled={isFromIzin || !isFromPresent}
+                className={`shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm w-full h-[35px] mt-4 py-3 rounded-xl hover:bg-opacity-90 transition-all font-montserrat flex items-center justify-center font-bold
+                  ${
+                    isFromIzin
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : !isFromPresent
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-[#57AEFF] text-white"
+                  }`}
               >
-                Buka Antrian
-              </button>
+                {isFromIzin ? "Anda sedang izin" : ""}
+                {isFromPresent ? "Buka Antrian" : ""}
+              </AnimatedButton>
             </div>
           </div>
         </div>

@@ -1,9 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import loginDone from '../assets/images/login.png';
+import AnimatedButton from '../components/Design/AnimatedButton';
 import '../LoginSuccess.css';
 
 const LoginSuccess = () => {
   const navigate = useNavigate();
+
+  // Cek apakah user datang dari halaman pilih-role maka button buka antrian akan tampil
+
 
   // Data dummy untuk treatment (nantinya akan diganti dengan data dari database)
   const treatmentData = {
@@ -38,13 +42,13 @@ const LoginSuccess = () => {
         </p>
 
         {/* Continue Button */}
-        <button
+        <AnimatedButton
           type="button"
           onClick={handleContinue}
           className="h-[40px] w-full py-3.5 px-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm bg-[#57AEFF] text-white rounded-xl font-montserrat flex items-center justify-center font-semibold"
         >
           Continue
-        </button>
+        </AnimatedButton>
       </div>
     </div>
   );

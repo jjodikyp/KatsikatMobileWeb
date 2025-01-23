@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import Header from '../components/Header';
+import Header from '../components/Com Header/Header';
 import { useNavigate } from 'react-router-dom';
+import LordIcon from '../components/Design/LordIcon';
+import AnimatedButton from '../components/Design/AnimatedButton';
 
-const KontrolKerja = () => {
+const KontrolKerja = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode }) => {
   const navigate = useNavigate();
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
@@ -43,7 +45,28 @@ const KontrolKerja = () => {
   }, [month, year]);
 
   const handleBack = () => {
-    navigate('/pilih-role');
+    const previousPage = sessionStorage.getItem('previousPage');
+    
+    // Default ke beranda teknisi jika tidak ada previous page
+    if (!previousPage) {
+      navigate('/berandateknisi');
+      return;
+    }
+
+    // Navigasi ke halaman sebelumnya berdasarkan path yang tersimpan
+    switch (previousPage) {
+      case '/berandakurir':
+        navigate('/berandakurir');
+        break;
+      case '/berandakasir':
+        navigate('/berandakasir');
+        break;
+      case '/berandateknisi':
+        navigate('/berandateknisi');
+        break;
+      default:
+        navigate('/berandateknisi');
+    }
   };
 
   const handleSetCurrentDate = () => {
@@ -61,24 +84,35 @@ const KontrolKerja = () => {
     }).format(amount);
   };
 
+  if (wrapperMode) {
+    return (
+      <div>
+        {/* ... existing wrapper mode content ... */}
+      </div>
+    );
+  }
+
   return (
     <div className="h-[100dvh] flex flex-col overflow-hidden bg-[#E6EFF9] font-montserrat">
       <Header />
-      <main className="pt-24 px-4 md:px-10 pb-10 flex-1 overflow-y-auto">
-        <div className="flex items-center gap-3 mb-4">
-          <button
-            onClick={handleBack}
-            className="p-2 bg-[#E2F2FF] rounded-full shadow-[4px_4px_10px_rgba(0,0,0,0.15)] hover:bg-[#d5e9fa] transition-colors w-[41px] h-[41px] flex items-center justify-center outline outline-2 outline-white"
-            title="Kembali ke Pilih Role"
-          >
-            <img 
-              src="/src/assets/images/Home Button.gif" 
-              alt="Beranda"
-              className="w-5 h-5"
-            />
-          </button>
-          <h1 className="text-2xl font-bebas">Kontrol Hasil Kerja</h1>
-        </div>
+      <main className={`${className} px-4 md:px-10 pb-10 flex-1 overflow-y-auto`}>
+        {!hideBackButton && (
+          <div className="flex items-center gap-3 mb-4">
+            <button
+              onClick={handleBack}
+              className="p-2 bg-[#E2F2FF] rounded-full shadow-[4px_4px_10px_rgba(0,0,0,0.15)] hover:bg-[#d5e9fa] transition-colors w-[41px] h-[41px] flex items-center justify-center outline outline-2 outline-white"
+              title="Kembali"
+            >
+              <LordIcon 
+                src="https://cdn.lordicon.com/jeuxydnh.json"
+                trigger="loop"
+                colors="primary:#57AEFF"
+                style={{width: 41, height: 41}}
+              />
+            </button>
+            {!hideTitle && <h1 className="text-2xl font-bebas">Kontrol Kinerja & SP</h1>}
+          </div>
+        )}
 
         {/* Section 1: Rentang Waktu */}
         <div className="mb-4 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white">
@@ -94,12 +128,12 @@ const KontrolKerja = () => {
               }}
               className="flex-1 bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
             />
-            <button
+            <AnimatedButton
               onClick={handleSetCurrentDate}
               className="bg-[#57AEFF] text-white shadow shadow-white opacity-100 outline outline-1 outline-white px-4 rounded-xl font-semibold hover:bg-[#4499e9] transition-colors"
             >
               Sekarang
-            </button>
+            </AnimatedButton>
           </div>
         </div>
 

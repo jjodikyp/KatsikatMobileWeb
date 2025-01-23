@@ -14,6 +14,8 @@ import CekGaji from './pages/CekGaji';
 import KontrolKerja from './pages/KontrolKerja';
 import AntrianKasir from './pages/AntrianKasir';
 import AntrianKurir from './pages/AntrianKurir';
+import IzinSuccess from './pages/IzinSuccess';
+import AnalisisKinerja from './pages/AnalisisKinerja';
 
 function App() {
   return (
@@ -38,6 +40,8 @@ function App() {
         <Route path="/cekgaji" element={<CekGaji/>} />
         <Route path="/kontrolkerja" element={<KontrolKerja/>} />
         <Route path="/kurir/:type" element={<AntrianKurir />} />
+        <Route path="/izin-success" element={<IzinSuccess />} />
+        <Route path="/analisis-kinerja" element={<AnalisisKinerja />} />
       </Routes>
     </Router>
   );

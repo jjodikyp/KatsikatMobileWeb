@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import absenImage from "../assets/images/absen.png";
 import absenSound from "../assets/sound/absen.mp3"; // Import sound file
 import { FaMedkit, FaCalendarDay, FaUserClock } from "react-icons/fa";
+import AnimatedButton from "../components/Design/AnimatedButton";
 
 const Absensi = () => {
   const navigate = useNavigate();
@@ -19,7 +20,11 @@ const Absensi = () => {
   const kategoriOptions = [
     { value: "sakit", label: "Sakit", icon: <FaMedkit /> },
     { value: "libur_bersama", label: "Libur Bersama", icon: <FaCalendarDay /> },
-    { value: "keperluan_pribadi", label: "Keperluan Pribadi", icon: <FaUserClock /> }
+    {
+      value: "keperluan_pribadi",
+      label: "Keperluan Pribadi",
+      icon: <FaUserClock />,
+    },
   ];
 
   // Fungsi untuk memainkan suara dengan volume yang diatur
@@ -27,14 +32,14 @@ const Absensi = () => {
     try {
       const audio = new Audio(absenSound);
       audio.volume = 0.7; // Set ke 70%
-      
+
       // Tambahkan event listener untuk debugging
-      audio.addEventListener('play', () => {
-        console.log('Audio mulai diputar');
+      audio.addEventListener("play", () => {
+        console.log("Audio mulai diputar");
       });
-      
-      audio.addEventListener('error', (e) => {
-        console.error('Error audio:', e);
+
+      audio.addEventListener("error", (e) => {
+        console.error("Error audio:", e);
       });
 
       // Coba mainkan audio dengan await
@@ -66,8 +71,8 @@ const Absensi = () => {
   //   lng: 106.9447146, // Longitude outlet Katsikat
   // };
   const OUTLET_LOCATION = {
-    lat: -7.9888889,  // Latitude outlet Katsikat
-    lng: 112.6838822  // Longitude outlet Katsikat
+    lat: -7.9888889, // Latitude outlet Katsikat
+    lng: 112.6838822, // Longitude outlet Katsikat
   };
 
   const ALLOWED_RADIUS = 10; // Radius dalam meter
@@ -156,62 +161,66 @@ const Absensi = () => {
   const handleHadir = () => {
     setError("");
     
-    if (!isWithinAllowedTime()) {
-      setError(
-        "Anda melakukan absensi di luar jam kerja (08:00-08:30 atau 16:00-16:30). Silahkan konfirmasi kehadiran kepada atasan."
-      );
-      return;
-    }
-
+    // Set session storage untuk tracking alur login
+    sessionStorage.setItem('fromPresent', 'true');
+    
     // Simpan waktu mulai kerja
     localStorage.setItem("workStartTime", new Date().toISOString());
-    
-    // Cek lokasi dan jika berhasil, mainkan suara
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const userLat = position.coords.latitude;
-          const userLng = position.coords.longitude;
 
-          console.log("Lokasi user:", { lat: userLat, lng: userLng });
+    // Langsung navigasi ke loginSuccess
+    navigate("/loginSuccess");
 
-          setUserLocation({ lat: userLat, lng: userLng });
+    // Cek lokasi sebagai background process
+    // if ("geolocation" in navigator) {
+    //   navigator.geolocation.getCurrentPosition(
+    //     async (position) => {
+    //       const userLat = position.coords.latitude;
+    //       const userLng = position.coords.longitude;
 
-          // Hitung jarak ke outlet
-          const distance = calculateDistance(
-            userLat,
-            userLng,
-            OUTLET_LOCATION.lat,
-            OUTLET_LOCATION.lng
-          );
+    //       console.log("Lokasi user:", { lat: userLat, lng: userLng });
 
-          console.log("Jarak ke outlet:", distance, "meter");
+    //       setUserLocation({ lat: userLat, lng: userLng });
 
-          if (distance <= ALLOWED_RADIUS) {
-            // User dalam radius yang diizinkan
-            try {
-              await playAbsenSound(); // Mainkan suara saat berhasil
-              console.log("Mencoba memutar suara");
-            } catch (audioError) {
-              console.error("Gagal memutar suara:", audioError);
-            }
-            navigate("/loginSuccess");
-          } else {
-            setError(
-              "Anda harus berada dalam radius 10 meter dari outlet untuk melakukan absensi!"
-            );
-          }
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-          setError(
-            "Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin lokasi diberikan."
-          );
-        }
-      );
-    } else {
-      setError("Browser Anda tidak mendukung geolocation.");
-    }
+    //       // Hitung jarak ke outlet
+    //       const distance = calculateDistance(
+    //         userLat,
+    //         userLng,
+    //         OUTLET_LOCATION.lat,
+    //         OUTLET_LOCATION.lng
+    //       );
+
+    //       console.log("Jarak ke outlet:", distance, "meter");
+
+    //       if (distance <= ALLOWED_RADIUS) {
+    //         // User dalam radius yang diizinkan
+    //         try {
+    //           await playAbsenSound(); // Mainkan suara saat berhasil
+    //           console.log("Mencoba memutar suara");
+    //         } catch (audioError) {
+    //           console.error("Gagal memutar suara:", audioError);
+    //         }
+    //       } else {
+    //         setError(
+    //           "Anda harus berada dalam radius 10 meter dari outlet untuk melakukan absensi!"
+    //         );
+    //         // Jika di luar radius, kembali ke halaman absensi
+    //         navigate("/absensi");
+    //       }
+    //     },
+    //     (error) => {
+    //       console.error("Error getting location:", error);
+    //       setError(
+    //         "Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin lokasi diberikan."
+    //       );
+    //       // Jika error, kembali ke halaman absensi
+    //       navigate("/absensi");
+    //     }
+    //   );
+    // } else {
+    //   setError("Browser Anda tidak mendukung geolocation.");
+    //   // Jika browser tidak support, kembali ke halaman absensi
+    //   navigate("/absensi");
+    // }
   };
 
   // Handle submit izin
@@ -220,14 +229,34 @@ const Absensi = () => {
       setError("Mohon pilih kategori izin");
       return;
     }
+
+    // Jika kategori izin adalah keperluan pribadi, maka tidak perlu isi alasan dan tidak perlu validasi
+    if (kategoriIzin === "keperluan_pribadi") {
+      setError("");
+      navigate("/izin-success");
+      return;
+    }
+
     if (!alasanIzin.trim()) {
       setError("Mohon isi alasan izin/libur");
       return;
     }
 
+    if (kategoriIzin === "libur_bersama" && !alasanIzin.trim()) {
+      setError("Mohon isi alasan libur bersama");
+      navigate("/izin-success");
+      return;
+    }
+
+    if (kategoriIzin === "sakit" && !alasanIzin.trim()) {
+      setError("Mohon isi alasan sakit");
+      navigate("/izin-success");
+      return;
+    }
+
     console.log("Kategori izin:", kategoriIzin);
     console.log("Alasan izin:", alasanIzin);
-    navigate("/loginSuccess");
+    navigate("/izin-success");
   };
 
   // Handle modal close dengan animasi
@@ -259,44 +288,49 @@ const Absensi = () => {
           PLEASE TAKE YOUR ATTENDANCE
         </h1>
         <p className="font-montserrat text-sm text-gray-800 tracking-wide text-center mb-3">
-          Make sure you are within 10 meters radius from the outlet and take attendance at the specified time!
+          Make sure you are within 10 meters radius from the outlet and take
+          attendance at the specified time!
         </p>
 
         {/* Buttons */}
         <div className="flex flex-col gap-3 mt-6">
-          <button
+          <AnimatedButton
             onClick={() => setShowIzinModal(true)}
             className="font-semibold w-full py-3 px-4 bg-[#E6EFF9] text-gray-600 font-montserrat rounded-xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-2 outline-white"
           >
             LEAVE / CLAIM DAY OFF
-          </button>
-          <button
+          </AnimatedButton>
+          <AnimatedButton
             onClick={handleHadir}
             className="font-semibold w-full py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-2 outline-white"
           >
             PRESENT
-          </button>
+          </AnimatedButton>
         </div>
 
         {/* Modal */}
         {showIzinModal && (
-          <div 
+          <div
             className={`fixed inset-0 bg-black transition-opacity duration-300 flex items-center justify-center p-4 z-50
-              ${showModalContent ? 'bg-opacity-60' : 'bg-opacity-0'}`}
+              ${showModalContent ? "bg-opacity-60" : "bg-opacity-0"}`}
           >
-            <div 
+            <div
               className={`bg-[#E2F2FF] rounded-3xl p-6 w-full max-w-[320px] mx-4 sm:mx-auto transform transition-all duration-300
-                ${showModalContent ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-full scale-150'}`}
+                ${
+                  showModalContent
+                    ? "opacity-100 translate-y-0 scale-100"
+                    : "opacity-0 -translate-y-full scale-150"
+                }`}
             >
               <h2 className="font-bebas text-2xl mb-4 text-center">
                 REASON FOR LEAVE / DAY OFF
               </h2>
-              
+
               <div className="flex items-center gap-2 mb-4">
                 <select
                   value={kategoriIzin}
                   onChange={(e) => setKategoriIzin(e.target.value)}
-                  className="w-full p-3 pr-10 bg-[#E6EFF9] text-gray-600 font-montserrat rounded-xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white"
+                  className="w-full p-3 pr-10 bg-[#E6EFF9] text-gray-600 font-montserrat rounded-xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white font-sm"
                 >
                   <option value="">Pilih Kategori Izin</option>
                   {kategoriOptions.map((option) => (
@@ -307,25 +341,40 @@ const Absensi = () => {
                 </select>
               </div>
 
-              <textarea
-                value={alasanIzin}
-                onChange={(e) => setAlasanIzin(e.target.value)}
-                placeholder="Write your reason for leave/day off here..."
-                className="w-full h-24 p-3 border border-gray-200 rounded-2xl mb-4 font-montserrat text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white"
-              />
+              {/* Jika kategori izin adalah keperluan pribadi, maka tidak perlu isi alasan */}
+              {kategoriIzin !== "keperluan_pribadi" && (
+                <div>
+                  <textarea
+                    value={alasanIzin}
+                    onChange={(e) => setAlasanIzin(e.target.value)}
+                    // jka kategori izin adalah libur bersama, maka placeholder menjadi "Berikan alasan libur bersama..."
+                    // jka kategori izin adalah sakit, maka placeholder menjadi "Berikan alasan sakit..." atau "Berikan alasan sakit..."
+                    // jka kategori izin adalah keperluan pribadi, maka placeholder menjadi "Berikan alasan keperluan pribadi..."
+                    placeholder={
+                      kategoriIzin === "libur_bersama"
+                        ? "Jelaskan kegiatan libur bersama..."
+                        : kategoriIzin === "sakit"
+                        ? "Jelaskan alasan sakit..."
+                        : "Pilih alasan izin diatas!"
+                    }
+                    className="w-full h-24 p-3 border border-gray-200 rounded-2xl mb-4 font-montserrat text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white"
+                  />
+                </div>
+              )}
+
               <div className="flex gap-3">
-                <button
+                <AnimatedButton
                   onClick={handleCloseModal}
                   className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-montserrat rounded-xl text-sm hover:bg-gray-200 transition-colors font-semibold shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white"
                 >
                   CANCEL
-                </button>
-                <button
+                </AnimatedButton>
+                <AnimatedButton
                   onClick={handleSubmitIzin}
                   className="flex-1 py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm hover:bg-opacity-90 transition-colors font-semibold shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white"
                 >
                   SEND
-                </button>
+                </AnimatedButton>
               </div>
             </div>
           </div>
