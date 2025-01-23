@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const FuelCalculationModal = ({ isOpen, onClose, onConfirm, data }) => {
+  const navigate = useNavigate();
   const [showOverlay, setShowOverlay] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
@@ -32,8 +34,8 @@ const FuelCalculationModal = ({ isOpen, onClose, onConfirm, data }) => {
 
   const handleConfirm = () => {
     onConfirm(fuelCost);
-    navigate('/login');
     onClose();
+    navigate('/absenakhir');  
   };
 
   return (
@@ -82,7 +84,7 @@ const FuelCalculationModal = ({ isOpen, onClose, onConfirm, data }) => {
             Batal
           </button>
           <button
-            onClick={() => onConfirm(fuelCost)}
+            onClick={handleConfirm}
             className="px-4 py-2 rounded-lg bg-[#57AEFF] text-white hover:bg-opacity-90 transition-all font-montserrat outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]"
           >
             Kirim

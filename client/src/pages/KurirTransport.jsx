@@ -64,16 +64,31 @@ const KurirTransport = () => {
 
   const handleSubmit = () => {
     // Validasi input
-    if (!formData.odoStart || !formData.odoEnd) {
+    if (!formData.odoStart.trim() || !formData.odoEnd.trim()) {
       setError("Semua field harus diisi");
       return;
     }
 
-    if (parseInt(formData.odoStart) >= parseInt(formData.odoEnd)) {
+    if (!photos.odoStart || !photos.odoEnd) {
+      setError("Harap upload foto ODO Mulai dan ODO Selesai");
+      return;
+    }
+
+    const odoStartNum = parseInt(formData.odoStart);
+    const odoEndNum = parseInt(formData.odoEnd);
+
+    if (isNaN(odoStartNum) || isNaN(odoEndNum)) {
+      setError("ODO Mulai dan ODO Selesai harus berupa angka");
+      return;
+    }
+
+    if (odoStartNum >= odoEndNum) {
       setError("ODO Selesai harus lebih besar dari ODO Mulai");
       return;
     }
 
+    // Jika semua validasi berhasil
+    setError("");
     setShowModal(true);
   };
 

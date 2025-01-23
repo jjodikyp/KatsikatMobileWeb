@@ -55,8 +55,11 @@ const LoginKaryawan = () => {
       setError(error.response?.data?.message || "Terjadi kesalahan saat login");
     }
 
-    sessionStorage.removeItem("fromIzin");
-    sessionStorage.removeItem("fromPresent");
+    sessionStorage.clear();
+
+    // sessionStorage.removeItem("fromIzin");
+    // sessionStorage.removeItem("fromPresent");
+    // sessionStorage.removeItem("previousPage");
   };
 
   return (

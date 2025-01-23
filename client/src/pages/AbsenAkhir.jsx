@@ -112,7 +112,7 @@ const AbsenAkhir = () => {
           className="max-w-xs w-full py-3 px-6 bg-[#57AEFF] text-white font-montserrat font-semibold rounded-2xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white
           hover:bg-[#2F82B2] transition-colors duration-200 text-sm shadow-xl"
         >
-          Absen Selesai
+          Absen Pulang
         </button>
       </div>
     </div>
