@@ -17,9 +17,7 @@ const AntrianKurirContent = ({
   const [copiedId, setCopiedId] = useState(null);
 
   const getWhatsAppMessage = (type) => {
-    return encodeURIComponent(
-      WhatsAppFormatter.formatInitialMessage()
-    );
+    return encodeURIComponent(WhatsAppFormatter.formatInitialMessage());
   };
 
   const getButtonText = (type) => {
@@ -39,7 +37,7 @@ const AntrianKurirContent = ({
           filteredAntrian.map((item) => (
             <div
               key={item.id}
-              className="bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
+              className="rounded-3xl p-4 outline outline-1 outline-[#C1C1C1]"
             >
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-lg md:text-xl truncate">
@@ -97,7 +95,7 @@ const AntrianKurirContent = ({
                   onClick={() =>
                     handleWhatsApp(item.phone, getWhatsAppMessage(type))
                   }
-                  className="w-[41px] h-[41px] rounded-2xl flex items-center justify-center text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] hover:bg-opacity-90 transition-all outline outline-1 outline-[#2ca58d]"
+                  className="w-[41px] h-[41px] rounded-2xl flex items-center justify-center text-white outline outline-1 outline-[#2ca58d]"
                   title="WhatsApp"
                 >
                   <LordIcon
@@ -113,14 +111,15 @@ const AntrianKurirContent = ({
                     <AnimatedButton
                       title="WA"
                       onClick={() => handleCancelDelivery(item.id)}
-                      className="flex-1 h-[41px] rounded-xl flex items-center justify-center text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] font-semibold bg-red-500 text-white opacity-100 outline outline-1 outline-white"
+                      className="flex-1 h-[41px] rounded-xl flex items-center justify-center text-sm font-semibold text-red-500 opacity-100 outline outline-1 outline-red-500"
                     >
-                      Batal
+                      Gagal
                     </AnimatedButton>
                     <AnimatedButton
                       title="Selesai"
+                      variant="green"
                       onClick={() => handleCompleteDelivery(item.id)}
-                      className="flex-1 h-[41px] rounded-xl flex items-center justify-center text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] font-semibold bg-[#57AEFF] text-white opacity-100 outline outline-1 outline-white"
+                      className="flex-1 h-[41px] rounded-xl flex items-center justify-center text-sm font-semibold"
                     >
                       Selesai
                     </AnimatedButton>
@@ -128,7 +127,8 @@ const AntrianKurirContent = ({
                 ) : (
                   <AnimatedButton
                     onClick={() => handleStartDelivery(item.id)}
-                    className="flex-1 h-[41px] rounded-xl flex items-center justify-center text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] font-semibold bg-[#57AEFF] text-white opacity-100 outline outline-1 outline-white"
+                    variant="green"
+                    className="flex-1 h-[41px] rounded-xl flex items-center justify-center text-sm"
                   >
                     {getButtonText(type)}
                   </AnimatedButton>

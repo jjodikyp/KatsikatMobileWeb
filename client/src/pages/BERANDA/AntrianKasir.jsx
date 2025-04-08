@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import AntrianHeader from '../../components/Header Antrian/AntrianHeader';
 import LoadingDots from '../../components/Design/LoadingDots';
-import LordIcon from '../../components/Design/LordIcon';
+import AnimatedButton from "../../components/Design/AnimatedButton";
 import FilterAndSearch from '../../components/Header Antrian/FilterAndSearch';
 import QualityCheckModal from '../../components/Modal/QualityCheckModal';
 
@@ -94,9 +94,9 @@ const AntrianKasir = () => {
   };
 
   return (
-    <div className="h-screen overflow-y-auto bg-[#E6EFF9] font-montserrat">
+    <div className="h-screen overflow-y-auto font-montserrat">
       {/* Header - Fixed at top */}
-      <header className="fixed top-0 left-0 right-0 z-10 bg-[#E6EFF9]">
+      <header className="fixed top-0 left-0 right-0 z-10 bg-white">
         <AntrianHeader />
         <FilterAndSearch 
           estimasi={estimasi}
@@ -117,7 +117,7 @@ const AntrianKasir = () => {
               filteredAntrian.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
+                  className="bg-white rounded-3xl p-4 outline outline-1 outline-[#C1C1C1]"
                 >
                   <div className="flex items-start gap-4">
                     <div 
@@ -154,18 +154,19 @@ const AntrianKasir = () => {
                     </div>
                   </div>
                   <div className="flex gap-2 mt-4">
-                    <button 
+                    <AnimatedButton 
                       onClick={() => handleStatusUpdate(item.id, 'failed')}
-                      className="flex-1 h-[35px] rounded-xl flex items-center justify-center text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] font-semibold bg-[#FD8087] text-white opacity-100 outline outline-1 outline-white"
+                      className="flex-1 h-[35px] rounded-xl flex items-center justify-center text-sm text-red-500 opacity-100 outline outline-1 outline-red-500 font-semibold"
                     >
                       Tidak Lolos
-                    </button>
-                    <button 
+                    </AnimatedButton>
+                    <AnimatedButton 
                       onClick={() => handleStatusUpdate(item.id, 'passed')}
-                      className="flex-1 h-[35px] rounded-xl flex items-center justify-center text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] font-semibold bg-[#57AEFF] text-white opacity-100 outline outline-1 outline-white"
+                      variant="blue"
+                      className="flex-1 h-[35px] rounded-xl flex items-center justify-center text-sm"
                     >
                       Lolos
-                    </button>
+                    </AnimatedButton>
                   </div>
                 </div>
               ))

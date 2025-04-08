@@ -12,7 +12,7 @@ const FilterAndSearch = ({
   setSearchQuery
 }) => {
   return (
-    <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex flex-col gap-4 w-full md:max-w-none bg-[#E6EFF9] shadow-lg">
+    <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex flex-col gap-4 w-full md:max-w-none bg-white shadow-lg">
       <FilterSection 
         estimasi={estimasi}
         selectedFilter={selectedFilter}

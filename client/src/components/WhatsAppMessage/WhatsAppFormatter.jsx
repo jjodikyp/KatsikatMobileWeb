@@ -3,7 +3,7 @@ const WhatsAppFormatter = {
     const jakartaTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' });
     const hour = new Date(jakartaTime).getHours();
 
-    if (hour >= 3 && hour < 11) return 'Pagi';
+    if (hour >= 5 && hour < 11) return 'Pagi';
     if (hour >= 11 && hour < 15) return 'Siang';
     if (hour >= 15 && hour < 18) return 'Sore';
     return 'Malam';

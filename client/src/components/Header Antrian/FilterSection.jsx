@@ -24,8 +24,8 @@ const FilterSection = ({
             onClick={() => handleFilterChange("cleaning")}
             className={`ml-4 px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${
               selectedFilter === "cleaning"
-                ? "bg-[#57AEFF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-2 outline-white"
-                : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                ? "bg-gradient-to-r from-[#5096FC] to-[#7BD1FD] text-white opacity-100"
+                : "bg-[#E6EFF9] text-gray-600 opacity-100"
             }`}
           >
             <svg 
@@ -55,8 +55,8 @@ const FilterSection = ({
             onClick={() => handleFilterChange("repair")}
             className={`ml-2 px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${
               selectedFilter === "repair"
-                ? "bg-[#57AEFF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-2 outline-white"
-                : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                ? "bg-gradient-to-r from-[#5096FC] to-[#7BD1FD] text-white opacity-100"
+                : "bg-[#E6EFF9] text-gray-600 opacity-100"
             }`}
           >
             <svg 

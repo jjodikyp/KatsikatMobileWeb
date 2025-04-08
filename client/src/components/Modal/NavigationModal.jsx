@@ -21,6 +21,7 @@ const NavigationModal = ({ isOpen, onClose }) => {
       path: '/kontrolkerja',
       icon: "/src/assets/images/chart.png"
     },
+    
   ];
 
   const handleNavigate = (path) => {
@@ -69,7 +70,7 @@ const NavigationModal = ({ isOpen, onClose }) => {
                 ease: [0.4, 0, 0.2, 1]
               }}
             >
-              <div className="bg-[#E2F2FF] px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <div className="bg-[#F8FCFF] px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   <div className="mt-1 text-center sm:mt-0 sm:text-left w-full">
                     <h3 className="text-2xl font-bebas mb-4">
@@ -80,7 +81,7 @@ const NavigationModal = ({ isOpen, onClose }) => {
                         <AnimatedButton 
                           key={item.path}
                           onClick={() => handleNavigate(item.path)}
-                          className="h-[45px] w-full text-left px-4 py-3 rounded-xl hover:bg-gray-100 transition-colors font-montserrat text-sm bg-[#E2F2FF] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-[#57AEFF] flex items-center justify-start"
+                          className="h-[45px] w-full text-left px-4 py-3 rounded-xl hover:bg-gray-100 transition-colors font-montserrat text-sm outline outline-1 outline-[#B6B6B6] flex items-center justify-start"
                         >
                           <div className="flex items-center gap-3">
                             <img 
@@ -96,11 +97,12 @@ const NavigationModal = ({ isOpen, onClose }) => {
                   </div>
                 </div>
               </div>
-              <div className="bg-[#E2F2FF] px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+              <div className="bg-[#F8FCFF] px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <AnimatedButton 
                   type="button"
                   onClick={onClose}
-                  className="mb-2 w-full inline-flex justify-center rounded-xl border border-transparent px-4 py-2 bg-[#57AEFF] text-base font-medium text-white sm:ml-3 sm:w-auto sm:text-sm font-montserrat transition-colors shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white"
+                  variant="black"
+                  className="mb-2 w-full h-[45px] inline-flex justify-center items-center rounded-xl px-4 py-2 sm:ml-3 sm:w-auto sm:text-sm font-montserrat"
                 >
                   Tutup
                 </AnimatedButton>

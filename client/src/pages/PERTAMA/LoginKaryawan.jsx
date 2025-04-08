@@ -64,13 +64,13 @@ const LoginKaryawan = () => {
 
   return (
     <div className="h-[100dvh] flex flex-col justify-center items-center bg-white px-10 sm:px-0 overflow-y-auto">
-      <div className="w-full sm:w-[380px] p-6 sm:p-8 my-auto bg-white rounded-3xl p-4 shadow-2xl shadow-grey opacity-100 outline outline-2 outline-white">
+      <div className="w-full sm:w-[380px] p-6 sm:p-8 my-auto bg-white rounded-3xl p-4 opacity-100 outline outline-2 outline-[#EEF1F7]">
         <div className="text-center mb-6">
           <h2 className="text-2xl sm:text-3xl font-bebas font-normal text-gray-800 tracking-wide">
-          LOGIN AS EMPLOYEE
+          Masuk akun karyawan
           </h2>
           <p className="mt-2 text-xs text-gray-600 px-1 font-montserrat">
-          Please enter your data below to access your account!
+          Silakan masukkan data Anda di bawah ini untuk mengakses akun Anda!
           </p>
         </div>
 
@@ -90,7 +90,7 @@ const LoginKaryawan = () => {
               name="email"
               id="email"
               className="block w-full pl-12 pr-3 py-3 sm:py-3.5 border border-gray-200 rounded-xl bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base placeholder:text-sm font-montserrat"
-              placeholder="Enter Email"
+              placeholder="Masukan Email"
               value={formData.email}
               onChange={handleChange}
               required
@@ -120,7 +120,7 @@ const LoginKaryawan = () => {
               name="password"
               id="password"
               className="placeholder:text-sm block w-full pl-12 pr-3 py-3 sm:py-3.5 border border-gray-200 rounded-xl bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm sm:text-base font-montserrat"
-              placeholder="Enter Password"
+              placeholder="Masukan Kata Sandi"
               value={formData.password}
               onChange={handleChange}
               required
@@ -130,9 +130,9 @@ const LoginKaryawan = () => {
 
           <AnimatedButton
             type="submit"
-            className="w-full h-[40px] py-3 sm:py-3.5 px-4 mt-2 bg-[#57AEFF] text-white rounded-xl shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white font-montserrat font-semibold flex items-center justify-center"
+            className="w-full h-[40px] py-3 sm:py-3.5 px-4 mt-2 bg-gradient-to-r from-[#5096FC] to-[#7BD1FD] text-white rounded-xl opacity-100 font-montserrat font-semibold flex items-center justify-center text-sm"
           >
-            Login
+            Masuk
           </AnimatedButton>
         </form>
       </div>

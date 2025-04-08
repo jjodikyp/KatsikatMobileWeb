@@ -277,7 +277,7 @@ const Absensi = () => {
 
   return (
     <div className="min-h-[100dvh] flex flex-col justify-center items-center bg-white px-10 sm:px-0">
-      <div className="w-full sm:w-[380px] p-8 sm:p-8 my-auto bg-white rounded-3xl shadow-2xl shadow-grey opacity-100 outline outline-2 outline-white">
+      <div className="w-full sm:w-[380px] p-8 sm:p-8 my-auto bg-white rounded-3xl outline outline-2 outline-[#EEF1F7]">
         {/* Illustration */}
         <div className="flex justify-center mb-6">
           <img src={absenImage} alt="Absen" className="w-32 h-32" />
@@ -285,26 +285,27 @@ const Absensi = () => {
 
         {/* Title & Description */}
         <h1 className="font-bebas text-2xl text-gray-800 tracking-wide text-center mb-3">
-          PLEASE TAKE YOUR ATTENDANCE
+          Konfirmasi kehadiran!
         </h1>
         <p className="font-montserrat text-sm text-gray-800 tracking-wide text-center mb-3">
-          Make sure you are within 10 meters radius from the outlet and take
-          attendance at the specified time!
+        Pastikan Anda berada dalam radius 10 meter dari outlet!
         </p>
 
         {/* Buttons */}
         <div className="flex flex-col gap-3 mt-6">
           <AnimatedButton
             onClick={() => setShowIzinModal(true)}
-            className="font-semibold w-full py-3 px-4 bg-[#E6EFF9] text-gray-600 font-montserrat rounded-xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-2 outline-white"
+            className="font-semibold w-full py-3 px-4 rounded-xl text-sm"
+            variant="grey"
           >
-            LEAVE / CLAIM DAY OFF
+            Izin/Ambil hari libur
           </AnimatedButton>
           <AnimatedButton
             onClick={handleHadir}
-            className="font-semibold w-full py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-2 outline-white"
+            className="font-semibold w-full py-3 px-4 rounded-xl text-sm"
+            variant="blue"
           >
-            PRESENT
+            Saya Hadir
           </AnimatedButton>
         </div>
 
@@ -315,7 +316,7 @@ const Absensi = () => {
               ${showModalContent ? "bg-opacity-60" : "bg-opacity-0"}`}
           >
             <div
-              className={`bg-[#E2F2FF] rounded-3xl p-6 w-full max-w-[320px] mx-4 sm:mx-auto transform transition-all duration-300
+              className={`bg-[#F8FCFF] rounded-3xl p-6 w-full max-w-[320px] mx-4 sm:mx-auto transform transition-all duration-300
                 ${
                   showModalContent
                     ? "opacity-100 translate-y-0 scale-100"
@@ -323,14 +324,14 @@ const Absensi = () => {
                 }`}
             >
               <h2 className="font-bebas text-2xl mb-4 text-center">
-                REASON FOR LEAVE / DAY OFF
+              ALASAN CUTI / LIBUR
               </h2>
 
               <div className="flex items-center gap-2 mb-4">
                 <select
                   value={kategoriIzin}
                   onChange={(e) => setKategoriIzin(e.target.value)}
-                  className="w-full p-3 pr-10 bg-[#E6EFF9] text-gray-600 font-montserrat rounded-xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white font-sm"
+                  className="w-full h-[35px] p-3 bg-[#F8FCFF] text-gray-600 font-montserrat rounded-xl text-sm outline outline-2 outline-[#EEF1F7]"
                 >
                   <option value="">Pilih Kategori Izin</option>
                   {kategoriOptions.map((option) => (
@@ -354,10 +355,10 @@ const Absensi = () => {
                       kategoriIzin === "libur_bersama"
                         ? "Jelaskan kegiatan libur bersama..."
                         : kategoriIzin === "sakit"
-                        ? "Jelaskan alasan sakit..."
+                        ? "Jelaskan sakit apa yang anda alami..."
                         : "Pilih alasan izin diatas!"
                     }
-                    className="w-full h-24 p-3 border border-gray-200 rounded-2xl mb-4 font-montserrat text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white"
+                    className="w-full h-24 p-3 rounded-2xl mb-4 font-montserrat resize-none bg-[#F8FCFF] outline outline-2 outline-[#EEF1F7] placeholder: text-sm"
                   />
                 </div>
               )}
@@ -365,15 +366,17 @@ const Absensi = () => {
               <div className="flex gap-3">
                 <AnimatedButton
                   onClick={handleCloseModal}
-                  className="flex-1 py-3 px-4 bg-gray-100 text-gray-700 font-montserrat rounded-xl text-sm hover:bg-gray-200 transition-colors font-semibold shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white"
+                  className="flex-1 py-3 px-4 rounded-xl text-sm hover:bg-gray-200 transition-colors font-semibold"
+                  variant="grey"
                 >
-                  CANCEL
+                  Batal
                 </AnimatedButton>
                 <AnimatedButton
                   onClick={handleSubmitIzin}
-                  className="flex-1 py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm hover:bg-opacity-90 transition-colors font-semibold shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white"
+                  className="flex-1 py-3 px-4 rounded-xl text-sm font-semibold"
+                  variant="blue"
                 >
-                  SEND
+                  Kirim
                 </AnimatedButton>
               </div>
             </div>

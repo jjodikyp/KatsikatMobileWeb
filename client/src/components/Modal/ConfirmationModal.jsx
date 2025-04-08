@@ -38,10 +38,10 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
   return (
     <div 
       className={`fixed inset-0 bg-black transition-opacity duration-300 flex items-center justify-center z-50
-        ${showOverlay ? 'bg-opacity-50' : 'bg-opacity-0'}`}
+        ${showOverlay ? 'bg-opacity-70' : 'bg-opacity-0'}`}
     >
       <div 
-        className={`bg-[#E2F2FF] rounded-3xl p-4 shadow-sm shadow-white opacity-100 outline outline-2 outline-white rounded-2xl p-6 w-[90%] max-w-md transform transition-all duration-300
+        className={`bg-white rounded-3xl p-4 rounded-2xl p-6 w-[90%] max-w-md transform transition-all duration-300
           ${showModal ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 -translate-y-full scale-150'}`}
       >
         <h3 className="text-2xl font-bebas mb-4">{title}</h3>
@@ -49,13 +49,15 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
         <div className="flex justify-end gap-3">
           <AnimatedButton
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white transition-all font-montserrat"
+            variant="grey"
+            className="px-4 py-2 font-montserrat"
           >
             Batal
           </AnimatedButton>
           <AnimatedButton
             onClick={handleConfirm}
-            className="px-4 py-2 rounded-lg bg-[#57AEFF] text-white shadow shadow-current opacity-100 outline outline-2 outline-white transition-all font-montserrat"
+            variant="blue"
+            className="px-4 py-2 font-montserrat"
           >
             Ya
           </AnimatedButton>

@@ -1,18 +1,27 @@
 import { motion } from "framer-motion";
+import buttonStyles from "../Design/ButtonDesign";
 
-const AnimatedButton = ({ children, className, onClick, disabled }) => {
+const AnimatedButton = ({
+  children,
+  variant,
+  className,
+  onClick,
+  disabled,
+}) => {
+  const buttonClass = buttonStyles[variant] || buttonStyles.default;
+
   return (
     <motion.button
-      className={className}
+      whileTap={{ scale: disabled ? 1 : 0.9 }}
+      // whileHover={{ scale: disabled ? 1 : 1.05 }}
+      transition={{ duration: 0.2 }}
+      className={`${buttonClass} ${className}`}
       onClick={onClick}
       disabled={disabled}
-      whileTap={{ scale: 0.2}}
-      whileHover={{ scale: 1.05 }}
-      transition={{ duration: 0.9 }}
     >
       {children}
     </motion.button>
   );
 };
 
-export default AnimatedButton; 
+export default AnimatedButton;

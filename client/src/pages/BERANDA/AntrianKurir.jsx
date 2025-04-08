@@ -99,10 +99,10 @@ const AntrianKurir = () => {
   };
 
   return (
-    <div className="h-screen overflow-y-auto bg-[#E6EFF9] font-montserrat">
-      <header className="fixed top-0 left-0 right-0 z-10 bg-[#E6EFF9]">
+    <div className="h-screen overflow-y-auto bg-white font-montserrat">
+      <header className="fixed top-0 left-0 right-0 z-10 bg-white">
         <AntrianHeader />
-        <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex flex-col gap-4 w-full md:max-w-none bg-[#E6EFF9] shadow-lg">
+        <div className="mx-auto px-4 py-4 pr-4 pl-4 md:px-10 flex flex-col gap-4 w-full md:max-w-none bg-white shadow-lg">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bebas">
               {type === "pickup" ? "Pick Up" : "Delivery"}
@@ -113,7 +113,7 @@ const AntrianKurir = () => {
                 placeholder="Cari nama atau alamat..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 rounded-xl bg-[#E6EFF9] text-gray-600 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white placeholder:text-gray-400 placeholder:text-sm"
+                className="w-full px-4 py-2 rounded-xl bg-white outline outline-1 outline-[#C1C1C1] text-gray-700 placeholder-gray-400 placeholder:text-sm"
               />
             </div>
           </div>

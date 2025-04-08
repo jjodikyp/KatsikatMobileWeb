@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LordIcon from "../../components/Design/LordIcon";
+import AnimatedButton from "../../components/Design/AnimatedButton";
 
 const AbsenAkhir = () => {
   const navigate = useNavigate();
@@ -51,17 +52,17 @@ const AbsenAkhir = () => {
       setError("Deskripsi harus minimal 3 kata!");
       return;
     }
-    
+
     // Hapus waktu mulai kerja dari localStorage
     localStorage.removeItem("workStartTime");
-    sessionStorage.removeItem('fromPresent');
-    sessionStorage.removeItem('fromIzin')
+    sessionStorage.removeItem("fromPresent");
+    sessionStorage.removeItem("fromIzin");
     // Arahkan ke halaman login
     navigate("/");
   };
 
   return (
-    <div className="min-h-screen bg-[#E6EFF9] flex items-center justify-center">
+    <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="max-w-[390px] w-full flex flex-col items-center ">
         {/* Gambar */}
         <LordIcon
@@ -82,7 +83,7 @@ const AbsenAkhir = () => {
         </p>
 
         {/* Durasi Kerja dengan detik */}
-        <div className="bg-[#E6EFF9] rounded-2xl p-2 w-full mb-6 max-w-xs shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white">
+        <div className="bg-white rounded-2xl p-2 w-full mb-6 max-w-xs outline outline-2 outline-[#EEF1F7]">
           <p className="font-montserrat text-lg text-center text-gray-800">
             {workDuration.hours} Jam {workDuration.minutes} Menit{" "}
             {workDuration.seconds} Detik
@@ -98,7 +99,7 @@ const AbsenAkhir = () => {
               setError("");
             }}
             placeholder="Masukkan hasil evaluasi harian Anda! (min. 3 kata)"
-            className="shadow-inner w-full p-4 font-montserrat text-lg rounded-2xl shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white resize-none h-32 bg-[#E6EFF9] text-gray-600"
+            className="w-full p-4 font-montserrat text-sm rounded-2xl outline outline-2 outline-[#EEF1F7] resize-none h-30 text-gray-600"
           />
           {error && (
             <p className="text-red-500 text-xs mt-1 font-montserrat">{error}</p>
@@ -106,13 +107,13 @@ const AbsenAkhir = () => {
         </div>
 
         {/* Button Selesai */}
-        <button
+        <AnimatedButton
           onClick={handleSelesaiKerja}
-          className="max-w-xs w-full py-3 px-6 bg-[#57AEFF] text-white font-montserrat font-semibold rounded-2xl text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white
-          hover:bg-[#2F82B2] transition-colors duration-200 text-sm shadow-xl"
+          variant="blue"
+          className="max-w-xs w-full py-3 px-6 font-montserrat font-semibold rounded-2xl text-sm"
         >
           Absen Pulang
-        </button>
+        </AnimatedButton>
       </div>
     </div>
   );

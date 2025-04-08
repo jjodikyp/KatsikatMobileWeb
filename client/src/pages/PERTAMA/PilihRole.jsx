@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import ConfirmRoleModal from '../../components/Modal/ConfirmRoleModal';
-import AnimatedButton from '../../components/Design/AnimatedButton';
+import { useState } from "react";
+import ConfirmRoleModal from "../../components/Modal/ConfirmRoleModal";
+import AnimatedButton from "../../components/Design/AnimatedButton";
 
 const PilihRole = () => {
-  const [selectedRole, setSelectedRole] = useState('');
+  const [selectedRole, setSelectedRole] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   const handleRoleSelect = (role) => {
@@ -12,7 +12,7 @@ const PilihRole = () => {
 
   const handleContinue = () => {
     if (!selectedRole) {
-      alert('Please select a role first');
+      alert("Please select a role first");
       return;
     }
     setShowModal(true);
@@ -24,29 +24,35 @@ const PilihRole = () => {
 
   return (
     <div className="min-h-[100dvh] flex flex-col justify-center items-center bg-white px-10 py-10">
-      <div className="w-full sm:w-[380px] p-6 sm:p-8 my-auto bg-white rounded-3xl shadow-2xl shadow-grey opacity-100 outline outline-2 outline-white">
-        <h1 className="text-2xl font-bebas text-center mb-2">SELECT YOUR ROLE</h1>
+      <div className="w-full sm:w-[380px] p-6 sm:p-8 my-auto bg-white rounded-3xl outline outline-2 outline-[#EEF1F7]">
+        <h1 className="text-2xl font-bebas text-center mb-2">
+          Pilih peran anda
+        </h1>
         <p className="text-center text-gray-600 mb-8 text-sm font-montserrat">
-          Please select a role according to your job position
+          Silakan pilih peran sesuai dengan posisi pekerjaan Anda
         </p>
 
         <div className="space-y-3">
           {/* Technician Button */}
           <button
-            onClick={() => handleRoleSelect('teknisi')}
+            onClick={() => handleRoleSelect("teknisi")}
             className={`w-full p-3 rounded-xl border transition-all flex items-center gap-3 hover:shadow-md ${
-              selectedRole === 'teknisi'
-                ? 'border-[#57AEFF] bg-gradient-to-r from-blue-50 to-white shadow-sm'
-                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+              selectedRole === "teknisi"
+                ? "border-[#57AEFF] bg-gradient-to-r from-blue-50 to-white shadow-sm"
+                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
             }`}
           >
-            <div className={`p-2 rounded-lg ${selectedRole === 'teknisi' ? 'bg-blue-100' : 'bg-gray-100'}`}>
+            <div
+              className={`p-2 rounded-lg ${
+                selectedRole === "teknisi" ? "bg-blue-100" : "bg-gray-100"
+              }`}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={2}
-                stroke={selectedRole === 'teknisi' ? '#57AEFF' : 'currentColor'}
+                stroke={selectedRole === "teknisi" ? "#57AEFF" : "currentColor"}
                 className="w-4 h-4"
               >
                 <path
@@ -57,27 +63,33 @@ const PilihRole = () => {
               </svg>
             </div>
             <div className="text-left font-montserrat">
-              <h3 className="font-semibold text-sm">Technician</h3>
-              <p className="text-[10px] text-gray-500">Role for service technician</p>
+              <h3 className="font-semibold text-sm">Teknisi</h3>
+              <p className="text-[10px] text-gray-500">
+                Pencucian & Reparasi Item
+              </p>
             </div>
           </button>
 
           {/* Cashier Button */}
           <button
-            onClick={() => handleRoleSelect('kasir')}
+            onClick={() => handleRoleSelect("kasir")}
             className={`w-full p-3 rounded-xl border transition-all flex items-center gap-3 hover:shadow-md ${
-              selectedRole === 'kasir'
-                ? 'border-[#57AEFF] bg-gradient-to-r from-blue-50 to-white shadow-sm'
-                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+              selectedRole === "kasir"
+                ? "border-[#57AEFF] bg-gradient-to-r from-blue-50 to-white shadow-sm"
+                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
             }`}
           >
-            <div className={`p-2 rounded-lg ${selectedRole === 'kasir' ? 'bg-blue-100' : 'bg-gray-100'}`}>
+            <div
+              className={`p-2 rounded-lg ${
+                selectedRole === "kasir" ? "bg-blue-100" : "bg-gray-100"
+              }`}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={2}
-                stroke={selectedRole === 'kasir' ? '#57AEFF' : 'currentColor'}
+                stroke={selectedRole === "kasir" ? "#57AEFF" : "currentColor"}
                 className="w-4 h-4"
               >
                 <path
@@ -88,27 +100,33 @@ const PilihRole = () => {
               </svg>
             </div>
             <div className="text-left font-montserrat">
-              <h3 className="font-semibold text-sm">Cashier</h3>
-              <p className="text-[10px] text-gray-500">Role for cashier operations</p>
+              <h3 className="font-semibold text-sm">Inspektur</h3>
+              <p className="text-[10px] text-gray-500">
+                Melakukan pengecekan tahap akhir
+              </p>
             </div>
           </button>
 
           {/* Courier Button */}
           <button
-            onClick={() => handleRoleSelect('kurir')}
+            onClick={() => handleRoleSelect("kurir")}
             className={`w-full p-3 rounded-xl border transition-all flex items-center gap-3 hover:shadow-md ${
-              selectedRole === 'kurir'
-                ? 'border-[#57AEFF] bg-gradient-to-r from-blue-50 to-white shadow-sm'
-                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+              selectedRole === "kurir"
+                ? "border-[#57AEFF] bg-gradient-to-r from-blue-50 to-white shadow-sm"
+                : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
             }`}
           >
-            <div className={`p-2 rounded-lg ${selectedRole === 'kurir' ? 'bg-blue-100' : 'bg-gray-100'}`}>
+            <div
+              className={`p-2 rounded-lg ${
+                selectedRole === "kurir" ? "bg-blue-100" : "bg-gray-100"
+              }`}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 strokeWidth={2}
-                stroke={selectedRole === 'kurir' ? '#57AEFF' : 'currentColor'}
+                stroke={selectedRole === "kurir" ? "#57AEFF" : "currentColor"}
                 className="w-4 h-4"
               >
                 <path
@@ -119,17 +137,20 @@ const PilihRole = () => {
               </svg>
             </div>
             <div className="text-left font-montserrat">
-              <h3 className="font-semibold text-sm">Courier</h3>
-              <p className="text-[10px] text-gray-500">Role for delivery services</p>
+              <h3 className="font-semibold text-sm">Kurir</h3>
+              <p className="text-[10px] text-gray-500">
+                Penjemputan & Pengantaran Item
+              </p>
             </div>
           </button>
         </div>
 
         <AnimatedButton
           onClick={handleContinue}
-          className="w-full py-3 px-4 bg-[#57AEFF] text-white font-montserrat rounded-xl text-sm font-semibold hover:bg-opacity-90 transition-colors shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white mt-6"
+          className="w-full py-3 px-4 rounded-xl text-sm font-semibold mt-6"
+          variant="blue"
         >
-          Continue
+          Lanjutkan
         </AnimatedButton>
       </div>
 
@@ -142,4 +163,4 @@ const PilihRole = () => {
   );
 };
 
-export default PilihRole; 
+export default PilihRole;

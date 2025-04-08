@@ -3,11 +3,11 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import LoadingDots from '../../components/Design/LoadingDots';
-import AntrianHeader from '../../components/Header Antrian/AntrianHeader';
+import LoadingDots from "../../components/Design/LoadingDots";
+import AntrianHeader from "../../components/Header Antrian/AntrianHeader";
 import LordIcon from "../../components/Design/LordIcon";
-import FilterAndSearch from '../../components/Header Antrian/FilterAndSearch';
-import AnimatedButton from '../../components/Design/AnimatedButton';
+import FilterAndSearch from "../../components/Header Antrian/FilterAndSearch";
+import AnimatedButton from "../../components/Design/AnimatedButton";
 
 const Antrian = () => {
   const navigate = useNavigate();
@@ -39,13 +39,13 @@ const Antrian = () => {
 
   useEffect(() => {
     if (showModal) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     }
 
     return () => {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     };
   }, [showModal]);
 
@@ -64,9 +64,10 @@ const Antrian = () => {
       setFilteredTreatments(antrianTreatment);
     } else {
       const searchLower = debouncedSearch.toLowerCase();
-      const filtered = antrianTreatment.filter(item => 
-        item.order?.customer?.name?.toLowerCase().includes(searchLower) ||
-        item.treatment?.name?.toLowerCase().includes(searchLower)
+      const filtered = antrianTreatment.filter(
+        (item) =>
+          item.order?.customer?.name?.toLowerCase().includes(searchLower) ||
+          item.treatment?.name?.toLowerCase().includes(searchLower)
       );
       setFilteredTreatments(filtered);
     }
@@ -110,26 +111,41 @@ const Antrian = () => {
 
   const fetchAntrianCounts = async () => {
     try {
-      const processTime = estimasi === "sameDay" ? "same_day" : estimasi === "nextDay" ? "next_day" : "regular";
-      
+      const processTime =
+        estimasi === "sameDay"
+          ? "same_day"
+          : estimasi === "nextDay"
+          ? "next_day"
+          : "regular";
+
       // Fetch cleaning count
-      const cleaningResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/${processTime}`, {
-        params: {
-          startDate: dateRange.startDate,
-          endDate: dateRange.endDate,
-          serviceType: 'cleaning',
-        },
-      });
+      const cleaningResponse = await axios.get(
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/order-details/process/${processTime}`,
+        {
+          params: {
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+            serviceType: "cleaning",
+          },
+        }
+      );
       setCleaningCount(cleaningResponse.data.data.length);
 
       // Fetch repair count
-      const repairResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/order-details/process/${processTime}`, {
-        params: {
-          startDate: dateRange.startDate,
-          endDate: dateRange.endDate,
-          serviceType: 'repair',
-        },
-      });
+      const repairResponse = await axios.get(
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/order-details/process/${processTime}`,
+        {
+          params: {
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+            serviceType: "repair",
+          },
+        }
+      );
       setRepairCount(repairResponse.data.data.length);
     } catch (error) {
       console.error("Error fetching counts:", error);
@@ -148,23 +164,23 @@ const Antrian = () => {
 
   const getThumbnailUrl = (originalUrl) => {
     // Jika menggunakan Cloudinary
-    if (originalUrl.includes('cloudinary')) {
-      return originalUrl.replace('/upload/', '/upload/w_200,h_200,c_fill/');
+    if (originalUrl.includes("cloudinary")) {
+      return originalUrl.replace("/upload/", "/upload/w_200,h_200,c_fill/");
     }
     // Jika menggunakan ImageKit
-    if (originalUrl.includes('imagekit')) {
-      return originalUrl + '?tr=w-200,h-200';
+    if (originalUrl.includes("imagekit")) {
+      return originalUrl + "?tr=w-200,h-200";
     }
     // Jika tidak menggunakan CDN, gunakan URL original
     return originalUrl;
   };
 
   return (
-    <div className="h-screen overflow-y-auto bg-[#E6EFF9] font-montserrat">
+    <div className="h-screen overflow-y-auto bg-white font-montserrat">
       {/* Header - Fixed at top */}
-      <header className="fixed top-0 left-0 right-0 z-10 bg-[#E6EFF9]">
+      <header className="fixed top-0 left-0 right-0 z-10 bg-white">
         <AntrianHeader />
-        <FilterAndSearch 
+        <FilterAndSearch
           estimasi={estimasi}
           selectedFilter={selectedFilter}
           handleFilterChange={handleFilterChange}
@@ -184,10 +200,10 @@ const Antrian = () => {
               filteredTreatments.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
+                  className="bg-white rounded-3xl p-4 opacity-100 outline outline-1 outline-[#C1C1C1]"
                 >
                   <div className="flex items-start gap-4">
-                    <div 
+                    <div
                       className="w-[100px] h-[100px] min-w-[100px] bg-gray-200 rounded-lg overflow-hidden shadow-md cursor-pointer"
                       onClick={() => {
                         if (item.shoes_photos && item.shoes_photos.length > 0) {
@@ -200,7 +216,9 @@ const Antrian = () => {
                         <>
                           {imageLoading && <LoadingDots />}
                           <img
-                            src={getThumbnailUrl(item.shoes_photos[0].url_photo)}
+                            src={getThumbnailUrl(
+                              item.shoes_photos[0].url_photo
+                            )}
                             alt="Shoes"
                             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             loading="lazy"
@@ -209,7 +227,9 @@ const Antrian = () => {
                         </>
                       ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                          <span className="text-gray-400 text-sm">No Image</span>
+                          <span className="text-gray-400 text-sm">
+                            No Image
+                          </span>
                         </div>
                       )}
                     </div>
@@ -230,19 +250,16 @@ const Antrian = () => {
                       </p>
                     </div>
                   </div>
-                  <AnimatedButton
-                    className="w-full h-[35px] mb-auto mt-4 rounded-xl flex items-center justify-center text-sm shadow-[4px_4px_10px_rgba(0,0,0,0.15)] font-semibold bg-[#57AEFF] text-white opacity-100 outline outline-1 outline-white"
-                  >
+                  <AnimatedButton className="w-full h-[35px] mb-auto mt-4 rounded-xl flex items-center justify-center text-sm  font-semibold bg-gradient-to-r from-[#5096FC] to-[#7BD1FD] text-white opacity-100">
                     Mulai Treatment
                   </AnimatedButton>
                 </div>
               ))
             ) : (
               <div className="col-span-full text-center py-8 text-gray-500">
-                {searchQuery.trim() !== "" 
+                {searchQuery.trim() !== ""
                   ? "No treatments found matching your search"
-                  : `Tidak ada antrian treatment untuk kategori ${selectedFilter}`
-                }
+                  : `Tidak ada antrian treatment untuk kategori ${selectedFilter}`}
               </div>
             )}
           </div>
@@ -251,7 +268,7 @@ const Antrian = () => {
 
       {/* Image Preview Modal dengan animasi yang sama dengan ConfirmationModal */}
       {showModal && (
-        <div 
+        <div
           className="fixed inset-0 z-50 overflow-y-auto"
           aria-labelledby="modal-title"
           role="dialog"
@@ -259,9 +276,9 @@ const Antrian = () => {
         >
           <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             {/* Background overlay dengan animasi fade */}
-            <div 
+            <div
               className={`fixed inset-0 bg-black transition-opacity duration-300 ${
-                showModal ? 'bg-opacity-75' : 'bg-opacity-0'
+                showModal ? "bg-opacity-75" : "bg-opacity-0"
               }`}
               aria-hidden="true"
               onClick={() => {
@@ -271,12 +288,21 @@ const Antrian = () => {
             />
 
             {/* Modal container untuk centering */}
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
 
             {/* Modal content dengan animasi */}
-            <div 
+            <div
               className={`inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all duration-300 sm:my-8 sm:align-middle sm:max-w-3xl w-full outline outline-2 outline-white
-                ${showModal ? 'opacity-100 translate-y-0 sm:scale-100' : 'opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95'}`}
+                ${
+                  showModal
+                    ? "opacity-100 translate-y-0 sm:scale-100"
+                    : "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                }`}
             >
               <div className="relative">
                 <img

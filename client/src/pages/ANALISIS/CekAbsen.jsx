@@ -160,14 +160,14 @@ const CekAbsen = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode 
   }
 
   return (
-    <div className="h-[100dvh] flex flex-col overflow-hidden bg-[#E6EFF9] font-montserrat">
+    <div className="h-[100dvh] flex flex-col overflow-hidden font-montserrat">
       <Header />
       <main className={`${className} px-4 md:px-10 pb-10 flex-1 overflow-y-auto`}>
         {!hideBackButton && (
           <div className="flex items-center gap-3 mb-4">
             <AnimatedButton
               onClick={handleBack}
-              className="p-2 bg-[#E2F2FF] rounded-full shadow-[4px_4px_10px_rgba(0,0,0,0.15)] hover:bg-[#d5e9fa] transition-colors w-[41px] h-[41px] flex items-center justify-center outline outline-2 outline-white"
+              className="p-2 rounded-full w-[41px] h-[41px] flex items-center justify-center outline outline-2 outline-[#EEF1F7]"
               title="Kembali"
             >
               <LordIcon 
@@ -182,7 +182,7 @@ const CekAbsen = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode 
         )}
 
         {/* Month Year Picker */}
-        <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
+        <div className="mb-2 rounded-3xl p-4 mt-4 opacity-100 outline outline-2 outline-[#EEF1F7]">
           <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
           <div className="flex gap-2">
             <input
@@ -193,11 +193,12 @@ const CekAbsen = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode 
                 setYear(parseInt(selectedYear));
                 setMonth(parseInt(selectedMonth));
               }}
-              className="flex-1 bg-[#E6EFF9] text-gray-600 shadow shadow-white opacity-100 outline outline-1 outline-white w-full p-2 rounded-xl font-semibold"
+              className="flex-1 bg-gray-100 text-gray-600 shadow shadow-white opacity-100 outline outline-2 outline-[#EEF1F7] w-full p-2 rounded-xl font-semibold"
             />
             <AnimatedButton
               onClick={handleSetCurrentDate}
-              className="bg-[#57AEFF] text-white shadow shadow-white opacity-100 outline outline-1 outline-white px-4 rounded-xl font-semibold hover:bg-[#d5e9fa] transition-colors"
+              className="px-4 rounded-xl font-semibold"
+              variant="blue"
             >
               Sekarang
             </AnimatedButton>
@@ -205,7 +206,7 @@ const CekAbsen = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode 
         </div>
 
         {/* Absen Report */}
-        <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
+        <div className="mb-2 rounded-3xl p-4 mt-4 outline outline-2 outline-[#EEF1F7]">
           {loading ? (
             <div className="text-center py-4">Loading...</div>
           ) : error ? (
@@ -218,7 +219,7 @@ const CekAbsen = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode 
                 className={`overflow-y-auto ${showAll ? "max-h-[400px]" : ""}`}
               >
                 <table className="w-full">
-                  <thead className="sticky top-0 bg-[#E2F2FF]">
+                  <thead className="sticky top-0 bg-white">
                     <tr className="text-left">
                       <th className="p-2">Tanggal</th>
                       <th className="p-2">Masuk</th>
@@ -237,10 +238,10 @@ const CekAbsen = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode 
                           <span
                             className={`px-2 py-1 rounded-full text-sm ${
                               absen.status === "hadir"
-                                ? "bg-green-100 text-green-800 outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]"
+                                ? "bg-green-100 text-green-800 outline outline-2 outline-[#EEF1F7]"
                                 : absen.status === "izin"
-                                ? "bg-yellow-100 text-yellow-800 outline outline-1 outline-white shadow-inner shadow-[4px_4px_10px_rgba(0,0,0,0.15)]"
-                                : "bg-red-100 text-red-800 outline outline-1 outline-white shadow-inner shadow-[4px_4px_10px_rgba(0,0,0,0.15)]"
+                                ? "bg-yellow-100 text-yellow-800 outline outline-2 outline-[#EEF1F7]"
+                                : "bg-red-100 text-red-800 outline outline-2 outline-[#EEF1F7]"
                             }`}
                           >
                             {absen.status}
@@ -252,7 +253,7 @@ const CekAbsen = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode 
                               absen.approval === "Disetujui"
                                 ? "bg-blue-100 text-blue-800"
                                 : "bg-gray-100 text-gray-800"
-                            } outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]`}
+                            } outline outline-2 outline-[#EEF1F7]`}
                           >
                             {absen.approval}
                           </span>
@@ -266,7 +267,8 @@ const CekAbsen = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode 
                 <div className="mt-4 text-center">
                   <AnimatedButton
                     onClick={() => setShowAll(!showAll)}
-                    className="bg-[#57AEFF] text-white px-4 py-2 rounded-xl hover:bg-[#4499e9] transition-colors shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white"
+                    className=" px-4 py-2"
+                    variant="blue"
                   >
                     {showAll ? "Tampilkan Lebih Sedikit" : "Tampilkan Semua"}
                   </AnimatedButton>
@@ -278,28 +280,28 @@ const CekAbsen = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode 
 
         {/* Setelah Absen Report, tambahkan Ringkasan Kehadiran */}
         {!loading && !error && absenData && absenData.length > 0 && (
-          <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
+          <div className="mb-2 rounded-3xl p-4 mt-4 opacity-100 outline outline-2 outline-[#EEF1F7]">
             <h2 className="text-2xl font-bebas mb-3">Ringkasan Kehadiran</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-[#E6EFF9] p-4 rounded-xl shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white">
+              <div className="bg-gray-100 p-4 rounded-xl">
                 <div className="text-sm text-gray-600">Total Kehadiran</div>
                 <div className="text-2xl font-semibold text-[#2E7CF6]">
                   {summary?.totalHadir} Hari
                 </div>
               </div>
-              <div className="bg-[#E6EFF9] p-4 rounded-xl shadow-inner shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white">
+              <div className="bg-gray-100 p-4 rounded-xl">
                 <div className="text-sm text-gray-600">Total Alpha</div>
                 <div className="text-2xl font-semibold text-[#2E7CF6]">
                   {summary?.totalAlpha} Hari
                 </div>
               </div>
-              <div className="bg-[#E6EFF9] p-4 rounded-xl shadow-inner shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white">
+              <div className="bg-gray-100 p-4 rounded-xl">
                 <div className="text-sm text-gray-600">Total Izin</div>
                 <div className="text-2xl font-semibold text-[#2E7CF6]">
                   {summary?.totalIzin} Hari
                 </div>
               </div>
-              <div className="bg-[#E6EFF9] p-4 rounded-xl shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white">
+              <div className="bg-gray-100 p-4 rounded-xl">
                 <div className="text-sm text-gray-600">Total Jam Kerja</div>
                 <div className="text-2xl font-semibold text-[#2E7CF6]">
                   {summary?.totalJamKerja.toFixed(1)} Jam

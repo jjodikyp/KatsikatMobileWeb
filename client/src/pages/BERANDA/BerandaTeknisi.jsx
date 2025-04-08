@@ -537,18 +537,18 @@ const BerandaTeknisi = () => {
   }, []);
 
   return (
-    <div className="h-[100dvh] flex flex-col overflow-hidden bg-[#E6EFF9] font-montserrat">
+    <div className="h-[100dvh] flex flex-col overflow-hidden bg-white font-montserrat">
       <Header />
 
       {/* Main Content dengan overflow scroll */}
       <main className="flex-1 overflow-y-auto pb-10">
-        <div className="mx-auto px-4 md:px-10 pt-20 pb-6">
-          <div className="max-w-[390px] md:max-w-none mx-auto mt-[120px]">
+        <div className="mx-auto px-4 md:px-10 pt-10 pb-6">
+          <div className="max-w-[390px] md:max-w-none mx-auto mt-[50px]">
             <WorkTimeAlert />
             <BreakTimeAlert />
 
             {/* Date Range Picker */}
-            <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
+            <div className="mb-2 bg-white rounded-3xl p-4 mt-4 opacity-100 outline outline-2 outline-[#EEF1F7]">
               <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
               <div className="grid grid-cols-2 gap-4 font-montserrat">
                 <div>
@@ -581,16 +581,16 @@ const BerandaTeknisi = () => {
             </div>
 
             {/* Detail Antrian Card dengan Button Buka Antrian */}
-            <div className="mb-2 bg-[#E2F2FF] rounded-3xl p-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] mt-4 opacity-100 outline outline-1 outline-white">
+            <div className="mb-2 bg-white rounded-3xl p-4 mt-4 opacity-100 outline outline-2 outline-[#EEF1F7]">
               <h2 className="text-2xl font-bebas mb-2">
                 Detail Antrian Treatment
               </h2>
               <div className="grid grid-cols-3 gap-2 font-['Montserrat']">
-                <AnimatedButton 
+                <AnimatedButton
                   className={`${
                     selectedEstimasi === "reguler"
-                      ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
-                      : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                      ? "bg-[#65B7FF] text-white"
+                      : "bg-[#E6EFF9] text-[#909FB1]"
                   } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                   onClick={() => setSelectedEstimasi("reguler")}
                 >
@@ -598,7 +598,7 @@ const BerandaTeknisi = () => {
                     className={
                       selectedEstimasi === "reguler"
                         ? "text-white"
-                        : "text-gray-600"
+                        : "text-[#909FB1]"
                     }
                   >
                     Reguler
@@ -607,11 +607,11 @@ const BerandaTeknisi = () => {
                     {antrianData?.reguler || 0}
                   </p>
                 </AnimatedButton>
-                <AnimatedButton 
+                <AnimatedButton
                   className={`${
                     selectedEstimasi === "sameDay"
-                      ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
-                      : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                      ? "bg-[#65B7FF] text-white"
+                      : "bg-[#E6EFF9] text-[#909FB1]"
                   } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                   onClick={() => setSelectedEstimasi("sameDay")}
                 >
@@ -619,7 +619,7 @@ const BerandaTeknisi = () => {
                     className={
                       selectedEstimasi === "sameDay"
                         ? "text-white"
-                        : "text-gray-600"
+                        : "text-[#909FB1]"
                     }
                   >
                     Same Day
@@ -628,11 +628,11 @@ const BerandaTeknisi = () => {
                     {antrianData?.sameDay || 0}
                   </p>
                 </AnimatedButton>
-                <AnimatedButton 
+                <AnimatedButton
                   className={`${
                     selectedEstimasi === "nextDay"
-                      ? "bg-gradient-to-b from-[#4CA9FF] to-[#0B89FF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white"
-                      : "bg-[#E6EFF9] text-gray-600 shadow shadow-current opacity-100 outline outline-2 outline-white"
+                      ? "bg-[#65B7FF] text-white"
+                      : "bg-[#E6EFF9] text-[#909FB1]"
                   } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
                   onClick={() => setSelectedEstimasi("nextDay")}
                 >
@@ -640,7 +640,7 @@ const BerandaTeknisi = () => {
                     className={
                       selectedEstimasi === "nextDay"
                         ? "text-white"
-                        : "text-gray-600"
+                        : "text-[#909FB1]"
                     }
                   >
                     Next Day
@@ -655,24 +655,16 @@ const BerandaTeknisi = () => {
               <AnimatedButton
                 onClick={() =>
                   navigate(`/antrian/${selectedEstimasi}`, {
-                    state: {
-                      dateRange,
-                      estimasi: selectedEstimasi,
-                    },
+                    state: { dateRange, estimasi: selectedEstimasi },
                   })
                 }
-                disabled={isFromIzin || !isFromPresent}
-                className={`shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm w-full h-[35px] mt-4 py-3 rounded-xl hover:bg-opacity-90 transition-all font-montserrat flex items-center justify-center font-bold
-                  ${
-                    isFromIzin
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : !isFromPresent
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-[#57AEFF] text-white"
-                  }`}
+                variant={
+                  isFromIzin ? "disabled" : isFromPresent ? "blue" : "default"
+                }
+                className="w-full h-[35px] mt-4 py-3 flex items-center justify-center"
+                disabled={isFromIzin}
               >
-                {isFromIzin ? "Anda sedang izin" : ""}
-                {isFromPresent ? "Buka Antrian" : ""}
+                {isFromIzin ? "Anda sedang izin" : "Buka Antrian"}
               </AnimatedButton>
             </div>
           </div>

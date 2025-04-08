@@ -17,33 +17,34 @@ const LoginSuccess = () => {
 
   return (
     <div className="min-h-[100dvh] flex flex-col justify-center items-center bg-white px-10 sm:px-0">
-      <div className="w-full sm:w-[380px] p-8 sm:p-8 my-auto bg-white rounded-3xl shadow-2xl shadow-grey opacity-100 outline outline-2 outline-white">
+      <div className="w-full sm:w-[380px] p-8 sm:p-8 my-auto bg-white rounded-3xl outline outline-2 outline-[#EEF1F7]">
         {/* Illustration */}
         <div className="flex justify-center mb-6">
           <LordIcon
             src="https://cdn.lordicon.com/dhmavvpz.json"
             trigger="loop"
-            style={{ width: '120px', height: '120px' }}
+            style={{ width: "120px", height: "120px" }}
           />
         </div>
 
         {/* Success Message */}
         <h1 className="font-bebas text-2xl text-gray-800 tracking-wide text-center mb-3">
-          ATTENDANCE SUCCESS
+          Berhasil Absen
         </h1>
 
         {/* Welcome Message */}
         <p className="font-montserrat text-sm text-gray-600 text-center mb-8">
-          Have a great day! Stay focused and give your best!
+          Semoga harimu menyenangkan! Tetap fokus dan berikan yang terbaik!
         </p>
 
         {/* Continue Button */}
         <AnimatedButton
           type="button"
           onClick={handleContinue}
-          className="h-[40px] w-full py-3.5 px-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm bg-[#57AEFF] text-white rounded-xl font-montserrat flex items-center justify-center font-semibold"
+          className="h-[40px] w-full py-3.5 px-4 rounded-xl font-montserrat flex items-center justify-center font-semibold"
+          variant="blue"
         >
-          Continue
+          Lanjutkan
         </AnimatedButton>
       </div>
     </div>

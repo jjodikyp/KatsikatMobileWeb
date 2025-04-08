@@ -7,13 +7,12 @@ const path = require("path");
 const sequelize = require("./src/config/database");
 const routes = require("./src/routes");
 const allowedOrigins = [
-  "http://192.168.1.18:5173",
+  "http://192.168.1.15:5173",
   "http://localhost:5173",
-  "http://192.168.1.18:3002",
+  "http://192.168.1.15:3002",
   "capacitor://localhost",
   "http://localhost",
 ];
-
 class App {
   constructor() {
     this.app = express();

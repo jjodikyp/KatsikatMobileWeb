@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import AnimatedButton from '../Design/AnimatedButton';
 
 const QualityCheckModal = ({ 
   isOpen, 
@@ -53,7 +54,7 @@ const QualityCheckModal = ({
 
             {/* Modal content dengan animasi */}
             <motion.div 
-              className="relative inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform sm:my-8 sm:align-middle sm:max-w-lg w-full outline outline-2 outline-white z-[102]"
+              className="relative inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform sm:my-8 sm:align-middle sm:max-w-lg w-full z-[102]"
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -63,8 +64,8 @@ const QualityCheckModal = ({
               }}
             >
               {/* Header */}
-              <div className="bg-[#57AEFF] px-6 py-4 outline outline-2 outline-white">
-                <h3 className="text-xl font-semibold text-white">
+              <div className="bg-gradient-to-r from-[#5096FC] to-[#7BD1FD] px-6 py-3">
+                <h3 className="text-lg font-semibold text-white">
                   {type === 'failed' ? 'Tidak Lolos Quality Check' : 'Lolos Quality Check'}
                 </h3>
               </div>
@@ -80,9 +81,9 @@ const QualityCheckModal = ({
                     <textarea
                       value={reason}
                       onChange={(e) => setReason(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg placeholder:text-sm"
                       rows="4"
-                      placeholder="Alasan akan dibaca oleh pihak teknisi yang mengerjakan..."
+                      placeholder="Alasan akan dibaca oleh pihak teknisi yang mengerjakan item ini..."
                     />
                   </div>
                 ) : (
@@ -93,11 +94,11 @@ const QualityCheckModal = ({
                         Pilih metode pengambilan:
                       </label>
                       <div className="grid grid-cols-2 gap-4">
-                        <div
+                        <AnimatedButton
                           className={`cursor-pointer p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition-all ${
                             deliveryOption === 'pickup'
-                              ? 'bg-[#57AEFF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white'
-                              : 'bg-[#E6EFF9] text-gray-600 shadow shadow-current outline outline-2 outline-white'
+                              ? 'bg-[#57AEFF] text-white'
+                              : 'bg-[#E6EFF9] text-gray-600'
                           }`}
                           onClick={() => setDeliveryOption('pickup')}
                         >
@@ -116,13 +117,13 @@ const QualityCheckModal = ({
                             />
                           </svg>
                           <span className="text-sm font-medium">Ambil di Outlet</span>
-                        </div>
+                        </AnimatedButton>
 
-                        <div
+                        <AnimatedButton
                           className={`cursor-pointer p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition-all ${
                             deliveryOption === 'delivery'
-                              ? 'bg-[#57AEFF] text-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white'
-                              : 'bg-[#E6EFF9] text-gray-600 shadow shadow-current outline outline-2 outline-white'
+                              ? 'bg-[#57AEFF] text-white'
+                              : 'bg-[#E6EFF9] text-gray-600'
                           }`}
                           onClick={() => setDeliveryOption('delivery')}
                         >
@@ -141,7 +142,7 @@ const QualityCheckModal = ({
                             />
                           </svg>
                           <span className="text-sm font-medium">Lakukan Pengiriman</span>
-                        </div>
+                        </AnimatedButton>
                       </div>
                     </div>
 
@@ -178,20 +179,21 @@ const QualityCheckModal = ({
 
               {/* Footer */}
               <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-2">
-                <button
+                <AnimatedButton
                   onClick={onClose}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow-lg shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white"
+                  className="px-4 py-2 rounded-xl text-black opacity-100 outline outline-1 outline-black font-semibold"
                 >
                   Batal
-                </button>
-                <button
+                </AnimatedButton>
+                <AnimatedButton
                   onClick={handleSubmit}
+                  variant="blue"
                   disabled={
                     (type === 'failed' && !reason) ||
                     (type === 'passed' && !deliveryOption) ||
                     (deliveryOption === 'delivery' && (!deliveryDate || !deliveryTime))
                   }
-                  className={`px-4 py-2 rounded-lg text-white transition-colors shadow-lg shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-2 outline-white ${
+                  className={`px-4 py-2 rounded-lg text-white transition-colors ${
                     ((type === 'failed' && reason) ||
                     (type === 'passed' && deliveryOption && 
                       (deliveryOption === 'pickup' || (deliveryDate && deliveryTime))))
@@ -200,7 +202,7 @@ const QualityCheckModal = ({
                   }`}
                 >
                   Konfirmasi
-                </button>
+                </AnimatedButton>
               </div>
             </motion.div>
           </div>
