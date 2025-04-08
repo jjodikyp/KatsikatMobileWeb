@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ConfirmationModal from "../Modal/ConfirmationModal";
 import NavigationModal from "../Modal/NavigationModal";
-import SwitchRoleModalTrigger from "./SwitchButton";
 import LogoutButton from "./LogoutButton";
 import UserName from "./UserName";
+// import SwitchButton from "./SwitchButton";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -41,7 +41,6 @@ const Header = () => {
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <LogoutButton onClick={() => setShowLogoutModal(true)} />
-                <SwitchRoleModalTrigger />
               </div>
 
               {/* Jika dibuka di halaman analsis kinerja, maka tidak ada user name */}

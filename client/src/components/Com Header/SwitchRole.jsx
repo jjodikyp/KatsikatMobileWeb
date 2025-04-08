@@ -109,7 +109,7 @@ const SwitchRole = () => {
 
   return (
     <>
-      <div className="flex gap-2 w-full">
+      <div className="flex gap-3 w-full">
         {roleButtons.map((button, index) => (
           <AnimatedButton
             key={button.role}
@@ -117,8 +117,8 @@ const SwitchRole = () => {
               playSound(switchSound);
               navigate(button.path);
             }}
-            variant="green"
-            className="flex-1 py-2 px-4 rounded-full flex items-center justify-center gap-2 w-full"
+            variant="transparent"
+            className="flex-1 py-2 px-4 rounded-xl flex items-center justify-center gap-2 w-full"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
