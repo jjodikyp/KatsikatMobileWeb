@@ -13,7 +13,7 @@ const IzinSuccess = () => {
    
   return (
     <div className="min-h-[100dvh] flex flex-col justify-center items-center bg-white px-10 sm:px-0">
-      <div className="w-full sm:w-[380px] p-8 sm:p-8 my-auto bg-white rounded-3xl shadow-2xl shadow-grey opacity-100 outline outline-2 outline-white">
+      <div className="w-full sm:w-[380px] p-8 sm:p-8 my-auto bg-white rounded-3xl outline outline-2 outline-[#EEF1F7]">
         {/* Illustration */}
         <div className="flex justify-center mb-6">
           <div className="w-[120px] h-[120px] animate-scale">
@@ -39,8 +39,9 @@ const IzinSuccess = () => {
         {/* Cek Data Kinerja */}
         <AnimatedButton
           type="button"
+          variant="grey"
           onClick={handleContinue}
-          className="mb-2 h-[40px] w-full py-3.5 px-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm bg-[#57AEFF] text-white rounded-xl font-montserrat flex items-center justify-center font-semibold hover:bg-[#4a91d8] transition-colors"
+          className="mb-2 h-[40px] w-full py-3.5 px-4 flex items-center justify-center"
         >
           Beranda
         </AnimatedButton>
@@ -48,8 +49,9 @@ const IzinSuccess = () => {
         {/* Keluar Button */}
         <AnimatedButton
           type="button"
+          variant="blue"
           onClick={() => navigate("/")}
-          className="h-[40px] w-full py-3.5 px-4 shadow-[4px_4px_10px_rgba(0,0,0,0.15)] opacity-100 outline outline-1 outline-white text-sm bg-[#FD8087] text-white rounded-xl font-montserrat flex items-center justify-center font-semibold hover:bg-[#d86a6e] transition-colors"
+          className="h-[40px] w-full py-3.5 px-4 flex items-center justify-center"
         >
           Keluar
         </AnimatedButton>

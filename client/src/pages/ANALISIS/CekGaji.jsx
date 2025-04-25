@@ -243,14 +243,16 @@ const CekGaji = ({
               <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <img
-                      src="/src/assets/images/pdf.svg"
-                      alt="PDF Icon"
-                      className="w-10 h-10"
-                    />
+                    <animated-icons
+                      src="https://animatedicons.co/get-icon?name=Pdf&style=minimalistic&token=d5afb04f-d10f-4540-bf0a-27e0b4e06ce8"
+                      trigger="loop"
+                      attributes='{"variationThumbColour":"#536DFE","variationName":"Two Tone","variationNumber":2,"numberOfGroups":2,"backgroundIsGroup":false,"strokeWidth":1,"defaultColours":{"group-1":"#000000","group-2":"#5096FCFF","background":"#FFFFFF"}}'
+                      height="40"
+                      width="40"
+                    ></animated-icons>
                     <div>
                       <div className="font-semibold text-gray-800">
-                        Slip Gaji Bulan {getMonthName(month)} {year}
+                        Slip Gaji {getMonthName(month)} {year}
                       </div>
                       <div className="text-sm text-gray-500">PDF • 245 KB</div>
                     </div>
@@ -258,7 +260,7 @@ const CekGaji = ({
                   <AnimatedButton
                     onClick={handleDownloadSlip}
                     variant="blue"
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl ml-2"
                   >
                     <span>Unduh</span>
                   </AnimatedButton>

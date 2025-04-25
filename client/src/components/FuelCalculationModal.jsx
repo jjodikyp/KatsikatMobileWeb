@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AnimatedButton from "./Design/AnimatedButton";
 
 const FuelCalculationModal = ({ isOpen, onClose, onConfirm, data }) => {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ const FuelCalculationModal = ({ isOpen, onClose, onConfirm, data }) => {
         ${showOverlay ? "bg-opacity-50" : "bg-opacity-0"}`}
     >
       <div
-        className={`bg-white rounded-2xl p-6 w-[90%] max-w-md transform transition-all duration-300 my-8 outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]
+        className={`bg-white rounded-2xl p-6 w-[80%] max-w-md transform transition-all duration-300 my-8]
           ${
             showModal
               ? "opacity-100 translate-y-0 scale-100"
@@ -55,56 +56,58 @@ const FuelCalculationModal = ({ isOpen, onClose, onConfirm, data }) => {
 
         <div className="space-y-3 mb-6">
           <div className="flex justify-between">
-            <span className="text-gray-600 font-montserrat">ODO Mulai:</span>
-            <span className="font-medium font-montserrat">
+            <span className="text-sm text-gray-600 font-montserrat">ODO Mulai:</span>
+            <span className="text-sm font-medium font-montserrat">
               {data.odoStart} km
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600 font-montserrat">ODO Selesai:</span>
-            <span className="font-medium font-montserrat">
+            <span className="text-sm text-gray-600 font-montserrat">ODO Selesai:</span>
+            <span className="text-sm font-medium font-montserrat">
               {data.odoEnd} km
             </span>
           </div>
           <div className="flex justify-between border-t pt-2">
-            <span className="text-gray-600 font-montserrat">Jarak Tempuh:</span>
-            <span className="font-medium font-montserrat">{distance} km</span>
+            <span className="text-sm text-gray-600 font-montserrat">Jarak Tempuh:</span>
+            <span className="text-sm font-medium font-montserrat">{distance} km</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600 font-montserrat">
+            <span className="text-sm text-gray-600 font-montserrat">
               Penggunaan Bensin:
             </span>
-            <span className="font-medium font-montserrat">
+            <span className="text-sm font-medium font-montserrat">
               {fuelUsage.toFixed(2)} liter
             </span>
           </div>
           <div className="flex justify-between border-t pt-2">
-            <span className="text-gray-600 font-montserrat">
+            <span className="text-sm text-gray-600 font-montserrat">
               Harga Pertalite:
             </span>
-            <span className="font-montserrat">Rp 10.000/liter</span>
+            <span className="text-sm font-montserrat">Rp 10.000/liter</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600 font-montserrat">Biaya Bensin:</span>
-            <span className="font-bold font-montserrat">
+            <span className="text-sm text-gray-600 font-montserrat">Biaya Bensin:</span>
+            <span className="text-sm font-bold font-montserrat">
               Rp {fuelCost.toLocaleString("id-ID")}
             </span>
           </div>
         </div>
 
         <div className="flex justify-end gap-3">
-          <button
+          <AnimatedButton
             onClick={onClose}
-            className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all font-montserrat outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]"
+            variant="grey"
+            className="px-4 py-2 rounded-lg"
           >
             Batal
-          </button>
-          <button
+          </AnimatedButton>
+          <AnimatedButton
             onClick={handleConfirm}
-            className="px-4 py-2 rounded-lg bg-[#57AEFF] text-white hover:bg-opacity-90 transition-all font-montserrat outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]"
+            variant="blue"
+            className="px-4 py-2 rounded-lg"
           >
             Kirim
-          </button>
+          </AnimatedButton>
         </div>
       </div>
     </div>

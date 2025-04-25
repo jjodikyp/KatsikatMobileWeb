@@ -1,6 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
-import ConfirmationModal from "../Modal/ConfirmationModal";
 import useSound from "../../hooks/useSound";
 import switchSound from "../../assets/sound/switch.mp3";
 import AnimatedButton from "../Design/AnimatedButton";

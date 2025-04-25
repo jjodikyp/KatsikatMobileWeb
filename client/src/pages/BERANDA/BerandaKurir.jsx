@@ -129,6 +129,43 @@ const BerandaKurir = () => {
     }
   }, []);
 
+  // Tambahkan fungsi untuk handle quick date selection
+  const handleQuickDateSelect = (type) => {
+    const today = new Date();
+    let newStartDate, newEndDate;
+
+    switch (type) {
+      case "today":
+        newStartDate = new Date(today);
+        newEndDate = new Date(today);
+        break;
+      case "yesterday":
+        newStartDate = new Date(today);
+        newStartDate.setDate(today.getDate() - 1);
+        newEndDate = new Date(newStartDate);
+        break;
+      case "tomorrow":
+        newStartDate = new Date(today);
+        newStartDate.setDate(today.getDate() + 1);
+        newEndDate = new Date(newStartDate);
+        break;
+      default:
+        return;
+    }
+
+    const formattedStartDate = formatDateForDB(newStartDate);
+    const formattedEndDate = formatDateForDB(newEndDate);
+
+    const newRange = {
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
+    };
+
+    setDateRange(newRange);
+    localStorage.setItem("dateRange", JSON.stringify(newRange));
+    fetchAntrianData(newRange);
+  };
+
   return (
     <div className="h-[100dvh] flex flex-col overflow-hidden bg-white font-montserrat">
       <Header />
@@ -141,6 +178,29 @@ const BerandaKurir = () => {
             {/* Date Range Picker */}
             <div className="mb-2 bg-white rounded-3xl p-4 mt-4 opacity-100 outline outline-2 outline-[#EEF1F7]">
               <h2 className="text-2xl font-bebas mb-3">Rentang Waktu</h2>
+
+              {/* Quick Date Selection Buttons */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <AnimatedButton
+                  onClick={() => handleQuickDateSelect("yesterday")}
+                  className="h-[35px] rounded-xl flex items-center justify-center text-sm font-semibold bg-[#E6EFF9] text-[#2E7CF6] hover:bg-[#65B7FF] hover:text-white transition-all"
+                >
+                  Kemarin
+                </AnimatedButton>
+                <AnimatedButton
+                  onClick={() => handleQuickDateSelect("today")}
+                  className="h-[35px] rounded-xl flex items-center justify-center text-sm font-semibold bg-[#E6EFF9] text-[#2E7CF6] hover:bg-[#65B7FF] hover:text-white transition-all"
+                >
+                  Hari Ini
+                </AnimatedButton>
+                <AnimatedButton
+                  onClick={() => handleQuickDateSelect("tomorrow")}
+                  className="h-[35px] rounded-xl flex items-center justify-center text-sm font-semibold bg-[#E6EFF9] text-[#2E7CF6] hover:bg-[#65B7FF] hover:text-white transition-all"
+                >
+                  Besok
+                </AnimatedButton>
+              </div>
+
               <div className="grid grid-cols-2 gap-4 font-montserrat">
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">

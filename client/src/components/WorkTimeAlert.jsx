@@ -1,10 +1,20 @@
-import { useState, useEffect } from 'react';
-import { differenceInHours, differenceInMinutes, differenceInSeconds, parseISO } from 'date-fns';
+import { useState, useEffect } from "react";
+import {
+  differenceInHours,
+  differenceInMinutes,
+  differenceInSeconds,
+  parseISO,
+} from "date-fns";
+import LordIcon from "./Design/LordIcon";
 
 const WorkTimeAlert = () => {
   const [showOvertimeWarning, setShowOvertimeWarning] = useState(false);
   const [canTakeOvertime, setCanTakeOvertime] = useState(false);
-  const [workDuration, setWorkDuration] = useState({ hours: 0, minutes: 0, seconds: 0 });
+  const [workDuration, setWorkDuration] = useState({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
   // Fungsi untuk mengecek jam kerja
   const checkWorkHours = () => {
@@ -49,16 +59,22 @@ const WorkTimeAlert = () => {
   if (!showOvertimeWarning) return null;
 
   return (
-    <div className="mb-2 bg-red-100 border border-red-400 rounded-3xl p-4 shadow-sm mt-4">
+    <div className="mb-4 bg-red-100 rounded-3xl p-4 mt-4 outline outline-2 outline-red-400">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bebas text-red-700">
             Peringatan Jam Kerja
+            <LordIcon
+              src="https://cdn.lordicon.com/zjuyeglr.json"
+              trigger="loop"
+              state="loop-oscillate"
+              style={{ width: "25px", height: "25px", marginLeft: "5px", paddingTop: "3px"}}
+            />
           </h2>
           <p className="text-red-600 text-sm">
-            Anda telah bekerja lebih dari 8 jam. Total jam kerja, {workDuration.hours} Jam,{" "}
-            {workDuration.minutes} Menit, dan {workDuration.seconds}{" "}
-            Detik. Silakan Absen Selesai!
+            Anda telah bekerja lebih dari 8 jam. Total jam kerja,{" "}
+            {workDuration.hours} Jam, {workDuration.minutes} Menit, dan{" "}
+            {workDuration.seconds} Detik. Silakan Absen Selesai!
           </p>
         </div>
         {canTakeOvertime && (
@@ -74,4 +90,4 @@ const WorkTimeAlert = () => {
   );
 };
 
-export default WorkTimeAlert; 
+export default WorkTimeAlert;

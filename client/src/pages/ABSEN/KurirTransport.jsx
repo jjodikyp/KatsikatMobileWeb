@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import FuelCalculationModal from "../../components/FuelCalculationModal";
+import AnimatedButton from "../../components/Design/AnimatedButton";
 
 const KurirTransport = () => {
   const navigate = useNavigate();
@@ -152,7 +153,7 @@ const KurirTransport = () => {
   };
 
   return (
-    <div className="h-screen overflow-y-auto bg-[#E6EFF9] p-4 pb-2 h-auto pb-20 flex flex-col items-center">
+    <div className="h-screen overflow-y-auto bg-white p-4 pb-2 h-auto pb-20 flex flex-col items-center">
       <div className="max-w-md mx-auto h-max pb-20">
 
         <h1 className="text-3xl font-bebas text-center mb-2 mt-10">
@@ -179,7 +180,7 @@ const KurirTransport = () => {
               name="odoStart"
               value={formData.odoStart}
               onChange={handleInputChange}
-              className="h-10 w-full p-3 rounded-xl font-montserrat outline outline-1 outline-white bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] placeholder:text-sm"
+              className="h-10 w-full p-3 rounded-xl font-montserrat outline outline-1 outline-gray-200 placeholder:text-sm"
               placeholder="Masukkan jarak mulai"
               disabled={loading}
             />
@@ -194,7 +195,7 @@ const KurirTransport = () => {
               name="odoEnd"
               value={formData.odoEnd}
               onChange={handleInputChange}
-              className="h-10 w-full p-3 rounded-xl outline outline-1 outline-white bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] placeholder:text-sm font-montserrat"
+              className="h-10 w-full p-3 rounded-xl outline outline-1 outline-gray-200 placeholder:text-sm font-montserrat"
               placeholder="Masukkan jarak selesai"
               disabled={loading}
             />
@@ -215,7 +216,7 @@ const KurirTransport = () => {
             />
             <label
               htmlFor="odoPhotos"
-              className="block w-full border-2 border-dashed border-blue-400 rounded-xl cursor-pointer hover:border-blue-400 transition-colors p-4"
+              className="block w-full border-2 border-dashed border-[#5096FC] rounded-xl cursor-pointer hover:border-blue-400 transition-colors p-4"
             >
               <div className="grid grid-cols-2 gap-4">
                 {/* Preview ODO Start */}
@@ -238,7 +239,7 @@ const KurirTransport = () => {
                       </button>
                     </>
                   ) : (
-                    <div className="flex items-center justify-center h-full bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] rounded-lg outline outline-1 outline-white p-2 font-montserrat">
+                    <div className="flex items-center justify-center h-full rounded-lg outline outline-1 outline-gray-200 p-2 font-montserrat">
                       <span className="text-gray-500 text-sm text-center">
                         Foto ODO Mulai
                       </span>
@@ -266,7 +267,7 @@ const KurirTransport = () => {
                       </button>
                     </>
                   ) : (
-                    <div className="flex items-center justify-center h-full rounded-lg bg-[#E6EFF9] shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white p-2 font-montserrat">
+                    <div className="flex items-center justify-center h-full rounded-lg outline outline-1 outline-gray-200 p-2 font-montserrat">
                       <span className="text-gray-500 text-sm text-center">
                         Foto ODO Selesai
                       </span>
@@ -281,15 +282,16 @@ const KurirTransport = () => {
             </label>
           </div>
 
-          <button
+          <AnimatedButton
             onClick={handleSubmit}
+            variant="blue"
             disabled={loading || !photos.odoStart || !photos.odoEnd}
-            className={`h-10 w-full py-3 bg-[#57AEFF] text-white rounded-xl font-semibold transition-all mt-6 font-montserrat text-center text-sm flex items-center justify-center shadow-[4px_4px_10px_rgba(0,0,0,0.15)] outline outline-1 outline-white ${
+            className={`h-10 w-full py-3 mt-6 font-montserrat text-center text-sm flex items-center justify-center ${
               (loading || !photos.odoStart || !photos.odoEnd) ? "opacity-50 cursor-not-allowed" : "hover:bg-opacity-90"
             }`}
           >
             {loading ? "Menyimpan..." : "Selanjutnya"}
-          </button>
+          </AnimatedButton>
         </div>
       </div>
 

@@ -9,8 +9,12 @@ import AnimatedButton from "../../components/Design/AnimatedButton";
 
 const BerandaKasir = () => {
   const navigate = useNavigate();
-  const [selectedEstimasi, setSelectedEstimasi] = useState("reguler");
-  const [antrianData, setAntrianData] = useState(null);
+  const [selectedEstimasi, setSelectedEstimasi] = useState("regular");
+  const [antrianData, setAntrianData] = useState({
+    regular: 0,
+    same_day: 0,
+    next_day: 0,
+  });
   const [dateRange, setDateRange] = useState(() => {
     const savedRange = localStorage.getItem("dateRange");
     if (savedRange) {
@@ -61,22 +65,47 @@ const BerandaKasir = () => {
   const fetchAntrianData = async (range = dateRange) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/antrian/count`,
-        {
-          params: {
-            startDate: formatDateForDB(range.startDate),
-            endDate: formatDateForDB(range.endDate),
-          },
-        }
+        "https://680340c50a99cb7408eb7488.mockapi.io/api/test/treatments"
       );
-      setAntrianData(response.data.data);
+
+      console.log("Raw API Response:", response.data);
+
+      // Log untuk memeriksa format process_time dari API
+      const processTimeExample = response.data[0]?.process_time;
+      console.log("Process Time Format Example:", processTimeExample);
+
+      if (Array.isArray(response.data)) {
+        // Filter dan log setiap kategori sebelum menghitung
+        const regularData = response.data.filter(
+          (item) => item.process_time?.toLowerCase() === "regular"
+        );
+        const sameDayData = response.data.filter(
+          (item) => item.process_time?.toLowerCase() === "same_day"
+        );
+        const nextDayData = response.data.filter(
+          (item) => item.process_time?.toLowerCase() === "next_day"
+        );
+
+        console.log("Regular Data:", regularData);
+        console.log("Same Day Data:", sameDayData);
+        console.log("Next Day Data:", nextDayData);
+
+        const counts = {
+          regular: regularData.length,
+          same_day: sameDayData.length,
+          next_day: nextDayData.length,
+        };
+
+        console.log("Final Counts:", counts);
+        setAntrianData(counts);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   useEffect(() => {
-    fetchAntrianData();
+    fetchAntrianData(dateRange);
     // Cek apakah user datang dari halaman izin-success
     const fromIzin = sessionStorage.getItem("fromIzin");
     if (fromIzin === "true") {
@@ -88,7 +117,7 @@ const BerandaKasir = () => {
     if (fromPresent === "true") {
       setIsFromPresent(true);
     }
-  }, []);
+  }, [dateRange]);
 
   const handleLogoutConfirm = () => {
     // Implementasi log out
@@ -105,6 +134,43 @@ const BerandaKasir = () => {
         estimasi: selectedEstimasi,
       },
     });
+  };
+
+  // Tambahkan fungsi untuk handle quick date selection
+  const handleQuickDateSelect = (type) => {
+    const today = new Date();
+    let newStartDate, newEndDate;
+
+    switch (type) {
+      case "today":
+        newStartDate = new Date(today);
+        newEndDate = new Date(today);
+        break;
+      case "yesterday":
+        newStartDate = new Date(today);
+        newStartDate.setDate(today.getDate() - 1);
+        newEndDate = new Date(newStartDate);
+        break;
+      case "tomorrow":
+        newStartDate = new Date(today);
+        newStartDate.setDate(today.getDate() + 1);
+        newEndDate = new Date(newStartDate);
+        break;
+      default:
+        return;
+    }
+
+    const formattedStartDate = formatDateForDB(newStartDate);
+    const formattedEndDate = formatDateForDB(newEndDate);
+
+    const newRange = {
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
+    };
+
+    setDateRange(newRange);
+    localStorage.setItem("dateRange", JSON.stringify(newRange));
+    fetchAntrianData(newRange);
   };
 
   return (
@@ -128,6 +194,30 @@ const BerandaKasir = () => {
             {/* Date Range Card */}
             <div className="mb-2 rounded-3xl p-4 outline outline-2 outline-[#EEF1F7]">
               <h2 className="text-2xl font-bebas mb-2">Rentang waktu</h2>
+
+              {/* Quick Date Selection Buttons */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                <AnimatedButton
+                  onClick={() => handleQuickDateSelect("yesterday")}
+                  className="h-[35px] rounded-xl flex items-center justify-center text-sm font-semibold bg-[#E6EFF9] text-[#2E7CF6] hover:bg-[#65B7FF] hover:text-white transition-all"
+                >
+                  Kemarin
+                </AnimatedButton>
+                <AnimatedButton
+                  onClick={() => handleQuickDateSelect("today")}
+                  className="h-[35px] rounded-xl flex items-center justify-center text-sm font-semibold bg-[#E6EFF9] text-[#2E7CF6] hover:bg-[#65B7FF] hover:text-white transition-all"
+                >
+                  Hari Ini
+                </AnimatedButton>
+                <AnimatedButton
+                  onClick={() => handleQuickDateSelect("tomorrow")}
+                  className="h-[35px] rounded-xl flex items-center justify-center text-sm font-semibold bg-[#E6EFF9] text-[#2E7CF6] hover:bg-[#65B7FF] hover:text-white transition-all"
+                >
+                  Besok
+                </AnimatedButton>
+              </div>
+
+              {/* Existing Date Range Inputs */}
               <div className="grid grid-cols-2 gap-4 font-montserrat">
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">
@@ -161,20 +251,20 @@ const BerandaKasir = () => {
             {/* Quality Check Queue Details Card */}
             <div className="mb-2 rounded-3xl p-4 mt-4 outline outline-2 outline-[#EEF1F7]">
               <h2 className="text-2xl font-bebas mb-2">
-              Antrean Pemeriksaan Kualitas
+                Antrean Pemeriksaan Kualitas
               </h2>
               <div className="grid grid-cols-3 gap-2 font-['Montserrat']">
                 <AnimatedButton
                   className={`${
-                    selectedEstimasi === "reguler"
+                    selectedEstimasi === "regular"
                       ? "bg-[#65B7FF] text-white"
                       : "bg-[#E6EFF9] text-[#909FB1]"
                   } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                  onClick={() => setSelectedEstimasi("reguler")}
+                  onClick={() => setSelectedEstimasi("regular")}
                 >
                   <h3
                     className={
-                      selectedEstimasi === "reguler"
+                      selectedEstimasi === "regular"
                         ? "text-white"
                         : "text-gray-600"
                     }
@@ -182,21 +272,21 @@ const BerandaKasir = () => {
                     Regular
                   </h3>
                   <p className="text-3xl font-bold">
-                    {antrianData?.reguler || 0}
+                    {antrianData ? antrianData.regular : 0}
                   </p>
                 </AnimatedButton>
 
                 <AnimatedButton
                   className={`${
-                    selectedEstimasi === "sameDay"
+                    selectedEstimasi === "same_day"
                       ? "bg-[#65B7FF] text-white"
                       : "bg-[#E6EFF9] text-[#909FB1]"
                   } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                  onClick={() => setSelectedEstimasi("sameDay")}
+                  onClick={() => setSelectedEstimasi("same_day")}
                 >
                   <h3
                     className={
-                      selectedEstimasi === "sameDay"
+                      selectedEstimasi === "same_day"
                         ? "text-white"
                         : "text-gray-600"
                     }
@@ -204,21 +294,21 @@ const BerandaKasir = () => {
                     Same Day
                   </h3>
                   <p className="text-3xl font-bold">
-                    {antrianData?.sameDay || 0}
+                    {antrianData ? antrianData.same_day : 0}
                   </p>
                 </AnimatedButton>
 
                 <AnimatedButton
                   className={`${
-                    selectedEstimasi === "nextDay"
+                    selectedEstimasi === "next_day"
                       ? "bg-[#65B7FF] text-white"
                       : "bg-[#E6EFF9] text-[#909FB1]"
                   } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                  onClick={() => setSelectedEstimasi("nextDay")}
+                  onClick={() => setSelectedEstimasi("next_day")}
                 >
                   <h3
                     className={
-                      selectedEstimasi === "nextDay"
+                      selectedEstimasi === "next_day"
                         ? "text-white"
                         : "text-gray-600"
                     }
@@ -226,9 +316,21 @@ const BerandaKasir = () => {
                     Next Day
                   </h3>
                   <p className="text-3xl font-bold">
-                    {antrianData?.nextDay || 0}
+                    {antrianData ? antrianData.next_day : 0}
                   </p>
                 </AnimatedButton>
+              </div>
+
+              {/* Tambahkan total antrian */}
+              <div className="mt-4 text-center outline outline-2 outline-[#EEF1F7] rounded-3xl p-2">
+                <p className="text-sm text-gray-600">
+                  Total Antrian:{" "}
+                  {antrianData
+                    ? antrianData.regular +
+                      antrianData.same_day +
+                      antrianData.next_day
+                    : 0}
+                </p>
               </div>
 
               {/* Open Queue Button */}

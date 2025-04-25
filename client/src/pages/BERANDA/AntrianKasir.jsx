@@ -1,17 +1,19 @@
-import { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import AntrianHeader from '../../components/Header Antrian/AntrianHeader';
-import LoadingDots from '../../components/Design/LoadingDots';
+import { useState, useEffect } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import axios from "axios";
+import AntrianHeader from "../../components/Header Antrian/AntrianHeader";
+import LoadingDots from "../../components/Design/LoadingDots";
 import AnimatedButton from "../../components/Design/AnimatedButton";
-import FilterAndSearch from '../../components/Header Antrian/FilterAndSearch';
-import QualityCheckModal from '../../components/Modal/QualityCheckModal';
+import FilterAndSearch from "../../components/Header Antrian/FilterAndSearch";
+import QualityCheckModal from "../../components/Modal/QualityCheckModal";
 
 const AntrianKasir = () => {
   const { estimasi } = useParams();
   const location = useLocation();
   const { dateRange } = location.state || {};
+  const navigate = useNavigate();
 
   const [antrianData, setAntrianData] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("cleaning");
@@ -27,8 +29,60 @@ const AntrianKasir = () => {
   const [selectedQCType, setSelectedQCType] = useState(null);
   const [selectedItemId, setSelectedItemId] = useState(null);
 
+  const fetchAntrianData = async () => {
+    try {
+      const response = await axios.get(
+        "https://680340c50a99cb7408eb7488.mockapi.io/api/test/treatments"
+      );
+
+      console.log("API Response:", response.data);
+      console.log("Current estimasi:", estimasi);
+
+      if (Array.isArray(response.data)) {
+        // Filter berdasarkan treatment_type dan process_time
+        const filteredData = response.data.filter(
+          (item) =>
+            item.treatment_type?.toLowerCase() === selectedFilter.toLowerCase() &&
+            item.process_time?.toLowerCase() === estimasi.toLowerCase()
+        );
+
+        console.log("Filtered Data:", filteredData);
+
+        // Sort berdasarkan createdAt (terbaru dulu)
+        const sortedData = filteredData.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+
+        setAntrianData(sortedData);
+        setFilteredAntrian(sortedData);
+
+        // Hitung total untuk masing-masing kategori
+        const allData = response.data;
+        const cleaningTotal = allData.filter(
+          (item) => 
+            item.treatment_type?.toLowerCase() === "cleaning" &&
+            item.process_time?.toLowerCase() === estimasi.toLowerCase()
+        ).length;
+        
+        const repairTotal = allData.filter(
+          (item) => 
+            item.treatment_type?.toLowerCase() === "repair" &&
+            item.process_time?.toLowerCase() === estimasi.toLowerCase()
+        ).length;
+
+        console.log("Cleaning count:", cleaningTotal);
+        console.log("Repair count:", repairTotal);
+
+        setCleaningCount(cleaningTotal);
+        setRepairCount(repairTotal);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   useEffect(() => {
-    fetchDummyData();
+    fetchAntrianData();
   }, [selectedFilter]);
 
   // Debounce search query
@@ -45,31 +99,14 @@ const AntrianKasir = () => {
       setFilteredAntrian(antrianData);
     } else {
       const searchLower = debouncedSearch.toLowerCase();
-      const filtered = antrianData.filter(item => 
-        item.customerName.toLowerCase().includes(searchLower) ||
-        item.treatment.toLowerCase().includes(searchLower)
+      const filtered = antrianData.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchLower) ||
+          item.treatment_type.toLowerCase().includes(searchLower)
       );
       setFilteredAntrian(filtered);
     }
   }, [debouncedSearch, antrianData]);
-
-  const fetchDummyData = () => {
-    // Data dummy
-    const dummyData = Array.from({ length: 10 }, (_, index) => ({
-      id: index + 1,
-      customerName: `Customer ${index + 1}`,
-      treatment: selectedFilter === "cleaning" ? "Deep Cleaning" : "Repair Sol",
-      notes: "Treatment harus ekstra hati-hati",
-      dueDate: new Date(Date.now() + (index * 24 * 60 * 60 * 1000)),
-      photoUrl: "https://picsum.photos/200",
-      status: "pending"
-    }));
-
-    setAntrianData(dummyData);
-    setFilteredAntrian(dummyData);
-    setCleaningCount(6);
-    setRepairCount(4);
-  };
 
   const handleFilterChange = (filter) => {
     setSelectedFilter(filter);
@@ -79,18 +116,75 @@ const AntrianKasir = () => {
     return originalUrl;
   };
 
-  const handleStatusUpdate = (id, status) => {
+  const handleStatusUpdate = async (id, status) => {
     setSelectedItemId(id);
     setSelectedQCType(status);
     setShowQCModal(true);
   };
 
-  const handleQCSubmit = (result) => {
-    console.log('QC Result for item', selectedItemId, ':', result);
-    // Implementasi logika update status
-    setShowQCModal(false);
-    setSelectedQCType(null);
-    setSelectedItemId(null);
+  const handleQCSubmit = async (result) => {
+    try {
+      // Step 1: POST ke /qualityControl
+      const qcPayload = {
+        treatment_id: selectedItemId,
+        qc_status: result.status,
+        ...(result.status === "failed" && {
+          rejection_reason: result.reason,
+        }),
+        ...(result.status === "passed" && {
+          delivery_method: result.deliveryOption,
+          ...(result.deliveryOption === "pickup" && {
+            outlet_name: "Outlet A", // Bisa disesuaikan dengan data outlet yang tersedia
+          }),
+          ...(result.deliveryOption === "delivery" && {
+            delivery_date: result.deliveryDateTime.split(" ")[0],
+            delivery_time: result.deliveryDateTime.split(" ")[1],
+          }),
+        }),
+      };
+
+      // POST quality control data
+      await axios.post(
+        "https://680340c50a99cb7408eb7488.mockapi.io/api/test/qualityControl",
+        qcPayload
+      );
+
+      // Step 2: PATCH status treatment
+      const updateData = {
+        status: result.status,
+      };
+
+      await axios.put(
+        `https://680340c50a99cb7408eb7488.mockapi.io/api/test/treatments/${selectedItemId}`,
+        updateData
+      );
+
+      // Refresh data setelah update
+      await fetchAntrianData();
+
+      setShowQCModal(false);
+      setSelectedQCType(null);
+      setSelectedItemId(null);
+    } catch (error) {
+      console.error("Error processing QC:", error);
+      // Bisa tambahkan notifikasi error ke user
+    }
+  };
+
+  const handleOpenQueue = () => {
+    // Konversi format estimasi jika diperlukan
+    const estimasiFormat = {
+      regular: "regular",
+      same_day: "same_day",
+      next_day: "next_day"
+    }[selectedEstimasi] || selectedEstimasi;
+
+    navigate(`/berandakasir/antriankasir/${estimasiFormat}`, {
+      state: {
+        dateRange,
+        estimasi: estimasiFormat,
+      },
+    });
   };
 
   return (
@@ -98,7 +192,7 @@ const AntrianKasir = () => {
       {/* Header - Fixed at top */}
       <header className="fixed top-0 left-0 right-0 z-10 bg-white">
         <AntrianHeader />
-        <FilterAndSearch 
+        <FilterAndSearch
           estimasi={estimasi}
           selectedFilter={selectedFilter}
           handleFilterChange={handleFilterChange}
@@ -120,16 +214,16 @@ const AntrianKasir = () => {
                   className="bg-white rounded-3xl p-4 outline outline-1 outline-[#C1C1C1]"
                 >
                   <div className="flex items-start gap-4">
-                    <div 
+                    <div
                       className="w-[100px] h-[100px] min-w-[100px] bg-gray-200 rounded-lg overflow-hidden shadow-md cursor-pointer"
                       onClick={() => {
-                        setSelectedImage(item.photoUrl);
+                        setSelectedImage(item.image_url);
                         setShowModal(true);
                       }}
                     >
                       {imageLoading && <LoadingDots />}
                       <img
-                        src={getThumbnailUrl(item.photoUrl)}
+                        src={item.image_url}
                         alt="Shoes"
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                         loading="lazy"
@@ -138,32 +232,41 @@ const AntrianKasir = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-md md:text-base truncate">
-                        {item.customerName}
+                        {item.name}
                       </p>
                       <p className="text-xs md:text-sm text-gray-600 truncate">
-                        {item.treatment}
+                        {item.treatment_type}
                       </p>
                       <p className="text-xs md:text-sm text-gray-500 mt-1 line-clamp-2 text-[#AA3328]">
-                        {item.notes}
+                        {item.note}
                       </p>
                       <p className="text-xs md:text-sm text-gray-500 mt-2 font-bold">
-                        {format(item.dueDate, "EEEE, dd MMMM yyyy", {
+                        {format(new Date(item.due_date), "EEEE, dd MMMM yyyy", {
                           locale: id,
                         })}
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-2 mt-4">
-                    <AnimatedButton 
-                      onClick={() => handleStatusUpdate(item.id, 'failed')}
-                      className="flex-1 h-[35px] rounded-xl flex items-center justify-center text-sm text-red-500 opacity-100 outline outline-1 outline-red-500 font-semibold"
+                    <AnimatedButton
+                      onClick={() => handleStatusUpdate(item.id, "failed")}
+                      className={`flex-1 h-[35px] rounded-xl flex items-center justify-center text-sm ${
+                        item.status === "failed"
+                          ? "bg-red-500 text-white"
+                          : "text-red-500 outline outline-1 outline-red-500"
+                      } font-semibold`}
+                      disabled={item.status === "passed"}
                     >
                       Tidak Lolos
                     </AnimatedButton>
-                    <AnimatedButton 
-                      onClick={() => handleStatusUpdate(item.id, 'passed')}
-                      variant="blue"
-                      className="flex-1 h-[35px] rounded-xl flex items-center justify-center text-sm"
+                    <AnimatedButton
+                      onClick={() => handleStatusUpdate(item.id, "passed")}
+                      className={`flex-1 h-[35px] rounded-xl flex items-center justify-center text-sm font-semibold ${
+                        item.status === "passed"
+                          ? "bg-[#57AEFF] text-white"
+                          : "bg-[#E6EFF9] text-[#2E7CF6]"
+                      }`}
+                      disabled={item.status === "failed"}
                     >
                       Lolos
                     </AnimatedButton>
@@ -172,10 +275,9 @@ const AntrianKasir = () => {
               ))
             ) : (
               <div className="col-span-full text-center py-8 text-gray-500">
-                {searchQuery.trim() !== "" 
+                {searchQuery.trim() !== ""
                   ? "No items found matching your search"
-                  : `Tidak ada antrian untuk kategori ${selectedFilter}`
-                }
+                  : `Tidak ada antrian untuk kategori ${selectedFilter}`}
               </div>
             )}
           </div>
@@ -186,14 +288,16 @@ const AntrianKasir = () => {
       {showModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div 
+            <div
               className="fixed inset-0 bg-black bg-opacity-75 transition-opacity"
               onClick={() => {
                 setShowModal(false);
                 setSelectedImage(null);
               }}
             />
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen">
+              &#8203;
+            </span>
             <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl w-full">
               <img
                 src={selectedImage}
@@ -231,4 +335,4 @@ const AntrianKasir = () => {
   );
 };
 
-export default AntrianKasir; 
+export default AntrianKasir;

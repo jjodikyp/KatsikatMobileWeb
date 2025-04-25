@@ -5,9 +5,10 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import LoadingDots from "../../components/Design/LoadingDots";
 import AntrianHeader from "../../components/Header Antrian/AntrianHeader";
-import LordIcon from "../../components/Design/LordIcon";
 import FilterAndSearch from "../../components/Header Antrian/FilterAndSearch";
 import AnimatedButton from "../../components/Design/AnimatedButton";
+import TreatmentDetailModal from "../../components/Modal/TreatmentDetailModal";
+import dummyTimerApi from "../../services/dummyTimerApi";
 
 const Antrian = () => {
   const navigate = useNavigate();
@@ -26,6 +27,10 @@ const Antrian = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filteredTreatments, setFilteredTreatments] = useState([]);
+  const [showTreatmentModal, setShowTreatmentModal] = useState(false);
+  const [selectedTreatment, setSelectedTreatment] = useState(null);
+  const [activeTreatments, setActiveTreatments] = useState({});
+  const [intervals, setIntervals] = useState({});
 
   useEffect(() => {
     const userDataFromStorage = localStorage.getItem("user");
@@ -72,6 +77,13 @@ const Antrian = () => {
       setFilteredTreatments(filtered);
     }
   }, [debouncedSearch, antrianTreatment]);
+
+  // Effect untuk memuat timer saat mount dan setelah data treatment diambil
+  useEffect(() => {
+    if (filteredTreatments.length > 0) {
+      fetchActiveTimers();
+    }
+  }, [filteredTreatments]);
 
   const fetchAntrianData = async () => {
     try {
@@ -156,10 +168,21 @@ const Antrian = () => {
     setSelectedFilter(filter === selectedFilter ? filter : filter);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await dummyTimerApi.clearAllTimers();
+
+      // Clear all intervals
+      Object.values(intervals).forEach((interval) => clearInterval(interval));
+      setIntervals({});
+      setActiveTreatments({});
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/login");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   const getThumbnailUrl = (originalUrl) => {
@@ -173,6 +196,170 @@ const Antrian = () => {
     }
     // Jika tidak menggunakan CDN, gunakan URL original
     return originalUrl;
+  };
+
+  // Fungsi untuk memformat durasi
+  const formatDuration = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // Fungsi untuk memulai treatment
+  const handleStartTreatment = async (treatmentId) => {
+    try {
+      const { startTime } = await dummyTimerApi.startTreatment(treatmentId);
+
+      setActiveTreatments((prev) => ({
+        ...prev,
+        [treatmentId]: {
+          isStarted: true,
+          startTime,
+          duration: 0,
+        },
+      }));
+
+      startTimer(treatmentId, startTime);
+    } catch (error) {
+      console.error("Error starting treatment:", error);
+    }
+  };
+
+  // Fungsi untuk menjalankan timer
+  const startTimer = (treatmentId, startTime) => {
+    // Hitung durasi awal
+    const now = new Date();
+    const start = new Date(startTime);
+    const initialDuration = Math.floor((now - start) / 1000);
+
+    setActiveTreatments(prev => ({
+      ...prev,
+      [treatmentId]: {
+        isStarted: true,
+        startTime,
+        duration: initialDuration
+      }
+    }));
+
+    const newInterval = setInterval(() => {
+      setActiveTreatments(prev => {
+        const treatment = prev[treatmentId];
+        if (!treatment) return prev;
+
+        const now = new Date();
+        const start = new Date(treatment.startTime);
+        const duration = Math.floor((now - start) / 1000);
+
+        return {
+          ...prev,
+          [treatmentId]: {
+            ...treatment,
+            duration
+          }
+        };
+      });
+    }, 1000);
+
+    setIntervals(prev => ({
+      ...prev,
+      [treatmentId]: newInterval
+    }));
+  };
+
+  // Fungsi untuk memuat data timer
+  const fetchActiveTimers = async () => {
+    try {
+      const activeTimers = await dummyTimerApi.getActiveTimers();
+
+      // Reset existing intervals
+      Object.values(intervals).forEach((interval) => clearInterval(interval));
+      setIntervals({});
+
+      // Start new timers for each active treatment
+      activeTimers.forEach((timer) => {
+        const { treatmentId, startTime } = timer;
+        setActiveTreatments((prev) => ({
+          ...prev,
+          [treatmentId]: {
+            isStarted: true,
+            startTime,
+            duration: 0,
+          },
+        }));
+        startTimer(treatmentId, startTime);
+      });
+    } catch (error) {
+      console.error("Error fetching active timers:", error);
+    }
+  };
+
+  // Effect untuk memuat timer saat komponen mount dan setelah refresh
+  useEffect(() => {
+    fetchActiveTimers();
+
+    // Cleanup intervals saat unmount
+    return () => {
+      Object.values(intervals).forEach((interval) => clearInterval(interval));
+    };
+  }, []);
+
+  // Fungsi untuk membatalkan treatment
+  const handleCancelTreatment = async (treatmentId) => {
+    try {
+      await dummyTimerApi.stopTreatment(treatmentId);
+
+      if (intervals[treatmentId]) {
+        clearInterval(intervals[treatmentId]);
+      }
+
+      setActiveTreatments((prev) => {
+        const newState = { ...prev };
+        delete newState[treatmentId];
+        return newState;
+      });
+
+      setIntervals((prev) => {
+        const newState = { ...prev };
+        delete newState[treatmentId];
+        return newState;
+      });
+    } catch (error) {
+      console.error("Error canceling treatment:", error);
+    }
+  };
+
+  // Update treatment card button section
+  const renderTreatmentButton = (item) => {
+    const activeTreatment = activeTreatments[item.id];
+
+    if (!activeTreatment?.isStarted) {
+      return (
+        <AnimatedButton
+          onClick={() => {
+            setSelectedTreatment(item);
+            setShowTreatmentModal(true);
+          }}
+          className="w-full h-[35px] mb-auto mt-4 rounded-xl flex items-center justify-center text-sm font-semibold bg-gradient-to-r from-[#5096FC] to-[#7BD1FD] text-white opacity-100"
+        >
+          Mulai Treatment
+        </AnimatedButton>
+      );
+    }
+
+    return (
+      <AnimatedButton
+        onClick={() => {
+          setSelectedTreatment(item);
+          setShowTreatmentModal(true);
+        }}
+        className="w-full h-[35px] mb-auto mt-4 rounded-xl flex items-center justify-center text-sm font-semibold bg-[#E6EFF9] text-[#2E7CF6] opacity-100 p-4"
+      >
+        Cek Detail Treatment ({formatDuration(activeTreatment.duration)})
+      </AnimatedButton>
+    );
   };
 
   return (
@@ -250,9 +437,7 @@ const Antrian = () => {
                       </p>
                     </div>
                   </div>
-                  <AnimatedButton className="w-full h-[35px] mb-auto mt-4 rounded-xl flex items-center justify-center text-sm  font-semibold bg-gradient-to-r from-[#5096FC] to-[#7BD1FD] text-white opacity-100">
-                    Mulai Treatment
-                  </AnimatedButton>
+                  {renderTreatmentButton(item)}
                 </div>
               ))
             ) : (
@@ -326,6 +511,18 @@ const Antrian = () => {
           </div>
         </div>
       )}
+
+      <TreatmentDetailModal
+        isOpen={showTreatmentModal}
+        onClose={() => setShowTreatmentModal(false)}
+        treatment={selectedTreatment?.treatment?.name}
+        description={selectedTreatment?.description}
+        treatmentId={selectedTreatment?.id}
+        isStarted={activeTreatments[selectedTreatment?.id]?.isStarted}
+        duration={activeTreatments[selectedTreatment?.id]?.duration || 0}
+        onStart={handleStartTreatment}
+        onCancel={handleCancelTreatment}
+      />
     </div>
   );
 };
