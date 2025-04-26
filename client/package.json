@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "update-env": "node ../update-network.js",
+    "dev": "npm run update-env && vite",
+    "build": "npm run update-env && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

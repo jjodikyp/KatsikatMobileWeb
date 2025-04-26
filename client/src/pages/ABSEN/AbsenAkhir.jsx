@@ -54,32 +54,34 @@ const AbsenAkhir = () => {
   const initializeCamera = async () => {
     try {
       // Polyfill untuk browser yang lebih lama
-      const getUserMedia = navigator.getUserMedia ||
-                         navigator.webkitGetUserMedia ||
-                         navigator.mozGetUserMedia ||
-                         navigator.msGetUserMedia ||
-                         (navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+      const getUserMedia =
+        navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.msGetUserMedia ||
+        (navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
 
       if (!getUserMedia) {
-        throw new Error('Kamera tidak didukung di browser ini');
+        throw new Error("Kamera tidak didukung di browser ini");
       }
 
       let stream;
-      
+
       // Menggunakan modern API jika tersedia
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         stream = await navigator.mediaDevices.getUserMedia({
           video: {
             width: { ideal: 1280 },
             height: { ideal: 720 },
-            facingMode: "user"
+            facingMode: "user",
           },
-          audio: false
+          audio: false,
         });
       } else {
         // Fallback untuk browser lama
         stream = await new Promise((resolve, reject) => {
-          getUserMedia.call(navigator, 
+          getUserMedia.call(
+            navigator,
             { video: true, audio: false },
             resolve,
             reject
@@ -89,13 +91,13 @@ const AbsenAkhir = () => {
 
       if (videoRef.current) {
         // Fallback untuk browser lama
-        if ('srcObject' in videoRef.current) {
+        if ("srcObject" in videoRef.current) {
           videoRef.current.srcObject = stream;
         } else {
           // Fallback untuk browser yang lebih lama
           videoRef.current.src = window.URL.createObjectURL(stream);
         }
-        
+
         videoRef.current.onloadedmetadata = () => {
           videoRef.current.play();
         };
@@ -104,11 +106,11 @@ const AbsenAkhir = () => {
         setCameraError(null);
       }
     } catch (err) {
-      console.error('Error accessing camera:', err);
+      console.error("Error accessing camera:", err);
       setCameraError(
-        err.name === 'NotAllowedError' 
-          ? 'Mohon izinkan akses kamera untuk melakukan absensi'
-          : 'Tidak dapat mengakses kamera. Silakan cek pengaturan browser Anda'
+        err.name === "NotAllowedError"
+          ? "Mohon izinkan akses kamera untuk melakukan absensi"
+          : "Tidak dapat mengakses kamera. Silakan cek pengaturan browser Anda"
       );
     }
   };
@@ -120,7 +122,7 @@ const AbsenAkhir = () => {
     return () => {
       if (stream) {
         const tracks = stream.getTracks();
-        tracks.forEach(track => track.stop());
+        tracks.forEach((track) => track.stop());
       }
     };
   }, []);
@@ -130,7 +132,7 @@ const AbsenAkhir = () => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
 
       // Set canvas dimensions
       canvas.width = video.videoWidth || 320;
@@ -139,11 +141,11 @@ const AbsenAkhir = () => {
       try {
         // Draw video frame to canvas
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL('image/jpeg');
+        const dataUrl = canvas.toDataURL("image/jpeg");
         setImageData(dataUrl);
       } catch (err) {
-        console.error('Error capturing image:', err);
-        setCameraError('Gagal mengambil gambar. Silakan coba lagi.');
+        console.error("Error capturing image:", err);
+        setCameraError("Gagal mengambil gambar. Silakan coba lagi.");
       }
     }
   };
@@ -162,6 +164,10 @@ const AbsenAkhir = () => {
     sessionStorage.removeItem("fromIzin");
     // Arahkan ke halaman login
     navigate("/");
+
+    setTimeout(() => { // biar kameranya mati
+      window.location.reload();
+    }, 100);
   };
 
   return (
@@ -198,7 +204,9 @@ const AbsenAkhir = () => {
           <div className="relative rounded-2xl overflow-hidden outline outline-2 outline-[#EEF1F7]">
             {cameraError ? (
               <div className="bg-red-50 p-4 rounded-2xl">
-                <p className="text-red-600 text-sm font-montserrat text-center">{cameraError}</p>
+                <p className="text-red-600 text-sm font-montserrat text-center">
+                  {cameraError}
+                </p>
                 <button
                   onClick={() => {
                     setCameraError(null);
@@ -216,9 +224,9 @@ const AbsenAkhir = () => {
                   autoPlay
                   playsInline
                   className="w-full rounded-2xl"
-                  style={{ display: imageData ? 'none' : 'block' }}
+                  style={{ display: imageData ? "none" : "block" }}
                 />
-                
+
                 {imageData && (
                   <div className="relative">
                     <img
@@ -233,13 +241,24 @@ const AbsenAkhir = () => {
                       }}
                       className="absolute top-2 right-2 bg-white rounded-full p-2 shadow-lg"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 text-gray-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
                       </svg>
                     </button>
                   </div>
                 )}
-                
+
                 {!imageData && (
                   <button
                     onClick={takeSnapshot}
@@ -254,10 +273,7 @@ const AbsenAkhir = () => {
         </div>
 
         {/* Hidden canvas for capturing */}
-        <canvas
-          ref={canvasRef}
-          style={{ display: 'none' }}
-        />
+        <canvas ref={canvasRef} style={{ display: "none" }} />
 
         {/* Area Input Deskripsi */}
         <div className="w-full max-w-xs mb-6">
