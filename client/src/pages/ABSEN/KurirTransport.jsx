@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import FuelCalculationModal from "../../components/FuelCalculationModal";
 import AnimatedButton from "../../components/Design/AnimatedButton";
+import imageCompression from "browser-image-compression";
 
 const KurirTransport = () => {
   const navigate = useNavigate();
@@ -34,32 +35,49 @@ const KurirTransport = () => {
     }
   };
 
-  const handlePhotoChange = (e) => {
+  const handlePhotoChange = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length !== 2) {
       setError("Harap upload 2 foto sekaligus (ODO Mulai dan ODO Selesai)");
       return;
     }
 
-    // Reset error message jika kedua foto berhasil diupload
     setError("");
 
-    // Proses kedua foto
-    files.forEach((file, index) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviews(prev => ({
-          ...prev,
-          [index === 0 ? 'odoStart' : 'odoEnd']: reader.result
-        }));
-      };
-      reader.readAsDataURL(file);
+    // Opsi kompresi
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920, // opsional, bisa diatur sesuai kebutuhan
+      useWebWorker: true,
+    };
 
-      setPhotos(prev => ({
-        ...prev,
-        [index === 0 ? 'odoStart' : 'odoEnd']: file
-      }));
-    });
+    // Kompres kedua file
+    try {
+      const compressedFiles = await Promise.all(
+        files.map(file => imageCompression(file, options))
+      );
+
+      // Tambahkan log keberhasilan kompresi
+      console.log("Foto berhasil di-compress:", compressedFiles.map(f => ({ name: f.name, size: f.size })));
+
+      compressedFiles.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviews(prev => ({
+            ...prev,
+            [index === 0 ? 'odoStart' : 'odoEnd']: reader.result
+          }));
+        };
+        reader.readAsDataURL(file);
+
+        setPhotos(prev => ({
+          ...prev,
+          [index === 0 ? 'odoStart' : 'odoEnd']: file
+        }));
+      });
+    } catch (err) {
+      setError("Gagal mengompres foto, silakan coba lagi.");
+    }
   };
 
   const handleSubmit = () => {
@@ -230,6 +248,7 @@ const KurirTransport = () => {
                         onClick={() => setSelectedPreview(previews.odoStart)}
                       />
                       <button
+                        variant-="blue"
                         onClick={() => handleEditPhoto('odoStart')}
                         className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
                       >
@@ -305,12 +324,13 @@ const KurirTransport = () => {
               className="w-full h-auto max-h-[70vh] object-contain"
             />
             <div className="p-4 bg-white flex justify-center">
-              <button
+              <AnimatedButton
+                variant="blue"
                 onClick={() => setSelectedPreview(null)}
-                className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-montserrat text-sm outline outline-1 outline-white shadow-[4px_4px_10px_rgba(0,0,0,0.15)]"
+                className="px-6 py-2"
               >
                 Tutup
-              </button>
+              </AnimatedButton>
             </div>
           </div>
         </div>

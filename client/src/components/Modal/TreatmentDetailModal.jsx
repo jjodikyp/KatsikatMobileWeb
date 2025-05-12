@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import AnimatedButton from "../Design/AnimatedButton";
+import Check from "../../assets/images/check.svg";
 
 const TreatmentDetailModal = ({
   isOpen,
@@ -106,6 +107,16 @@ const TreatmentDetailModal = ({
                         className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors"
                       >
                         ✕
+                      </AnimatedButton>
+                      <AnimatedButton
+                        onClick={handleCancel}
+                        className="px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-red-600 transition-colors"
+                      >
+                        <img
+                          src={Check}
+                          alt="Check Icon"
+                          className="w-5 h-5"
+                        />
                       </AnimatedButton>
                     </>
                   )}
