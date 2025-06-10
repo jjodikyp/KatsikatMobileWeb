@@ -3,18 +3,19 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import LoadingDots from "../../components/Design/LoadingDots";
 import AntrianHeader from "../../components/Header Antrian/AntrianHeader";
 import FilterAndSearch from "../../components/Header Antrian/FilterAndSearch";
 import AnimatedButton from "../../components/Design/AnimatedButton";
 import TreatmentDetailModal from "../../components/Modal/TreatmentDetailModal";
 import dummyTimerApi from "../../services/dummyTimerApi";
+import dummyAntrianData from "../../services/dummyAntrianData";
 
 const Antrian = () => {
   const navigate = useNavigate();
   const { estimasi } = useParams();
   const location = useLocation();
   const { dateRange } = location.state || {};
+  const { antrianData: antrianFromState } = location.state || {};
 
   const [userData, setUserData] = useState(null);
   const [antrianTreatment, setAntrianTreatment] = useState([]);
@@ -31,16 +32,75 @@ const Antrian = () => {
   const [selectedTreatment, setSelectedTreatment] = useState(null);
   const [activeTreatments, setActiveTreatments] = useState({});
   const [intervals, setIntervals] = useState({});
+  const [countRegular, setCountRegular] = useState(0);
+  const [countSameDay, setCountSameDay] = useState(0);
+  const [countNextDay, setCountNextDay] = useState(0);
+  const [countRegularCleaning, setCountRegularCleaning] = useState(0);
+  const [countRegularRepair, setCountRegularRepair] = useState(0);
+  const [countSameDayCleaning, setCountSameDayCleaning] = useState(0);
+  const [countSameDayRepair, setCountSameDayRepair] = useState(0);
+  const [countNextDayCleaning, setCountNextDayCleaning] = useState(0);
+  const [countNextDayRepair, setCountNextDayRepair] = useState(0);
 
   useEffect(() => {
-    const userDataFromStorage = localStorage.getItem("user");
-    if (userDataFromStorage) {
-      setUserData(JSON.parse(userDataFromStorage));
-    }
+  
 
-    fetchAntrianData();
-    fetchAntrianCounts();
-  }, [selectedFilter, dateRange, estimasi]);
+    // Ambil estimasi dari params (regular, sameDay, nextDay)
+    let filteredData = dummyAntrianData;
+    if (estimasi === "regular") {
+      filteredData = dummyAntrianData.filter(
+        (item) => item.process_time === "Regular"
+      );
+      if (selectedFilter === "cleaning") {
+        filteredData = filteredData.filter(
+          (item) => item.treatment?.name?.toLowerCase() === "cleaning"
+        );
+      } else if (selectedFilter === "repair") {
+        filteredData = filteredData.filter(
+          (item) => item.treatment?.name?.toLowerCase() === "repair"
+        );
+      }
+    } else if (estimasi === "sameDay") {
+      filteredData = dummyAntrianData.filter(
+        (item) => item.process_time === "Same Day"
+      );
+      if (selectedFilter === "cleaning") {
+        filteredData = filteredData.filter(
+          (item) => item.treatment?.name?.toLowerCase() === "cleaning"
+        );
+      } else if (selectedFilter === "repair") {
+        filteredData = filteredData.filter(
+          (item) => item.treatment?.name?.toLowerCase() === "repair"
+        );
+      }
+    } else if (estimasi === "nextDay") {
+      filteredData = dummyAntrianData.filter(
+        (item) => item.process_time === "Next Day"
+      );
+      if (selectedFilter === "cleaning") {
+        filteredData = filteredData.filter(
+          (item) => item.treatment?.name?.toLowerCase() === "cleaning"
+        );
+      } else if (selectedFilter === "repair") {
+        filteredData = filteredData.filter(
+          (item) => item.treatment?.name?.toLowerCase() === "repair"
+        );
+      }
+    }
+    setAntrianTreatment(filteredData);
+    setFilteredTreatments(filteredData);
+    setCleaningCount(
+      filteredData.filter(
+        (item) => item.treatment?.name?.toLowerCase() === "cleaning"
+      ).length
+    );
+    setRepairCount(
+      filteredData.filter(
+        (item) => item.treatment?.name?.toLowerCase() === "repair"
+      ).length
+    );
+    console.log('Estimasi:', estimasi, 'SelectedFilter:', selectedFilter, 'FilteredData:', filteredData);
+  }, [selectedFilter, estimasi]);
 
   useEffect(() => {
     if (showModal) {
@@ -85,87 +145,130 @@ const Antrian = () => {
     }
   }, [filteredTreatments]);
 
+  useEffect(() => {
+    // Total per estimasi
+    setCountRegular(
+      dummyAntrianData.filter((item) => item.process_time === "Regular").length
+    );
+    setCountSameDay(
+      dummyAntrianData.filter((item) => item.process_time === "Same Day").length
+    );
+    setCountNextDay(
+      dummyAntrianData.filter((item) => item.process_time === "Next Day").length
+    );
+    // Total per treatment per estimasi
+    setCountRegularCleaning(
+      dummyAntrianData.filter(
+        (item) =>
+          item.process_time === "Regular" &&
+          item.treatment?.name?.toLowerCase() === "cleaning"
+      ).length
+    );
+    setCountRegularRepair(
+      dummyAntrianData.filter(
+        (item) =>
+          item.process_time === "Regular" &&
+          item.treatment?.name?.toLowerCase() === "repair"
+      ).length
+    );
+    setCountSameDayCleaning(
+      dummyAntrianData.filter(
+        (item) =>
+          item.process_time === "Same Day" &&
+          item.treatment?.name?.toLowerCase() === "cleaning"
+      ).length
+    );
+    setCountSameDayRepair(
+      dummyAntrianData.filter(
+        (item) =>
+          item.process_time === "Same Day" &&
+          item.treatment?.name?.toLowerCase() === "repair"
+      ).length
+    );
+    setCountNextDayCleaning(
+      dummyAntrianData.filter(
+        (item) =>
+          item.process_time === "Next Day" &&
+          item.treatment?.name?.toLowerCase() === "cleaning"
+      ).length
+    );
+    setCountNextDayRepair(
+      dummyAntrianData.filter(
+        (item) =>
+          item.process_time === "Next Day" &&
+          item.treatment?.name?.toLowerCase() === "repair"
+      ).length
+    );
+  }, []);
+
   const fetchAntrianData = async () => {
     try {
-      const processTime =
-        estimasi === "sameDay"
-          ? "same_day"
-          : estimasi === "nextDay"
-          ? "next_day"
-          : "regular";
+      const params = {
+        search: searchQuery || "",
+        startDate: formatDateForDB(dateRange.startDate),
+        endDate: formatDateForDB(dateRange.endDate),
+      };
 
-      console.log("Fetching data with params:", {
-        processTime,
-        serviceType: selectedFilter,
-        startDate: dateRange.startDate,
-        endDate: dateRange.endDate,
+      const response = await axios.get("https://api.katsikat.id/orders", {
+        params,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
       });
 
-      const response = await axios.get(
-        `${
-          import.meta.env.VITE_API_URL
-        }/api/order-details/process/${processTime}`,
-        {
-          params: {
-            startDate: dateRange.startDate,
-            endDate: dateRange.endDate,
-            serviceType: selectedFilter,
-          },
-        }
-      );
+      if (response.data && response.data.data) {
+        // Filter data berdasarkan status dan jenis treatment
+        const filteredData = response.data.data.filter(
+          (item) => item.status === "not_yet"
+        );
 
-      console.log("Response data:", response.data);
-      setAntrianTreatment(response.data.data);
+        // Pisahkan data berdasarkan jenis treatment
+        const cleaningData = filteredData.filter((item) =>
+          item.treatment?.name?.toLowerCase().includes("cleaning")
+        );
+
+        const repairData = filteredData.filter((item) =>
+          item.treatment?.name?.toLowerCase().includes("repair")
+        );
+
+        setCleaningCount(cleaningData.length);
+        setRepairCount(repairData.length);
+
+        // Set data berdasarkan filter yang dipilih
+        if (selectedFilter === "cleaning") {
+          setAntrianTreatment(cleaningData);
+        } else if (selectedFilter === "repair") {
+          setAntrianTreatment(repairData);
+        }
+      }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching orders:", error);
+      if (error.response?.status === 401) {
+        console.error("Token tidak valid atau expired");
+        navigate("/login");
+      }
     }
   };
 
   const fetchAntrianCounts = async () => {
-    try {
-      const processTime =
-        estimasi === "sameDay"
-          ? "same_day"
-          : estimasi === "nextDay"
-          ? "next_day"
-          : "regular";
-
-      // Fetch cleaning count
-      const cleaningResponse = await axios.get(
-        `${
-          import.meta.env.VITE_API_URL
-        }/api/order-details/process/${processTime}`,
-        {
-          params: {
-            startDate: dateRange.startDate,
-            endDate: dateRange.endDate,
-            serviceType: "cleaning",
-          },
-        }
-      );
-      setCleaningCount(cleaningResponse.data.data.length);
-
-      // Fetch repair count
-      const repairResponse = await axios.get(
-        `${
-          import.meta.env.VITE_API_URL
-        }/api/order-details/process/${processTime}`,
-        {
-          params: {
-            startDate: dateRange.startDate,
-            endDate: dateRange.endDate,
-            serviceType: "repair",
-          },
-        }
-      );
-      setRepairCount(repairResponse.data.data.length);
-    } catch (error) {
-      console.error("Error fetching counts:", error);
-    }
+    setCleaningCount(0);
+    setRepairCount(0);
   };
 
   const handleFilterChange = (filter) => {
-    setSelectedFilter(filter === selectedFilter ? filter : filter);
+    setSelectedFilter(filter);
+    if (antrianTreatment.length > 0) {
+      const filteredData = antrianTreatment.filter(
+        (item) =>
+          item.status === "not_yet" &&
+          (filter === "cleaning"
+            ? item.treatment?.name?.toLowerCase().includes("cleaning")
+            : item.treatment?.name?.toLowerCase().includes("repair"))
+      );
+      setFilteredTreatments(filteredData);
+    }
   };
 
   const handleLogout = async () => {
@@ -235,17 +338,17 @@ const Antrian = () => {
     const start = new Date(startTime);
     const initialDuration = Math.floor((now - start) / 1000);
 
-    setActiveTreatments(prev => ({
+    setActiveTreatments((prev) => ({
       ...prev,
       [treatmentId]: {
         isStarted: true,
         startTime,
-        duration: initialDuration
-      }
+        duration: initialDuration,
+      },
     }));
 
     const newInterval = setInterval(() => {
-      setActiveTreatments(prev => {
+      setActiveTreatments((prev) => {
         const treatment = prev[treatmentId];
         if (!treatment) return prev;
 
@@ -257,15 +360,15 @@ const Antrian = () => {
           ...prev,
           [treatmentId]: {
             ...treatment,
-            duration
-          }
+            duration,
+          },
         };
       });
     }, 1000);
 
-    setIntervals(prev => ({
+    setIntervals((prev) => ({
       ...prev,
-      [treatmentId]: newInterval
+      [treatmentId]: newInterval,
     }));
   };
 
@@ -400,18 +503,15 @@ const Antrian = () => {
                       }}
                     >
                       {item.shoes_photos && item.shoes_photos.length > 0 ? (
-                        <>
-                          {imageLoading && <LoadingDots />}
-                          <img
-                            src={getThumbnailUrl(
-                              item.shoes_photos[0].url_photo
-                            )}
-                            alt="Shoes"
-                            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            loading="lazy"
-                            onLoad={() => setImageLoading(false)}
-                          />
-                        </>
+                        <img
+                          src={getThumbnailUrl(
+                            item.shoes_photos[0].url_photo
+                          )}
+                          alt="Shoes"
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          onLoad={() => setImageLoading(false)}
+                        />
                       ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                           <span className="text-gray-400 text-sm">
@@ -422,13 +522,14 @@ const Antrian = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-md md:text-base truncate">
-                        {item.order?.customer?.name || "No Name"}
+                        {item.name || "No Name"}
                       </p>
                       <p className="text-xs md:text-sm text-gray-600 truncate">
+                        {item.item?.name || "No Item"} -{" "}
                         {item.treatment?.name || "No Treatment"}
                       </p>
-                      <p className="text-xs md:text-sm text-gray-500 mt-1 line-clamp-2 text-[#AA3328]">
-                        {item.description || "Tidak ada keterangan"}
+                      <p className="text-xs md:text-sm text-gray-500">
+                        Process: {item.process_time || "Regular"}
                       </p>
                       <p className="text-xs md:text-sm text-gray-500 mt-2 font-bold">
                         {format(new Date(item.due_date), "EEEE, dd MMMM yyyy", {
@@ -443,7 +544,7 @@ const Antrian = () => {
             ) : (
               <div className="col-span-full text-center py-8 text-gray-500">
                 {searchQuery.trim() !== ""
-                  ? "No treatments found matching your search"
+                  ? "Tidak ada treatment yang sesuai dengan pencarian Anda"
                   : `Tidak ada antrian treatment untuk kategori ${selectedFilter}`}
               </div>
             )}

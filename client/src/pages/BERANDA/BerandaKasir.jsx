@@ -6,6 +6,7 @@ import WorkTimeAlert from "../../components/WorkTimeAlert";
 import BreakTimeAlert from "../../components/BreakTimeAlert";
 import ConfirmationModal from "../../components/Modal/ConfirmationModal";
 import AnimatedButton from "../../components/Design/AnimatedButton";
+import dummyKasirAntrianData from "../../services/dummyKasirAntrianData";
 
 const BerandaKasir = () => {
   const navigate = useNavigate();
@@ -58,65 +59,19 @@ const BerandaKasir = () => {
 
     setDateRange(newRange);
     localStorage.setItem("dateRange", JSON.stringify(newRange));
-    await fetchAntrianData(newRange);
-  };
-
-  // Fungsi untuk mengambil data antrian
-  const fetchAntrianData = async (range = dateRange) => {
-    try {
-      const response = await axios.get(
-        "https://680340c50a99cb7408eb7488.mockapi.io/api/test/treatments"
-      );
-
-      console.log("Raw API Response:", response.data);
-
-      // Log untuk memeriksa format process_time dari API
-      const processTimeExample = response.data[0]?.process_time;
-      console.log("Process Time Format Example:", processTimeExample);
-
-      if (Array.isArray(response.data)) {
-        // Filter dan log setiap kategori sebelum menghitung
-        const regularData = response.data.filter(
-          (item) => item.process_time?.toLowerCase() === "regular"
-        );
-        const sameDayData = response.data.filter(
-          (item) => item.process_time?.toLowerCase() === "same_day"
-        );
-        const nextDayData = response.data.filter(
-          (item) => item.process_time?.toLowerCase() === "next_day"
-        );
-
-        console.log("Regular Data:", regularData);
-        console.log("Same Day Data:", sameDayData);
-        console.log("Next Day Data:", nextDayData);
-
-        const counts = {
-          regular: regularData.length,
-          same_day: sameDayData.length,
-          next_day: nextDayData.length,
-        };
-
-        console.log("Final Counts:", counts);
-        setAntrianData(counts);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
   };
 
   useEffect(() => {
-    fetchAntrianData(dateRange);
-    // Cek apakah user datang dari halaman izin-success
+    // Hitung jumlah antrian berdasarkan process_time dari data dummy
+    const regular = dummyKasirAntrianData.filter(item => item.process_time === "regular").length;
+    const same_day = dummyKasirAntrianData.filter(item => item.process_time === "same_day").length;
+    const next_day = dummyKasirAntrianData.filter(item => item.process_time === "next_day").length;
+    setAntrianData({ regular, same_day, next_day });
+    // Cek izin dan present seperti sebelumnya
     const fromIzin = sessionStorage.getItem("fromIzin");
-    if (fromIzin === "true") {
-      setIsFromIzin(true);
-    }
-
-    // Cek apakah user datang dari halaman pilih-role setelah login
+    if (fromIzin === "true") setIsFromIzin(true);
     const fromPresent = sessionStorage.getItem("fromPresent");
-    if (fromPresent === "true") {
-      setIsFromPresent(true);
-    }
+    if (fromPresent === "true") setIsFromPresent(true);
   }, [dateRange]);
 
   const handleLogoutConfirm = () => {
@@ -170,7 +125,6 @@ const BerandaKasir = () => {
 
     setDateRange(newRange);
     localStorage.setItem("dateRange", JSON.stringify(newRange));
-    fetchAntrianData(newRange);
   };
 
   return (

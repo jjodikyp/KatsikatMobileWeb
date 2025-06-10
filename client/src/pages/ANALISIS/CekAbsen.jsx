@@ -151,6 +151,9 @@ const CekAbsen = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode 
 
   const summary = calculateSummary();
 
+  // Validasi bulan dan tahun berjalan
+  const isFutureMonth = (year > new Date().getFullYear()) || (year === new Date().getFullYear() && month > new Date().getMonth() + 1);
+
   if (wrapperMode) {
     return (
       <div>
@@ -205,110 +208,118 @@ const CekAbsen = ({ hideBackButton, hideTitle, className = "pt-24", wrapperMode 
           </div>
         </div>
 
-        {/* Absen Report */}
-        <div className="mb-2 rounded-3xl p-4 mt-4 outline outline-2 outline-[#EEF1F7]">
-          {loading ? (
-            <div className="text-center py-4">Loading...</div>
-          ) : error ? (
-            <div className="text-center py-4 text-red-500">{error}</div>
-          ) : !absenData || absenData.length === 0 ? (
-            <div className="text-center py-4">Tidak ada data absen</div>
-          ) : (
-            <>
-              <div
-                className={`overflow-y-auto ${showAll ? "max-h-[400px]" : ""}`}
-              >
-                <table className="w-full">
-                  <thead className="sticky top-0 bg-white">
-                    <tr className="text-left">
-                      <th className="p-2">Tanggal</th>
-                      <th className="p-2">Masuk</th>
-                      <th className="p-2">Keluar</th>
-                      <th className="p-2">Status</th>
-                      <th className="p-2">Keterangan</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {displayedData.map((absen, index) => (
-                      <tr key={index} className="border-t border-gray-200">
-                        <td className="p-2">{formatDate(absen.date)}</td>
-                        <td className="p-2">{formatTime(absen.clockIn)}</td>
-                        <td className="p-2">{formatTime(absen.clockOut)}</td>
-                        <td className="p-2">
-                          <span
-                            className={`px-2 py-1 rounded-full text-sm ${
-                              absen.status === "hadir"
-                                ? "bg-green-100 text-green-800 outline outline-2 outline-[#EEF1F7]"
-                                : absen.status === "izin"
-                                ? "bg-yellow-100 text-yellow-800 outline outline-2 outline-[#EEF1F7]"
-                                : "bg-red-100 text-red-800 outline outline-2 outline-[#EEF1F7]"
-                            }`}
-                          >
-                            {absen.status}
-                          </span>
-                        </td>
-                        <td className="p-2">
-                          <span
-                            className={`px-2 py-1 rounded-full text-sm ${
-                              absen.approval === "Disetujui"
-                                ? "bg-blue-100 text-blue-800"
-                                : "bg-gray-100 text-gray-800"
-                            } outline outline-2 outline-[#EEF1F7]`}
-                          >
-                            {absen.approval}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {absenData.length > 5 && (
-                <div className="mt-4 text-center">
-                  <AnimatedButton
-                    onClick={() => setShowAll(!showAll)}
-                    className=" px-4 py-2"
-                    variant="blue"
-                  >
-                    {showAll ? "Tampilkan Lebih Sedikit" : "Tampilkan Semua"}
-                  </AnimatedButton>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Setelah Absen Report, tambahkan Ringkasan Kehadiran */}
-        {!loading && !error && absenData && absenData.length > 0 && (
-          <div className="mb-2 rounded-3xl p-4 mt-4 opacity-100 outline outline-2 outline-[#EEF1F7]">
-            <h2 className="text-2xl font-bebas mb-3">Ringkasan Kehadiran</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-gray-100 p-4 rounded-xl">
-                <div className="text-sm text-gray-600">Total Kehadiran</div>
-                <div className="text-2xl font-semibold text-[#2E7CF6]">
-                  {summary?.totalHadir} Hari
-                </div>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-xl">
-                <div className="text-sm text-gray-600">Total Alpha</div>
-                <div className="text-2xl font-semibold text-[#2E7CF6]">
-                  {summary?.totalAlpha} Hari
-                </div>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-xl">
-                <div className="text-sm text-gray-600">Total Izin</div>
-                <div className="text-2xl font-semibold text-[#2E7CF6]">
-                  {summary?.totalIzin} Hari
-                </div>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-xl">
-                <div className="text-sm text-gray-600">Total Jam Kerja</div>
-                <div className="text-2xl font-semibold text-[#2E7CF6]">
-                  {summary?.totalJamKerja.toFixed(1)} Jam
-                </div>
-              </div>
-            </div>
+        {/* Validasi bulan/tahun berjalan */}
+        {isFutureMonth ? (
+          <div className="mb-4 bg-yellow-100 text-yellow-800 rounded-3xl p-4 mt-4 outline outline-2 outline-[#EEF1F7] text-center font-semibold">
+            Data atau informasi untuk bulan dan tahun tersebut belum tersedia. Mohon menunggu hingga admin melakukan update informasinya.
           </div>
+        ) : (
+          <>
+            {/* Absen Report */}
+            <div className="mb-2 rounded-3xl p-4 mt-4 outline outline-2 outline-[#EEF1F7]">
+              {loading ? (
+                <div className="text-center py-4">Loading...</div>
+              ) : error ? (
+                <div className="text-center py-4 text-red-500">{error}</div>
+              ) : !absenData || absenData.length === 0 ? (
+                <div className="text-center py-4">Tidak ada data absen</div>
+              ) : (
+                <>
+                  <div
+                    className={`overflow-y-auto ${showAll ? "max-h-[400px]" : ""}`}
+                  >
+                    <table className="w-full">
+                      <thead className="sticky top-0 bg-white">
+                        <tr className="text-left">
+                          <th className="p-2">Tanggal</th>
+                          <th className="p-2">Masuk</th>
+                          <th className="p-2">Keluar</th>
+                          <th className="p-2">Status</th>
+                          <th className="p-2">Keterangan</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {displayedData.map((absen, index) => (
+                          <tr key={index} className="border-t border-gray-200">
+                            <td className="p-2">{formatDate(absen.date)}</td>
+                            <td className="p-2">{formatTime(absen.clockIn)}</td>
+                            <td className="p-2">{formatTime(absen.clockOut)}</td>
+                            <td className="p-2">
+                              <span
+                                className={`px-2 py-1 rounded-full text-sm ${
+                                  absen.status === "hadir"
+                                    ? "bg-green-100 text-green-800 outline outline-2 outline-[#EEF1F7]"
+                                    : absen.status === "izin"
+                                    ? "bg-yellow-100 text-yellow-800 outline outline-2 outline-[#EEF1F7]"
+                                    : "bg-red-100 text-red-800 outline outline-2 outline-[#EEF1F7]"
+                                }`}
+                              >
+                                {absen.status}
+                              </span>
+                            </td>
+                            <td className="p-2">
+                              <span
+                                className={`px-2 py-1 rounded-full text-sm ${
+                                  absen.approval === "Disetujui"
+                                    ? "bg-blue-100 text-blue-800"
+                                    : "bg-gray-100 text-gray-800"
+                                } outline outline-2 outline-[#EEF1F7]`}
+                              >
+                                {absen.approval}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {absenData.length > 5 && (
+                    <div className="mt-4 text-center">
+                      <AnimatedButton
+                        onClick={() => setShowAll(!showAll)}
+                        className=" px-4 py-2"
+                        variant="blue"
+                      >
+                        {showAll ? "Tampilkan Lebih Sedikit" : "Tampilkan Semua"}
+                      </AnimatedButton>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            {/* Ringkasan Kehadiran hanya muncul jika data tersedia dan bukan bulan/tahun depan */}
+            {!loading && !error && absenData && absenData.length > 0 && !isFutureMonth && (
+              <div className="mb-2 rounded-3xl p-4 mt-4 opacity-100 outline outline-2 outline-[#EEF1F7]">
+                <h2 className="text-2xl font-bebas mb-3">Ringkasan Kehadiran</h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-gray-100 p-4 rounded-xl">
+                    <div className="text-sm text-gray-600">Total Kehadiran</div>
+                    <div className="text-2xl font-semibold text-[#2E7CF6]">
+                      {summary?.totalHadir} Hari
+                    </div>
+                  </div>
+                  <div className="bg-gray-100 p-4 rounded-xl">
+                    <div className="text-sm text-gray-600">Total Alpha</div>
+                    <div className="text-2xl font-semibold text-[#2E7CF6]">
+                      {summary?.totalAlpha} Hari
+                    </div>
+                  </div>
+                  <div className="bg-gray-100 p-4 rounded-xl">
+                    <div className="text-sm text-gray-600">Total Izin</div>
+                    <div className="text-2xl font-semibold text-[#2E7CF6]">
+                      {summary?.totalIzin} Hari
+                    </div>
+                  </div>
+                  <div className="bg-gray-100 p-4 rounded-xl">
+                    <div className="text-sm text-gray-600">Total Jam Kerja</div>
+                    <div className="text-2xl font-semibold text-[#2E7CF6]">
+                      {summary?.totalJamKerja.toFixed(1)} Jam
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>

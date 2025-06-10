@@ -13,10 +13,6 @@ const AbsenAkhir = () => {
   const [deskripsi, setDeskripsi] = useState("");
   const [error, setError] = useState("");
   const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const [imageData, setImageData] = useState(null);
-  const [stream, setStream] = useState(null);
-  const [cameraError, setCameraError] = useState(null);
 
   useEffect(() => {
     // Ambil waktu mulai kerja dari localStorage
@@ -50,107 +46,9 @@ const AbsenAkhir = () => {
     }
   }, []);
 
-  // Fungsi untuk mengecek dan meminta akses kamera
-  const initializeCamera = async () => {
-    try {
-      // Polyfill untuk browser yang lebih lama
-      const getUserMedia =
-        navigator.getUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.mozGetUserMedia ||
-        navigator.msGetUserMedia ||
-        (navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-
-      if (!getUserMedia) {
-        throw new Error("Kamera tidak didukung di browser ini");
-      }
-
-      let stream;
-
-      // Menggunakan modern API jika tersedia
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-            facingMode: "user",
-          },
-          audio: false,
-        });
-      } else {
-        // Fallback untuk browser lama
-        stream = await new Promise((resolve, reject) => {
-          getUserMedia.call(
-            navigator,
-            { video: true, audio: false },
-            resolve,
-            reject
-          );
-        });
-      }
-
-      if (videoRef.current) {
-        // Fallback untuk browser lama
-        if ("srcObject" in videoRef.current) {
-          videoRef.current.srcObject = stream;
-        } else {
-          // Fallback untuk browser yang lebih lama
-          videoRef.current.src = window.URL.createObjectURL(stream);
-        }
-
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play();
-        };
-
-        setStream(stream);
-        setCameraError(null);
-      }
-    } catch (err) {
-      console.error("Error accessing camera:", err);
-      setCameraError(
-        err.name === "NotAllowedError"
-          ? "Mohon izinkan akses kamera untuk melakukan absensi"
-          : "Tidak dapat mengakses kamera. Silakan cek pengaturan browser Anda"
-      );
-    }
-  };
-
   // Effect untuk setup kamera
-  useEffect(() => {
-    initializeCamera();
 
-    return () => {
-      if (stream) {
-        const tracks = stream.getTracks();
-        tracks.forEach((track) => track.stop());
-      }
-    };
-  }, []);
-
-  // Fungsi untuk mengambil foto
-  const takeSnapshot = () => {
-    if (videoRef.current && canvasRef.current) {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
-
-      // Set canvas dimensions
-      canvas.width = video.videoWidth || 320;
-      canvas.height = video.videoHeight || 240;
-
-      try {
-        // Draw video frame to canvas
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const dataUrl = canvas.toDataURL("image/jpeg");
-        setImageData(dataUrl);
-      } catch (err) {
-        console.error("Error capturing image:", err);
-        setCameraError("Gagal mengambil gambar. Silakan coba lagi.");
-      }
-    }
-  };
-
-  const handleSelesaiKerja = () => {
+  const handleSelesaiKerja = async () => {
     // Validasi deskripsi
     const wordCount = deskripsi.trim().split(/\s+/).length;
     if (wordCount < 3) {
@@ -158,16 +56,56 @@ const AbsenAkhir = () => {
       return;
     }
 
-    // Hapus waktu mulai kerja dari localStorage
-    localStorage.removeItem("workStartTime");
-    sessionStorage.removeItem("fromPresent");
-    sessionStorage.removeItem("fromIzin");
-    // Arahkan ke halaman login
-    navigate("/");
+    setError("");
+    const currentAbsentId = localStorage.getItem("currentAbsentId");
+    const token = localStorage.getItem("token");
 
-    setTimeout(() => { // biar kameranya mati
-      window.location.reload();
-    }, 100);
+    console.log('Debug Absen Pulang: Token =', token);
+    console.log('Debug Absen Pulang: currentAbsentId =', currentAbsentId);
+
+    if (!currentAbsentId || !token) {
+      setError("Data absensi atau token tidak ditemukan. Silakan coba lagi.");
+      return;
+    }
+
+    const now = new Date();
+    const clock_out = now.toTimeString().slice(0, 8);
+
+    try {
+      const res = await fetch(
+        `https://api.katsikat.id/absents/${currentAbsentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            clock_out,
+            description: deskripsi, // Sertakan deskripsi evaluasi harian
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.success && data.statusCode === 200) {
+        // Hapus data terkait absensi dari localStorage/sessionStorage
+        localStorage.removeItem("workStartTime");
+        localStorage.removeItem("currentAbsentId"); // Hapus ID absensi
+        localStorage.removeItem("token"); // Hapus token saat berhasil absen pulang
+        localStorage.removeItem("userData"); // Hapus userData saat berhasil absen pulang
+        sessionStorage.removeItem("fromPresent");
+        sessionStorage.removeItem("fromIzin");
+        // Arahkan ke halaman login (root path)
+        navigate("/");
+      } else {
+        setError(data.message || "Gagal absen pulang.");
+      }
+    } catch (err) {
+      console.error("Error absen pulang:", err);
+      setError("Gagal mengirim data absen pulang. Periksa koneksi internet.");
+    }
   };
 
   return (
@@ -199,82 +137,6 @@ const AbsenAkhir = () => {
           </p>
         </div>
 
-        {/* Camera Section */}
-        <div className="w-full max-w-xs mb-6">
-          <div className="relative rounded-2xl overflow-hidden outline outline-2 outline-[#EEF1F7]">
-            {cameraError ? (
-              <div className="bg-red-50 p-4 rounded-2xl">
-                <p className="text-red-600 text-sm font-montserrat text-center">
-                  {cameraError}
-                </p>
-                <button
-                  onClick={() => {
-                    setCameraError(null);
-                    initializeCamera();
-                  }}
-                  className="mt-2 text-blue-600 text-sm font-montserrat underline w-full"
-                >
-                  Coba Lagi
-                </button>
-              </div>
-            ) : (
-              <>
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  className="w-full rounded-2xl"
-                  style={{ display: imageData ? "none" : "block" }}
-                />
-
-                {imageData && (
-                  <div className="relative">
-                    <img
-                      src={imageData}
-                      alt="captured"
-                      className="w-full rounded-2xl"
-                    />
-                    <button
-                      onClick={() => {
-                        setImageData(null);
-                        initializeCamera();
-                      }}
-                      className="absolute top-2 right-2 bg-white rounded-full p-2 shadow-lg"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6 text-gray-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                )}
-
-                {!imageData && (
-                  <button
-                    onClick={takeSnapshot}
-                    className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full p-3 shadow-lg"
-                  >
-                    <div className="w-12 h-12 rounded-full border-4 border-[#2E7CF6]"></div>
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Hidden canvas for capturing */}
-        <canvas ref={canvasRef} style={{ display: "none" }} />
-
         {/* Area Input Deskripsi */}
         <div className="w-full max-w-xs mb-6">
           <textarea
@@ -296,7 +158,6 @@ const AbsenAkhir = () => {
           onClick={handleSelesaiKerja}
           variant="blue"
           className="max-w-xs w-full py-3 px-6 font-montserrat font-semibold rounded-2xl text-sm"
-          disabled={!imageData}
         >
           Absen Pulang
         </AnimatedButton>

@@ -5,6 +5,8 @@ import Header from "../../components/Com Header/Header";
 import WorkTimeAlert from "../../components/WorkTimeAlert";
 import BreakTimeAlert from "../../components/BreakTimeAlert";
 import AnimatedButton from "../../components/Design/AnimatedButton";
+import dummyKurirAntrianData from "../../services/dummyKurirAntrianData";
+
 const BerandaKurir = () => {
   const navigate = useNavigate();
   const [selectedEstimasi, setSelectedEstimasi] = useState("pickup");
@@ -23,6 +25,9 @@ const BerandaKurir = () => {
   });
   const [isFromIzin, setIsFromIzin] = useState(false);
   const [isFromPresent, setIsFromPresent] = useState(false);
+  const [countRegular, setCountRegular] = useState(0);
+  const [countSameDay, setCountSameDay] = useState(0);
+  const [countNextDay, setCountNextDay] = useState(0);
 
   // Fungsi untuk memformat tanggal ke format database (YYYY-MM-DD)
   const formatDateForDB = (dateString) => {
@@ -49,85 +54,28 @@ const BerandaKurir = () => {
 
     setDateRange(newRange);
     localStorage.setItem("dateRange", JSON.stringify(newRange));
-    await fetchAntrianData(newRange);
   };
 
-  // Fungsi untuk mengambil data antrian
-  const fetchAntrianData = async (range = dateRange) => {
-    try {
-      const formattedStartDate = formatDateForDB(range.startDate);
-      const formattedEndDate = formatDateForDB(range.endDate);
-
-      const baseUrl = `${import.meta.env.VITE_API_URL}/api/transport`;
-
-      const [pickupResponse, deliveryResponse] = await Promise.all([
-        axios.get(`${baseUrl}/pickup`, {
-          params: {
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
-          },
-        }),
-        axios.get(`${baseUrl}/delivery`, {
-          params: {
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
-          },
-        }),
-      ]);
-
-      setAntrianData({
-        pickup: pickupResponse.data.data.length,
-        delivery: deliveryResponse.data.data.length,
-      });
-
-      if (selectedEstimasi === "pickup") {
-        setAntrianTransport(pickupResponse.data.data);
-      } else {
-        setAntrianTransport(deliveryResponse.data.data);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+  useEffect(() => {
+    // Hitung jumlah antrian pickup dan delivery dari data dummy
+    const pickup = dummyKurirAntrianData.filter(
+      (item) => item.status === "pending" && item.type === "pickup"
+    ).length;
+    const delivery = dummyKurirAntrianData.filter(
+      (item) => item.status === "pending" && item.type === "delivery"
+    ).length;
+    setAntrianData({ pickup, delivery });
+    // Cek izin dan present seperti sebelumnya
+    const fromIzin = sessionStorage.getItem("fromIzin");
+    if (fromIzin === "true") setIsFromIzin(true);
+    const fromPresent = sessionStorage.getItem("fromPresent");
+    if (fromPresent === "true") setIsFromPresent(true);
+  }, [dateRange]);
 
   // Filter antrian berdasarkan tipe
   const filterTransport = async (type) => {
     setSelectedEstimasi(type);
-    try {
-      const formattedStartDate = formatDateForDB(dateRange.startDate);
-      const formattedEndDate = formatDateForDB(dateRange.endDate);
-
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/transport/${type}`,
-        {
-          params: {
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
-          },
-        }
-      );
-
-      setAntrianTransport(response.data.data);
-    } catch (error) {
-      console.error("Error filtering data:", error);
-      setAntrianTransport([]);
-    }
   };
-
-  useEffect(() => {
-    fetchAntrianData();
-    // Cek apakah user datang dari halaman izin-success
-    const fromIzin = sessionStorage.getItem("fromIzin");
-    if (fromIzin === "true") {
-      setIsFromIzin(true);
-    }
-
-    // Cek status presensi dari session storage
-    const fromPresent = sessionStorage.getItem("fromPresent");
-    if (fromPresent === "true") {
-      setIsFromPresent(true);
-    }
-  }, []);
 
   // Tambahkan fungsi untuk handle quick date selection
   const handleQuickDateSelect = (type) => {
@@ -163,7 +111,6 @@ const BerandaKurir = () => {
 
     setDateRange(newRange);
     localStorage.setItem("dateRange", JSON.stringify(newRange));
-    fetchAntrianData(newRange);
   };
 
   return (
@@ -236,6 +183,7 @@ const BerandaKurir = () => {
               <h2 className="text-2xl font-bebas mb-2">
                 Antrian antar & jemput
               </h2>
+
               <div className="grid grid-cols-2 gap-2 font-['Montserrat']">
                 <AnimatedButton
                   className={`${
@@ -311,6 +259,13 @@ const BerandaKurir = () => {
                     {antrianData?.delivery || 0}
                   </p>
                 </AnimatedButton>
+              </div>
+              {/* Total Antrian ala kasir */}
+              <div className="mt-4 text-center outline outline-2 outline-[#EEF1F7] rounded-3xl p-2 mb-4">
+                <p className="text-sm text-gray-600">
+                  Total Antrian:{" "}
+                  {antrianData ? antrianData.pickup + antrianData.delivery : 0}
+                </p>
               </div>
 
               {/* Button Buka Antrian */}

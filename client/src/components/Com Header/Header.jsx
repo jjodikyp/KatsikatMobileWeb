@@ -15,8 +15,7 @@ const Header = () => {
   const [showNavModal, setShowNavModal] = useState(false);
 
   const handleLogoutConfirm = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.removeItem("userData");
 
     const fromIzin = sessionStorage.getItem("fromIzin");
     const fromPresent = sessionStorage.getItem("fromPresent");

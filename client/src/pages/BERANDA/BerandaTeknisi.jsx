@@ -16,11 +16,28 @@ import Header from "../../components/Com Header/Header";
 import WorkTimeAlert from "../../components/WorkTimeAlert";
 import BreakTimeAlert from "../../components/BreakTimeAlert";
 import AnimatedButton from "../../components/Design/AnimatedButton";
+import dummyAntrianData from "../../services/dummyAntrianData";
+
+// Konfigurasi axios interceptor
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+      config.headers["Accept"] = "application/json";
+      config.headers["Content-Type"] = "application/json";
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 const BerandaTeknisi = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
-  const [selectedEstimasi, setSelectedEstimasi] = useState("reguler");
+  const [selectedEstimasi, setSelectedEstimasi] = useState("regular");
   const [antrianData, setAntrianData] = useState(null);
   const [antrianTreatment, setAntrianTreatment] = useState([]);
   const [dateRange, setDateRange] = useState(() => {
@@ -69,6 +86,9 @@ const BerandaTeknisi = () => {
   const [currentTime, setCurrentTime] = useState("");
   const [isFromIzin, setIsFromIzin] = useState(false);
   const [isFromPresent, setIsFromPresent] = useState(false);
+  const [countRegular, setCountRegular] = useState(0);
+  const [countSameDay, setCountSameDay] = useState(0);
+  const [countNextDay, setCountNextDay] = useState(0);
 
   // Fungsi untuk mendapatkan waktu WIB
   const getJakartaTime = () => {
@@ -182,153 +202,42 @@ const BerandaTeknisi = () => {
       newRange.startDate = formattedValue;
     }
 
-    console.log("New date range:", newRange);
-
-    // Update dateRange dan localStorage
     setDateRange(newRange);
     localStorage.setItem("dateRange", JSON.stringify(newRange));
-
-    try {
-      console.log("Fetching data with new date range...");
-      const [regularResponse, sameDayResponse, nextDayResponse] =
-        await Promise.all([
-          axios.get(
-            `${import.meta.env.VITE_API_URL}/api/order-details/process/regular`,
-            {
-              params: {
-                startDate: newRange.startDate,
-                endDate: newRange.endDate,
-              },
-            }
-          ),
-          axios.get(
-            `${
-              import.meta.env.VITE_API_URL
-            }/api/order-details/process/same_day`,
-            {
-              params: {
-                startDate: newRange.startDate,
-                endDate: newRange.endDate,
-              },
-            }
-          ),
-          axios.get(
-            `${
-              import.meta.env.VITE_API_URL
-            }/api/order-details/process/next_day`,
-            {
-              params: {
-                startDate: newRange.startDate,
-                endDate: newRange.endDate,
-              },
-            }
-          ),
-        ]);
-
-      const regularFiltered = filterByDateRange(
-        regularResponse.data.data || []
-      );
-      const sameDayFiltered = filterByDateRange(
-        sameDayResponse.data.data || []
-      );
-      const nextDayFiltered = filterByDateRange(
-        nextDayResponse.data.data || []
-      );
-
-      console.log("Filtered data:", {
-        regular: regularFiltered.length,
-        sameDay: sameDayFiltered.length,
-        nextDay: nextDayFiltered.length,
-      });
-
-      setAntrianData({
-        reguler: regularFiltered.length,
-        sameDay: sameDayFiltered.length,
-        nextDay: nextDayFiltered.length,
-      });
-
-      // Update antrian treatment sesuai filter yang aktif
-      if (selectedEstimasi === "reguler") {
-        console.log("Setting antrian reguler:", regularFiltered);
-        setAntrianTreatment(regularFiltered);
-      } else if (selectedEstimasi === "sameDay") {
-        console.log("Setting antrian same day:", sameDayFiltered);
-        setAntrianTreatment(sameDayFiltered);
-      } else if (selectedEstimasi === "nextDay") {
-        console.log("Setting antrian next day:", nextDayFiltered);
-        setAntrianTreatment(nextDayFiltered);
-      }
-    } catch (error) {
-      console.error("Error updating data:", error);
-      // Log detail error
-      console.error("Error details:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        config: error.config,
-      });
-    }
+    fetchAntrianData(newRange);
   };
 
-  // Modifikasi fetchAntrianData untuk menerima parameter rentang tanggal
+  // Update fetchAntrianData untuk menggunakan axios dengan interceptor
   const fetchAntrianData = async (range = dateRange) => {
     try {
-      const formattedStartDate = formatDateForDB(range.startDate);
-      const formattedEndDate = formatDateForDB(range.endDate);
+      const params = {
+        search: "",
+        startDate: formatDateForDB(range.startDate),
+        endDate: formatDateForDB(range.endDate),
+      };
 
-      console.log("Sending request with params:", {
-        startDate: formattedStartDate,
-        endDate: formattedEndDate,
+      const response = await axios.get(`https://api.katsikat.id/orders`, {
+        params,
       });
 
-      // Gunakan VITE_API_URL dari env
-      const baseUrl = `${
-        import.meta.env.VITE_API_URL
-      }/api/order-details/process`;
+      // Log untuk debugging
+      console.log("Token:", localStorage.getItem("token"));
+      console.log("Request Headers:", response.config.headers);
+      console.log("Response:", response.data);
 
-      const [regularResponse, sameDayResponse, nextDayResponse] =
-        await Promise.all([
-          axios.get(`${baseUrl}/regular`, {
-            params: {
-              startDate: formattedStartDate,
-              endDate: formattedEndDate,
-            },
-          }),
-          axios.get(`${baseUrl}/same_day`, {
-            params: {
-              startDate: formattedStartDate,
-              endDate: formattedEndDate,
-            },
-          }),
-          axios.get(`${baseUrl}/next_day`, {
-            params: {
-              startDate: formattedStartDate,
-              endDate: formattedEndDate,
-            },
-          }),
-        ]);
-
-      setAntrianData({
-        reguler: regularResponse.data.data.length,
-        sameDay: sameDayResponse.data.data.length,
-        nextDay: nextDayResponse.data.data.length,
-      });
-
-      // Set antrian treatment sesuai filter yang aktif
-      if (selectedEstimasi === "reguler")
-        setAntrianTreatment(regularResponse.data.data);
-      else if (selectedEstimasi === "sameDay")
-        setAntrianTreatment(sameDayResponse.data.data);
-      else if (selectedEstimasi === "nextDay")
-        setAntrianTreatment(nextDayResponse.data.data);
+      if (response.data && response.data.data) {
+        setAntrianData({
+          total: response.data.data.length,
+        });
+        setAntrianTreatment(response.data.data);
+      }
     } catch (error) {
-      console.error("Error details:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-      });
-      // Tambahkan log detail error
-      console.error("Error response:", error.response?.data);
+      console.error("Error fetching orders:", error);
+      if (error.response?.status === 401) {
+        console.error("Token tidak valid atau expired");
+        // Redirect ke login jika token expired
+        navigate("/login");
+      }
     }
   };
 
@@ -337,19 +246,42 @@ const BerandaTeknisi = () => {
   }, []);
 
   useEffect(() => {
-    fetchAntrianData();
-    // Cek apakah user datang dari halaman izin-success
-    const fromIzin = sessionStorage.getItem("fromIzin");
-    if (fromIzin === "true") {
-      setIsFromIzin(true);
-    }
+    // Total Regular (Cleaning + Repair)
+    setCountRegular(
+      dummyAntrianData.filter((item) => item.process_time === "Regular").length
+    );
+    // Total Same Day (Cleaning + Repair)
+    setCountSameDay(
+      dummyAntrianData.filter((item) => item.process_time === "Same Day").length
+    );
+    // Total Next Day (Cleaning + Repair)
+    setCountNextDay(
+      dummyAntrianData.filter((item) => item.process_time === "Next Day").length
+    );
 
-    // Cek apakah user datang dari halaman pilih-role setelah login
-    const fromPresent = sessionStorage.getItem("fromPresent");
-    if (fromPresent === "true") {
-      setIsFromPresent(true);
+    // Filter data sesuai estimasi yang dipilih
+    let filtered = [];
+    if (selectedEstimasi === "regular") {
+      filtered = dummyAntrianData.filter(
+        (item) => item.process_time === "Regular"
+      );
+    } else if (selectedEstimasi === "sameDay") {
+      filtered = dummyAntrianData.filter(
+        (item) => item.process_time === "Same Day"
+      );
+    } else if (selectedEstimasi === "nextDay") {
+      filtered = dummyAntrianData.filter(
+        (item) => item.process_time === "Next Day"
+      );
     }
-  }, []);
+    setAntrianTreatment(filtered);
+
+    // Cek izin dan present seperti sebelumnya
+    const fromIzin = sessionStorage.getItem("fromIzin");
+    if (fromIzin === "true") setIsFromIzin(true);
+    const fromPresent = sessionStorage.getItem("fromPresent");
+    if (fromPresent === "true") setIsFromPresent(true);
+  }, [dateRange, selectedEstimasi]);
 
   // Debug state changes
   useEffect(() => {
@@ -403,96 +335,8 @@ const BerandaTeknisi = () => {
 
   // Tambahkan useEffect untuk memantau perubahan dateRange
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Log tanggal sebelum format
-        console.log("Original date range:", dateRange);
-
-        // Format tanggal
-        const formattedStartDate = formatDateForDB(dateRange.startDate);
-        const formattedEndDate = formatDateForDB(dateRange.endDate);
-
-        // Log tanggal setelah format
-        console.log("Formatted dates:", {
-          formattedStartDate,
-          formattedEndDate,
-        });
-
-        const params = {
-          startDate: formattedStartDate,
-          endDate: formattedEndDate,
-        };
-
-        // Log full request details
-        console.log("Making requests with:", {
-          url: "http://localhost:3002/api/order-details/process/regular",
-          params,
-        });
-
-        const [regularResponse, sameDayResponse, nextDayResponse] =
-          await Promise.all([
-            axios.get(
-              `${
-                import.meta.env.VITE_API_URL
-              }/api/order-details/process/regular`,
-              { params }
-            ),
-            axios.get(
-              `${
-                import.meta.env.VITE_API_URL
-              }/api/order-details/process/same_day`,
-              { params }
-            ),
-            axios.get(
-              `${
-                import.meta.env.VITE_API_URL
-              }/api/order-details/process/next_day`,
-              { params }
-            ),
-          ]);
-
-        // Log responses
-        console.log("Responses received:", {
-          regular: regularResponse.data,
-          sameDay: sameDayResponse.data,
-          nextDay: nextDayResponse.data,
-        });
-
-        const regularFiltered = filterByDateRange(
-          regularResponse.data.data || []
-        );
-        const sameDayFiltered = filterByDateRange(
-          sameDayResponse.data.data || []
-        );
-        const nextDayFiltered = filterByDateRange(
-          nextDayResponse.data.data || []
-        );
-
-        setAntrianData({
-          reguler: regularFiltered.length,
-          sameDay: sameDayFiltered.length,
-          nextDay: nextDayFiltered.length,
-        });
-
-        if (selectedEstimasi === "reguler")
-          setAntrianTreatment(regularFiltered);
-        else if (selectedEstimasi === "sameDay")
-          setAntrianTreatment(sameDayFiltered);
-        else if (selectedEstimasi === "nextDay")
-          setAntrianTreatment(nextDayFiltered);
-      } catch (error) {
-        // Detailed error logging
-        console.error("Error details:", {
-          message: error.message,
-          response: error.response?.data,
-          status: error.response?.status,
-          config: error.config, // This will show what was actually sent
-        });
-      }
-    };
-
-    fetchData();
-  }, [dateRange, selectedEstimasi]);
+    fetchAntrianData(dateRange);
+  }, [dateRange]);
 
   // Tambahkan useEffect untuk mengambil data user
   useEffect(() => {
@@ -645,27 +489,26 @@ const BerandaTeknisi = () => {
               <h2 className="text-2xl font-bebas mb-2">
                 Detail Antrian Treatment
               </h2>
+
               <div className="grid grid-cols-3 gap-2 font-['Montserrat']">
                 <AnimatedButton
                   className={`${
-                    selectedEstimasi === "reguler"
+                    selectedEstimasi === "regular"
                       ? "bg-[#65B7FF] text-white"
                       : "bg-[#E6EFF9] text-[#909FB1]"
                   } p-4 rounded-2xl cursor-pointer hover:bg-opacity-90 transition-all`}
-                  onClick={() => setSelectedEstimasi("reguler")}
+                  onClick={() => setSelectedEstimasi("regular")}
                 >
                   <h3
                     className={
-                      selectedEstimasi === "reguler"
+                      selectedEstimasi === "regular"
                         ? "text-white"
                         : "text-[#909FB1]"
                     }
                   >
-                    Reguler
+                    Regular
                   </h3>
-                  <p className="text-3xl font-bold">
-                    {antrianData?.reguler || 0}
-                  </p>
+                  <p className="text-3xl font-bold">{countRegular}</p>
                 </AnimatedButton>
                 <AnimatedButton
                   className={`${
@@ -684,9 +527,7 @@ const BerandaTeknisi = () => {
                   >
                     Same Day
                   </h3>
-                  <p className="text-3xl font-bold">
-                    {antrianData?.sameDay || 0}
-                  </p>
+                  <p className="text-3xl font-bold">{countSameDay}</p>
                 </AnimatedButton>
                 <AnimatedButton
                   className={`${
@@ -705,10 +546,14 @@ const BerandaTeknisi = () => {
                   >
                     Next Day
                   </h3>
-                  <p className="text-3xl font-bold">
-                    {antrianData?.nextDay || 0}
-                  </p>
+                  <p className="text-3xl font-bold">{countNextDay}</p>
                 </AnimatedButton>
+              </div>
+              {/* Total Antrian ala kasir/kurir */}
+              <div className="mt-4 text-center outline outline-2 outline-[#EEF1F7] rounded-3xl p-2 mb-4">
+                <p className="text-sm text-gray-600">
+                  Total Antrian: {countRegular + countSameDay + countNextDay}
+                </p>
               </div>
 
               {/* Button Buka Antrian */}

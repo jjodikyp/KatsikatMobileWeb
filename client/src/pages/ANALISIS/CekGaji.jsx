@@ -25,6 +25,7 @@ const CekGaji = ({
         pendapatan: {
           gajiPokok: 2500000,
           bonus: Math.floor(Math.random() * 600000),
+          biayaTransport: 330188,
         },
         potongan: {
           totalAlpha: 3,
@@ -43,7 +44,8 @@ const CekGaji = ({
 
       dummyData.totalPendapatan =
         dummyData.pendapatan.gajiPokok +
-        dummyData.pendapatan.bonus -
+        dummyData.pendapatan.bonus +
+        dummyData.pendapatan.biayaTransport -
         (dummyData.potongan.potonganAlpha + dummyData.potongan.potonganIzin);
 
       setGajiData(dummyData);
@@ -121,6 +123,11 @@ const CekGaji = ({
     alert("Mengunduh slip gaji...");
   };
 
+  // Validasi bulan dan tahun berjalan
+  const isFutureMonth =
+    year > new Date().getFullYear() ||
+    (year === new Date().getFullYear() && month > new Date().getMonth() + 1);
+
   return (
     <div className="h-[100dvh] flex flex-col overflow-hidden bg-white font-montserrat">
       <Header />
@@ -171,102 +178,122 @@ const CekGaji = ({
           </div>
         </div>
 
-        {loading ? (
-          <div className="text-center py-4">Loading...</div>
+        {/* Validasi bulan/tahun berjalan */}
+        {isFutureMonth ? (
+          <div className="mb-4 bg-yellow-100 text-yellow-800 rounded-3xl p-4 mt-4 outline outline-2 outline-[#EEF1F7] text-center font-semibold">
+            Data atau informasi untuk bulan dan tahun tersebut belum tersedia.
+            Mohon menunggu hingga admin melakukan update informasinya.
+          </div>
         ) : (
           <>
-            {/* Bagian 1: Total Pendapatan */}
-            <div className="mb-4 bg-white rounded-3xl p-4 outline outline-2 outline-[#EEF1F7]">
-              <h2 className="text-2xl font-bebas mb-3">Total Pendapatan</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                  <div className="text-sm text-gray-600">Gaji Pokok</div>
-                  <div className="text-2xl font-semibold text-[#2E7CF6]">
-                    {formatCurrency(gajiData.pendapatan.gajiPokok)}
-                  </div>
-                </div>
-                <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                  <div className="text-sm text-gray-600">Bonus</div>
-                  <div className="text-2xl font-semibold text-[#2E7CF6]">
-                    {formatCurrency(gajiData.pendapatan.bonus)}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bagian 2: Potongan Bulanan */}
-            <div className="mb-4 bg-white rounded-3xl p-4 outline outline-2 outline-[#EEF1F7]">
-              <h2 className="text-2xl font-bebas mb-3">Potongan Bulanan</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                  <div className="text-sm text-gray-600">
-                    Potongan Alpha ({gajiData.potongan.totalAlpha} hari)
-                  </div>
-                  <div className="text-2xl font-semibold text-red-600">
-                    {formatCurrency(gajiData.potongan.potonganAlpha)}
-                  </div>
-                </div>
-                <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                  <div className="text-sm text-gray-600">
-                    Potongan Izin ({gajiData.potongan.totalIzin} hari)
-                  </div>
-                  <div className="text-2xl font-semibold text-red-600">
-                    {formatCurrency(gajiData.potongan.potonganIzin)}
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                <div className="text-sm text-gray-600">Total Potongan</div>
-                <div className="text-2xl font-semibold text-red-600">
-                  {formatCurrency(
-                    gajiData.potongan.potonganAlpha +
-                      gajiData.potongan.potonganIzin
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Bagian 3: Grand Total */}
-            <div className="bg-white rounded-3xl p-4 outline outline-2 outline-[#EEF1F7]">
-              <h2 className="text-2xl font-bebas mb-3">Total Gaji Bulan Ini</h2>
-              <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                <div className="text-sm text-gray-600">Grand Total</div>
-                <div className="text-2xl font-semibold text-blue-600">
-                  {formatCurrency(gajiData.totalPendapatan)}
-                </div>
-              </div>
-            </div>
-
-            {/* Setelah Grand Total, tambahkan section Slip Gaji */}
-            <div className="mt-4 bg-white rounded-3xl p-4 outline outline-2 outline-[#EEF1F7]">
-              <h2 className="text-2xl font-bebas mb-3">Slip Gaji</h2>
-              <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <animated-icons
-                      src="https://animatedicons.co/get-icon?name=Pdf&style=minimalistic&token=d5afb04f-d10f-4540-bf0a-27e0b4e06ce8"
-                      trigger="loop"
-                      attributes='{"variationThumbColour":"#536DFE","variationName":"Two Tone","variationNumber":2,"numberOfGroups":2,"backgroundIsGroup":false,"strokeWidth":1,"defaultColours":{"group-1":"#000000","group-2":"#5096FCFF","background":"#FFFFFF"}}'
-                      height="40"
-                      width="40"
-                    ></animated-icons>
-                    <div>
-                      <div className="font-semibold text-gray-800">
-                        Slip Gaji {getMonthName(month)} {year}
+            {loading ? (
+              <div className="text-center py-4">Loading...</div>
+            ) : (
+              <>
+                {/* Bagian 1: Total Pendapatan */}
+                <div className="mb-4 bg-white rounded-3xl p-4 outline outline-2 outline-[#EEF1F7]">
+                  <h2 className="text-2xl font-bebas mb-3">Total Pendapatan</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                      <div className="text-sm text-gray-600">Gaji Pokok</div>
+                      <div className="text-2xl font-semibold text-[#2E7CF6]">
+                        {formatCurrency(gajiData.pendapatan.gajiPokok)}
                       </div>
-                      <div className="text-sm text-gray-500">PDF • 245 KB</div>
+                    </div>
+                    <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                      <div className="text-sm text-gray-600">Bonus</div>
+                      <div className="text-2xl font-semibold text-[#2E7CF6]">
+                        {formatCurrency(gajiData.pendapatan.bonus)}
+                      </div>
+                    </div>
+                    <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                      <div className="text-sm text-gray-600">Biaya Transport</div>
+                      <div className="text-2xl font-semibold text-[#2E7CF6]">
+                        {formatCurrency(gajiData.pendapatan.biayaTransport)}
+                      </div>
                     </div>
                   </div>
-                  <AnimatedButton
-                    onClick={handleDownloadSlip}
-                    variant="blue"
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl ml-2"
-                  >
-                    <span>Unduh</span>
-                  </AnimatedButton>
                 </div>
-              </div>
-            </div>
+
+                {/* Bagian 2: Potongan Bulanan */}
+                <div className="mb-4 bg-white rounded-3xl p-4 outline outline-2 outline-[#EEF1F7]">
+                  <h2 className="text-2xl font-bebas mb-3">Potongan Bulanan</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                      <div className="text-sm text-gray-600">
+                        Potongan Alpha ({gajiData.potongan.totalAlpha} hari)
+                      </div>
+                      <div className="text-2xl font-semibold text-red-600">
+                        {formatCurrency(gajiData.potongan.potonganAlpha)}
+                      </div>
+                    </div>
+                    <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                      <div className="text-sm text-gray-600">
+                        Potongan Izin ({gajiData.potongan.totalIzin} hari)
+                      </div>
+                      <div className="text-2xl font-semibold text-red-600">
+                        {formatCurrency(gajiData.potongan.potonganIzin)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                    <div className="text-sm text-gray-600">Total Potongan</div>
+                    <div className="text-2xl font-semibold text-red-600">
+                      {formatCurrency(
+                        gajiData.potongan.potonganAlpha +
+                          gajiData.potongan.potonganIzin
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bagian 3: Grand Total */}
+                <div className="bg-white rounded-3xl p-4 outline outline-2 outline-[#EEF1F7]">
+                  <h2 className="text-2xl font-bebas mb-3">
+                    Total Gaji Bulan Ini
+                  </h2>
+                  <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                    <div className="text-sm text-gray-600">Grand Total</div>
+                    <div className="text-2xl font-semibold text-blue-600">
+                      {formatCurrency(gajiData.totalPendapatan)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Setelah Grand Total, tambahkan section Slip Gaji */}
+                <div className="mt-4 bg-white rounded-3xl p-4 outline outline-2 outline-[#EEF1F7]">
+                  <h2 className="text-2xl font-bebas mb-3">Slip Gaji</h2>
+                  <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <animated-icons
+                          src="https://animatedicons.co/get-icon?name=Pdf&style=minimalistic&token=d5afb04f-d10f-4540-bf0a-27e0b4e06ce8"
+                          trigger="loop"
+                          attributes='{"variationThumbColour":"#536DFE","variationName":"Two Tone","variationNumber":2,"numberOfGroups":2,"backgroundIsGroup":false,"strokeWidth":1,"defaultColours":{"group-1":"#000000","group-2":"#5096FCFF","background":"#FFFFFF"}}'
+                          height="40"
+                          width="40"
+                        ></animated-icons>
+                        <div>
+                          <div className="font-semibold text-gray-800">
+                            Slip Gaji {getMonthName(month)} {year}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            PDF • 245 KB
+                          </div>
+                        </div>
+                      </div>
+                      <AnimatedButton
+                        onClick={handleDownloadSlip}
+                        variant="blue"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl ml-2"
+                      >
+                        <span>Unduh</span>
+                      </AnimatedButton>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
       </main>

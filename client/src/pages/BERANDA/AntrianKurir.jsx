@@ -6,6 +6,7 @@ import AntrianHeader from '../../components/Header Antrian/AntrianHeader';
 import AntrianKurirContent from '../../components/AntrianKurirContent';
 import AnimatedButton from '../../components/Design/AnimatedButton';
 import WhatsAppFormatter from '../../components/WhatsAppMessage/WhatsAppFormatter';
+import dummyKurirAntrianData from '../../services/dummyKurirAntrianData';
 
 const AntrianKurir = () => {
   const { type } = useParams();
@@ -18,8 +19,11 @@ const AntrianKurir = () => {
   const [filteredAntrian, setFilteredAntrian] = useState([]);
 
   useEffect(() => {
-    fetchDummyData();
-  }, []);
+    // Filter data sesuai type (pickup/delivery)
+    const filtered = dummyKurirAntrianData.filter(item => item.type === type);
+    setAntrianData(filtered);
+    setFilteredAntrian(filtered);
+  }, [type]);
 
   // Debounce search query
   useEffect(() => {
@@ -42,22 +46,6 @@ const AntrianKurir = () => {
       setFilteredAntrian(filtered);
     }
   }, [debouncedSearch, antrianData]);
-
-  const fetchDummyData = () => {
-    // Data dummy dengan status
-    const dummyData = Array.from({ length: 10 }, (_, index) => ({
-      id: index + 1,
-      customerName: `Customer ${index + 1}`,
-      address: `Jl. Contoh No. ${index + 1}, Kota Jakarta`,
-      phone: `08123456789${index}`,
-      requestTime: new Date(Date.now() + (index * 60 * 60 * 1000)),
-      googleMapsUrl: 'https://maps.google.com',
-      status: 'pending'
-    }));
-
-    setAntrianData(dummyData);
-    setFilteredAntrian(dummyData);
-  };
 
   const handleWhatsApp = (phone, message) => {
     const url = `https://wa.me/6282255355740?text=${message}`;

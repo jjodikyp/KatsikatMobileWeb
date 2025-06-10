@@ -89,6 +89,9 @@ const KontrolKerja = ({
     }).format(amount);
   };
 
+  // Validasi bulan dan tahun berjalan
+  const isFutureMonth = (year > new Date().getFullYear()) || (year === new Date().getFullYear() && month > new Date().getMonth() + 1);
+
   if (wrapperMode) {
     return <div>{/* ... existing wrapper mode content ... */}</div>;
   }
@@ -143,56 +146,63 @@ const KontrolKerja = ({
           </div>
         </div>
 
-        {/* Section 2: Ringkasan Keseluruhan */}
-        {!loading && summaryData && (
-          <div className="bg-white rounded-3xl p-4 outline outline-2 outline-[#EEF1F7]">
-            <h2 className="text-2xl font-bebas mb-3">Ringkasan Keseluruhan</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Kehadiran */}
-              <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                <div className="text-sm text-gray-600">Total Kehadiran</div>
-                <div className="text-2xl font-semibold text-green-600">
-                  {summaryData.kehadiran.totalHadir} Hari
+        {/* Validasi bulan/tahun berjalan */}
+        {isFutureMonth ? (
+          <div className="mb-4 bg-yellow-100 text-yellow-800 rounded-3xl p-4 mt-4 outline outline-2 outline-[#EEF1F7] text-center font-semibold">
+            Data atau informasi untuk bulan dan tahun tersebut belum tersedia. Mohon menunggu hingga admin melakukan update informasinya.
+          </div>
+        ) : (
+          !loading && summaryData && (
+            <div className="bg-white rounded-3xl p-4 outline outline-2 outline-[#EEF1F7]">
+              <h2 className="text-2xl font-bebas mb-3">Ringkasan Keseluruhan</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Kehadiran */}
+                <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                  <div className="text-sm text-gray-600">Total Kehadiran</div>
+                  <div className="text-2xl font-semibold text-green-600">
+                    {summaryData.kehadiran.totalHadir} Hari
+                  </div>
                 </div>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                <div className="text-sm text-gray-600">Total Alpha</div>
-                <div className="text-2xl font-semibold text-red-600">
-                  {summaryData.kehadiran.totalAlpha} Hari
+                <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                  <div className="text-sm text-gray-600">Total Alpha</div>
+                  <div className="text-2xl font-semibold text-red-600">
+                    {summaryData.kehadiran.totalAlpha} Hari
+                  </div>
                 </div>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                <div className="text-sm text-gray-600">Total Izin</div>
-                <div className="text-2xl font-semibold text-yellow-600">
-                  {summaryData.kehadiran.totalIzin} Hari
+                <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                  <div className="text-sm text-gray-600">Total Izin</div>
+                  <div className="text-2xl font-semibold text-yellow-600">
+                    {summaryData.kehadiran.totalIzin} Hari
+                  </div>
                 </div>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                <div className="text-sm text-gray-600">Total Jam Kerja</div>
-                <div className="text-2xl font-semibold text-blue-600">
-                  {summaryData.kehadiran.totalJamKerja} Jam
+                <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                  <div className="text-sm text-gray-600">Total Jam Kerja</div>
+                  <div className="text-2xl font-semibold text-blue-600">
+                    {summaryData.kehadiran.totalJamKerja} Jam
+                  </div>
                 </div>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                <div className="text-sm text-gray-600">
-                  Total Kerjaan Selesai
+                <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                  <div className="text-sm text-gray-600">
+                    Total Kerjaan Selesai
+                  </div>
+                  <div className="text-2xl font-semibold text-purple-600">
+                    {summaryData.kinerja.totalKerjaanSelesai} Task
+                  </div>
                 </div>
-                <div className="text-2xl font-semibold text-purple-600">
-                  {summaryData.kinerja.totalKerjaanSelesai} Task
-                </div>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
-                <div className="text-sm text-gray-600">Total Pendapatan</div>
-                <div className="text-2xl font-semibold text-emerald-600">
-                  {formatCurrency(
-                    summaryData.kinerja.pendapatan -
-                      summaryData.kinerja.potongan
-                  )}
+                <div className="bg-gray-100 p-4 rounded-xl outline outline-2 outline-[#EEF1F7]">
+                  <div className="text-sm text-gray-600">Total Pendapatan</div>
+                  <div className="text-2xl font-semibold text-emerald-600">
+                    {formatCurrency(
+                      summaryData.kinerja.pendapatan -
+                        summaryData.kinerja.potongan
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )
         )}
+        
       </main>
     </div>
   );

@@ -13,6 +13,9 @@ const Absensi = () => {
   const [alasanIzin, setAlasanIzin] = useState("");
   const [error, setError] = useState("");
   const [kategoriIzin, setKategoriIzin] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAlreadyAbsent, setIsAlreadyAbsent] = useState(false);
+  const [employeeId, setEmployeeId] = useState(null);
 
   // Tambahkan state untuk audio
   const [audio] = useState(new Audio(absenSound));
@@ -158,105 +161,177 @@ const Absensi = () => {
   };
 
   // Handle absensi hadir
-  const handleHadir = () => {
+  const handleHadir = async () => {
+    console.log("Tombol Saya Hadir diklik");
     setError("");
-    
-    // Set session storage untuk tracking alur login
-    sessionStorage.setItem('fromPresent', 'true');
-    
-    // Simpan waktu mulai kerja
-    localStorage.setItem("workStartTime", new Date().toISOString());
-
-    // Langsung navigasi ke loginSuccess
-    navigate("/loginSuccess");
-
-    // Cek lokasi sebagai background process
-    // if ("geolocation" in navigator) {
-    //   navigator.geolocation.getCurrentPosition(
-    //     async (position) => {
-    //       const userLat = position.coords.latitude;
-    //       const userLng = position.coords.longitude;
-
-    //       console.log("Lokasi user:", { lat: userLat, lng: userLng });
-
-    //       setUserLocation({ lat: userLat, lng: userLng });
-
-    //       // Hitung jarak ke outlet
-    //       const distance = calculateDistance(
-    //         userLat,
-    //         userLng,
-    //         OUTLET_LOCATION.lat,
-    //         OUTLET_LOCATION.lng
-    //       );
-
-    //       console.log("Jarak ke outlet:", distance, "meter");
-
-    //       if (distance <= ALLOWED_RADIUS) {
-    //         // User dalam radius yang diizinkan
-    //         try {
-    //           await playAbsenSound(); // Mainkan suara saat berhasil
-    //           console.log("Mencoba memutar suara");
-    //         } catch (audioError) {
-    //           console.error("Gagal memutar suara:", audioError);
-    //         }
-    //       } else {
-    //         setError(
-    //           "Anda harus berada dalam radius 10 meter dari outlet untuk melakukan absensi!"
-    //         );
-    //         // Jika di luar radius, kembali ke halaman absensi
-    //         navigate("/absensi");
-    //       }
-    //     },
-    //     (error) => {
-    //       console.error("Error getting location:", error);
-    //       setError(
-    //         "Gagal mendapatkan lokasi. Pastikan GPS aktif dan izin lokasi diberikan."
-    //       );
-    //       // Jika error, kembali ke halaman absensi
-    //       navigate("/absensi");
-    //     }
-    //   );
-    // } else {
-    //   setError("Browser Anda tidak mendukung geolocation.");
-    //   // Jika browser tidak support, kembali ke halaman absensi
-    //   navigate("/absensi");
-    // }
+    setIsLoading(true);
+    try {
+      // Ambil data user
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('userData');
+      if (!userData) {
+        console.log('userData tidak ditemukan di localStorage');
+        setError('Data user tidak ditemukan. Silakan login ulang.');
+        setIsLoading(false);
+        return;
+      }
+      const user = JSON.parse(userData);
+      const employee_id = parseInt(user.id);
+      const branch_id = user.branch_id ? parseInt(user.branch_id) : 1;
+      // Ambil waktu sekarang
+      const now = new Date();
+      const date = now.toISOString().slice(0, 10); // YYYY-MM-DD
+      const clock_in = now.toTimeString().slice(0, 8); // HH:mm:ss
+      if (!employee_id || isNaN(employee_id)) {
+        console.log('employee_id tidak valid:', employee_id);
+        setError('ID user tidak valid.');
+        setIsLoading(false);
+        return;
+      }
+      console.log('Kirim absen hadir dengan:', { employee_id, branch_id, date, clock_in });
+      // Kirim POST ke absents
+      const res = await fetch('https://api.katsikat.id/absents', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          employee_id,
+          branch_id,
+          date,
+          clock_in,
+          status: 'Present',
+          description: 'Regular Absent'
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.statusCode === 200) {
+        // Sukses absen hadir
+        // Set session storage untuk tracking alur login
+        sessionStorage.setItem('fromPresent', 'true');
+        // Simpan waktu mulai kerja
+        localStorage.setItem("workStartTime", new Date().toISOString());
+        localStorage.setItem("currentAbsentId", data.data.id);
+        navigate("/loginSuccess");
+      } else {
+        setError("Gagal menyimpan data kehadiran.");
+      }
+    } catch (err) {
+      setError("Gagal mengirim data kehadiran.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // Ambil employeeId dari localStorage saat mount
+  useEffect(() => {
+    try {
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        const user = JSON.parse(userData);
+        setEmployeeId(user.id);
+        console.log('employeeId didapat:', user.id);
+      } else {
+        setError('Data user tidak ditemukan. Silakan login ulang.');
+        setIsAlreadyAbsent(true);
+        console.log('userData tidak ditemukan di localStorage');
+      }
+    } catch (e) {
+      setError('Gagal membaca data user.');
+      setIsAlreadyAbsent(true);
+      console.log('Error parsing userData:', e);
+    }
+  }, []);
+
+  // Cek absen hanya jika employeeId sudah ada
+  /*
+  useEffect(() => {
+    console.log('useEffect cek absen jalan, employeeId:', employeeId);
+    if (!employeeId) return;
+    const checkAbsen = async () => {
+      setIsLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`https://api.katsikat.id/check-today?employee_id=${employeeId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+        console.log('Hasil API check-today:', data);
+        if (data.data && data.data.isTodayAbsent) {
+          setError("Anda sudah absen hari ini.");
+          setIsAlreadyAbsent(true);
+        } else {
+          setIsAlreadyAbsent(false);
+        }
+      } catch (err) {
+        setError("Gagal cek status absen.");
+        console.log('Error fetch check-today:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkAbsen();
+  }, [employeeId]);
+  */
+
   // Handle submit izin
-  const handleSubmitIzin = () => {
+  const handleSubmitIzin = async () => {
     if (!kategoriIzin) {
       setError("Mohon pilih kategori izin");
       return;
     }
-
-    // Jika kategori izin adalah keperluan pribadi, maka tidak perlu isi alasan dan tidak perlu validasi
-    if (kategoriIzin === "keperluan_pribadi") {
-      setError("");
-      navigate("/izin-success");
-      return;
-    }
-
-    if (!alasanIzin.trim()) {
+    if (kategoriIzin !== "keperluan_pribadi" && !alasanIzin.trim()) {
       setError("Mohon isi alasan izin/libur");
       return;
     }
-
-    if (kategoriIzin === "libur_bersama" && !alasanIzin.trim()) {
-      setError("Mohon isi alasan libur bersama");
-      navigate("/izin-success");
+    if (!employeeId) {
+      setError('Data user tidak ditemukan. Silakan login ulang.');
       return;
     }
+    setIsLoading(true);
+    setError("");
 
-    if (kategoriIzin === "sakit" && !alasanIzin.trim()) {
-      setError("Mohon isi alasan sakit");
-      navigate("/izin-success");
-      return;
+    // Ambil waktu sekarang
+    const now = new Date();
+    const date = now.toISOString().slice(0, 10); // YYYY-MM-DD
+    const clock_in = now.toTimeString().slice(0, 8); // HH:mm:ss
+
+    // Mapping status
+    let status = "";
+    if (kategoriIzin === "sakit") status = "Sick";
+    else if (kategoriIzin === "libur_bersama") status = "Libur Bersama";
+    else if (kategoriIzin === "keperluan_pribadi") status = "Keperluan Pribadi";
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('https://api.katsikat.id/permissions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          status,
+          date,
+          description: alasanIzin,
+          clock_in,
+          employee_id: employeeId
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.statusCode === 200) {
+        navigate("/izin-success");
+      } else {
+        setError("Gagal menyimpan data izin.");
+      }
+    } catch (err) {
+      setError("Gagal mengirim data izin.");
+    } finally {
+      setIsLoading(false);
     }
-
-    console.log("Kategori izin:", kategoriIzin);
-    console.log("Alasan izin:", alasanIzin);
-    navigate("/izin-success");
   };
 
   // Handle modal close dengan animasi
@@ -297,13 +372,15 @@ const Absensi = () => {
             onClick={() => setShowIzinModal(true)}
             className="font-semibold w-full py-3 px-4 rounded-xl text-sm"
             variant="grey"
+            disabled={isAlreadyAbsent || isLoading}
           >
             Izin/Ambil hari libur
           </AnimatedButton>
           <AnimatedButton
-            onClick={handleHadir}
+            onClick={() => { console.log('onClick AnimatedButton'); handleHadir(); }}
             className="font-semibold w-full py-3 px-4 rounded-xl text-sm"
             variant="blue"
+            disabled={isAlreadyAbsent || isLoading}
           >
             Saya Hadir
           </AnimatedButton>
@@ -331,7 +408,7 @@ const Absensi = () => {
                 <select
                   value={kategoriIzin}
                   onChange={(e) => setKategoriIzin(e.target.value)}
-                  className="w-full h-[35px] p-3 bg-[#F8FCFF] text-gray-600 font-montserrat rounded-xl text-sm outline outline-2 outline-[#EEF1F7]"
+                  className="w-full h-[50px] p-3 bg-[#F8FCFF] text-gray-600 font-montserrat rounded-xl text-sm outline outline-2 outline-[#EEF1F7]"
                 >
                   <option value="">Pilih Kategori Izin</option>
                   {kategoriOptions.map((option) => (
@@ -368,6 +445,7 @@ const Absensi = () => {
                   onClick={handleCloseModal}
                   className="flex-1 py-3 px-4 rounded-xl text-sm hover:bg-gray-200 transition-colors font-semibold"
                   variant="grey"
+                  disabled={isLoading}
                 >
                   Batal
                 </AnimatedButton>
@@ -375,8 +453,9 @@ const Absensi = () => {
                   onClick={handleSubmitIzin}
                   className="flex-1 py-3 px-4 rounded-xl text-sm font-semibold"
                   variant="blue"
+                  disabled={isLoading}
                 >
-                  Kirim
+                  {isLoading ? "Mengirim..." : "Kirim"}
                 </AnimatedButton>
               </div>
             </div>

@@ -23,36 +23,100 @@ const LoginKaryawan = () => {
     setError("");
 
     try {
+      const loginUrl = 'https://api.katsikat.id/login';
+      console.log('Attempting login to:', loginUrl);
+      console.log('Login payload:', {
+        email: formData.email,
+        password: formData.password
+      });
+
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        loginUrl,
         {
           email: formData.email,
           password: formData.password,
+        },
+        {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          }
         }
       );
 
       console.log("Response login:", response.data);
 
-      if (response.data.success) {
-        const userData = response.data.user;
+      if (response.data?.data?.token) {
+        localStorage.setItem("token", response.data.data.token);
+        
+        const userData = { ...response.data.data.userCheck };
+        localStorage.setItem("userData", JSON.stringify(userData));
+        console.log('userData berhasil disimpan ke localStorage:', userData);
 
-        // Simpan data user lengkap ke localStorage sesuai struktur yang benar
-        localStorage.setItem("user", JSON.stringify({
-          id: userData.id,
-          name: userData.name,
-          email: userData.email,
-          photo: userData.photo || null
-        }));
-        localStorage.setItem("token", response.data.token);
-
-        // Redirect ke beranda
-        navigate("/absensi");
+        // --- Tambahan: Cek status absen/izin ---
+        try {
+          const token = response.data.data.token;
+          const employeeId = userData.id;
+          const checkRes = await axios.get(`https://api.katsikat.id/check-today?employee_id=${employeeId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          const checkData = checkRes.data;
+          if (checkData.data && checkData.statusCode === 200 && checkData.data.isTodayAbsent) {
+            // Sudah absen/izin hari ini
+            // Cek status absen/izin
+            const status = checkData.data.absentData?.status;
+            const absentId = checkData.data.absentData?.id;
+            if (absentId) {
+              localStorage.setItem("currentAbsentId", absentId);
+            }
+            if (status === 'Present' || status === 'Hadir') {
+              sessionStorage.setItem('fromPresent', 'true');
+              localStorage.setItem("workStartTime", new Date().toISOString());
+              navigate("/loginSuccess");
+              return;
+            } else if (
+              status === 'Libur Bersama' ||
+              status === 'Sick' ||
+              status === 'Keperluan Pribadi'
+            ) {
+              navigate("/izin-success");
+              return;
+            } else {
+              // Jika status tidak dikenali, fallback ke absensi
+              navigate("/absensi");
+              return;
+            }
+          } else {
+            // Belum absen/izin
+            navigate("/absensi");
+            return;
+          }
+        } catch (err) {
+          // Jika gagal cek status, fallback ke absensi
+          console.error('Gagal cek status absen:', err);
+          navigate("/absensi");
+          return;
+        }
+        // --- End tambahan ---
       } else {
-        setError(response.data.message || "Email atau password tidak valid");
+        setError("Token tidak ditemukan dalam response");
+        console.error("Response structure:", response.data);
       }
     } catch (error) {
-      console.error("Error:", error);
-      setError(error.response?.data?.message || "Terjadi kesalahan saat login");
+      console.error("Error login:", error);
+      console.error("Error details:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        headers: error.response?.headers
+      });
+      
+      if (error.response?.status === 404) {
+        setError("URL login tidak ditemukan. Mohon periksa koneksi.");
+      } else {
+        setError(error.response?.data?.message || "Terjadi kesalahan saat login");
+      }
     }
 
     sessionStorage.clear();
