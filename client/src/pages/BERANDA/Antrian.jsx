@@ -8,7 +8,6 @@ import FilterAndSearch from "../../components/Header Antrian/FilterAndSearch";
 import AnimatedButton from "../../components/Design/AnimatedButton";
 import TreatmentDetailModal from "../../components/Modal/TreatmentDetailModal";
 import dummyTimerApi from "../../services/dummyTimerApi";
-import dummyAntrianData from "../../services/dummyAntrianData";
 
 const Antrian = () => {
   const navigate = useNavigate();
@@ -42,65 +41,11 @@ const Antrian = () => {
   const [countNextDayCleaning, setCountNextDayCleaning] = useState(0);
   const [countNextDayRepair, setCountNextDayRepair] = useState(0);
 
-  useEffect(() => {
-  
-
-    // Ambil estimasi dari params (regular, sameDay, nextDay)
-    let filteredData = dummyAntrianData;
-    if (estimasi === "regular") {
-      filteredData = dummyAntrianData.filter(
-        (item) => item.process_time === "Regular"
-      );
-      if (selectedFilter === "cleaning") {
-        filteredData = filteredData.filter(
-          (item) => item.treatment?.name?.toLowerCase() === "cleaning"
-        );
-      } else if (selectedFilter === "repair") {
-        filteredData = filteredData.filter(
-          (item) => item.treatment?.name?.toLowerCase() === "repair"
-        );
-      }
-    } else if (estimasi === "sameDay") {
-      filteredData = dummyAntrianData.filter(
-        (item) => item.process_time === "Same Day"
-      );
-      if (selectedFilter === "cleaning") {
-        filteredData = filteredData.filter(
-          (item) => item.treatment?.name?.toLowerCase() === "cleaning"
-        );
-      } else if (selectedFilter === "repair") {
-        filteredData = filteredData.filter(
-          (item) => item.treatment?.name?.toLowerCase() === "repair"
-        );
-      }
-    } else if (estimasi === "nextDay") {
-      filteredData = dummyAntrianData.filter(
-        (item) => item.process_time === "Next Day"
-      );
-      if (selectedFilter === "cleaning") {
-        filteredData = filteredData.filter(
-          (item) => item.treatment?.name?.toLowerCase() === "cleaning"
-        );
-      } else if (selectedFilter === "repair") {
-        filteredData = filteredData.filter(
-          (item) => item.treatment?.name?.toLowerCase() === "repair"
-        );
-      }
-    }
-    setAntrianTreatment(filteredData);
-    setFilteredTreatments(filteredData);
-    setCleaningCount(
-      filteredData.filter(
-        (item) => item.treatment?.name?.toLowerCase() === "cleaning"
-      ).length
-    );
-    setRepairCount(
-      filteredData.filter(
-        (item) => item.treatment?.name?.toLowerCase() === "repair"
-      ).length
-    );
-    console.log('Estimasi:', estimasi, 'SelectedFilter:', selectedFilter, 'FilteredData:', filteredData);
-  }, [selectedFilter, estimasi]);
+  // Fungsi untuk memformat tanggal ke format database (YYYY-MM-DD)
+  const formatDateForDB = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
 
   useEffect(() => {
     if (showModal) {
@@ -126,8 +71,10 @@ const Antrian = () => {
   // Filter data berdasarkan pencarian
   useEffect(() => {
     if (debouncedSearch.trim() === "") {
+      // If search is cleared, reset filteredTreatments to show all fetched data
       setFilteredTreatments(antrianTreatment);
     } else {
+      // If there's a search query, filter the already fetched antrianTreatment
       const searchLower = debouncedSearch.toLowerCase();
       const filtered = antrianTreatment.filter(
         (item) =>
@@ -145,71 +92,18 @@ const Antrian = () => {
     }
   }, [filteredTreatments]);
 
-  useEffect(() => {
-    // Total per estimasi
-    setCountRegular(
-      dummyAntrianData.filter((item) => item.process_time === "Regular").length
-    );
-    setCountSameDay(
-      dummyAntrianData.filter((item) => item.process_time === "Same Day").length
-    );
-    setCountNextDay(
-      dummyAntrianData.filter((item) => item.process_time === "Next Day").length
-    );
-    // Total per treatment per estimasi
-    setCountRegularCleaning(
-      dummyAntrianData.filter(
-        (item) =>
-          item.process_time === "Regular" &&
-          item.treatment?.name?.toLowerCase() === "cleaning"
-      ).length
-    );
-    setCountRegularRepair(
-      dummyAntrianData.filter(
-        (item) =>
-          item.process_time === "Regular" &&
-          item.treatment?.name?.toLowerCase() === "repair"
-      ).length
-    );
-    setCountSameDayCleaning(
-      dummyAntrianData.filter(
-        (item) =>
-          item.process_time === "Same Day" &&
-          item.treatment?.name?.toLowerCase() === "cleaning"
-      ).length
-    );
-    setCountSameDayRepair(
-      dummyAntrianData.filter(
-        (item) =>
-          item.process_time === "Same Day" &&
-          item.treatment?.name?.toLowerCase() === "repair"
-      ).length
-    );
-    setCountNextDayCleaning(
-      dummyAntrianData.filter(
-        (item) =>
-          item.process_time === "Next Day" &&
-          item.treatment?.name?.toLowerCase() === "cleaning"
-      ).length
-    );
-    setCountNextDayRepair(
-      dummyAntrianData.filter(
-        (item) =>
-          item.process_time === "Next Day" &&
-          item.treatment?.name?.toLowerCase() === "repair"
-      ).length
-    );
-  }, []);
-
   const fetchAntrianData = async () => {
     try {
+      const formattedStartDate = formatDateForDB(dateRange.startDate);
+      const formattedEndDate = formatDateForDB(dateRange.endDate);
+
       const params = {
         search: searchQuery || "",
-        startDate: formatDateForDB(dateRange.startDate),
-        endDate: formatDateForDB(dateRange.endDate),
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
       };
 
-      const response = await axios.get("https://api.katsikat.id/orders", {
+      const response = await axios.get(`https://api.katsikat.id/orders`, {
         params,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -218,30 +112,57 @@ const Antrian = () => {
         },
       });
 
-      if (response.data && response.data.data) {
-        // Filter data berdasarkan status dan jenis treatment
-        const filteredData = response.data.data.filter(
-          (item) => item.status === "not_yet"
+      if (response.data && response.data.data && response.data.data.orders) {
+        const rawOrders = response.data.data.orders;
+        const ordersArray = Array.isArray(rawOrders) ? rawOrders : [];
+
+        // Flatten order_details into a single array of treatments for easier filtering
+        const allTreatments = ordersArray.flatMap((order) => {
+          // Safely access order_details and ensure it's an array, defaulting to empty array if undefined/null
+          const orderDetails = Array.isArray(order?.order_details)
+            ? order.order_details
+            : [];
+
+          return orderDetails.map((detail) => ({
+            ...detail,
+            order: {
+              // Attach necessary order info to each detail
+              customer: order.customer,
+              id: order.id,
+              entry_date: order.entry_date,
+            },
+          }));
+        });
+
+        // Filter for "not_yet" status and estimasi directly in fetchAntrianData
+        const processTimeMap = {
+          regular: "regular",
+          sameDay: "same_day",
+          nextDay: "next_day",
+        };
+        const currentProcessTime = processTimeMap[estimasi];
+
+        let initialFilteredData = allTreatments.filter(
+          (item) =>
+            (item.status === "not_yet" || item.status === "on_progress") &&
+            item.process_time?.toLowerCase() === currentProcessTime
         );
 
-        // Pisahkan data berdasarkan jenis treatment
-        const cleaningData = filteredData.filter((item) =>
-          item.treatment?.name?.toLowerCase().includes("cleaning")
-        );
-
-        const repairData = filteredData.filter((item) =>
-          item.treatment?.name?.toLowerCase().includes("repair")
-        );
-
-        setCleaningCount(cleaningData.length);
-        setRepairCount(repairData.length);
-
-        // Set data berdasarkan filter yang dipilih
-        if (selectedFilter === "cleaning") {
-          setAntrianTreatment(cleaningData);
-        } else if (selectedFilter === "repair") {
-          setAntrianTreatment(repairData);
+        // Apply search query filter directly here as well
+        if (searchQuery.trim() !== "") {
+          const searchLower = searchQuery.toLowerCase();
+          initialFilteredData = initialFilteredData.filter(
+            (item) =>
+              item.order?.customer?.name?.toLowerCase().includes(searchLower) ||
+              item.treatment?.name?.toLowerCase().includes(searchLower)
+          );
         }
+
+        setAntrianTreatment(initialFilteredData); // Set this as the base data
+        setFilteredTreatments(initialFilteredData); // Initial display data
+      } else {
+        setAntrianTreatment([]);
+        setFilteredTreatments([]);
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -249,26 +170,107 @@ const Antrian = () => {
         console.error("Token tidak valid atau expired");
         navigate("/login");
       }
+      setAntrianTreatment([]);
+      setCountNextDayRepair(0);
     }
   };
 
-  const fetchAntrianCounts = async () => {
-    setCleaningCount(0);
-    setRepairCount(0);
-  };
+  // Initial data load or refetch when dateRange/estimasi/debouncedSearch changes
+  useEffect(() => {
+    // Removed antrianFromState logic here, always fetch if dateRange is available
+    if (dateRange && dateRange.startDate && dateRange.endDate) {
+      fetchAntrianData();
+    }
+  }, [dateRange, estimasi, searchQuery]); // Added estimasi and searchQuery to dependencies
+
+  // useEffect to apply cleaning/repair filter on top of the already fetched and filtered data
+  useEffect(() => {
+    // Define categories for cleaning and repair based on type_service
+    const isCleaning = (typeService) =>
+      [
+        "Deep Clean",
+        "Outside Clean",
+        "3 Deep Package",
+        "Deep Clean Extra",
+        "Garansi cuci",
+        "Medium Koper",
+        "2 Deep Clean 50rb",
+      ].includes(typeService);
+    const isRepair = (typeService) =>
+      [
+        "Reglue Minor (<10%)",
+        "Reglue (15%-25%)",
+        "Reglue (25%-50%)",
+        "Reglue (50%-75%)",
+        "Reglue (75%-100%)",
+        "Reglue (Extra)",
+        "Repaint Upper & Deep Clean",
+        "Repaint Upper Leather",
+        "Un-Yellowing",
+        "Reglue (100%)",
+        "Repaint Upper Canvas High Top",
+        "Repaint",
+        "Insole Repair",
+        "Repaint Midsole",
+        "Repaint Upper Special",
+        "Repair Leather",
+        "Outsole Repair 130",
+        "Claim Garansi Reglue",
+        "Full Reglue",
+        "Claim Garnsi",
+        "Repair 150",
+      ].includes(typeService);
+
+    let dataToFilter = antrianTreatment; // Start with the data already filtered by status and estimasi
+
+    let finalDisplayData = [];
+    if (selectedFilter === "cleaning") {
+      finalDisplayData = dataToFilter.filter((item) =>
+        isCleaning(item.treatment?.type_service)
+      );
+    } else if (selectedFilter === "repair") {
+      finalDisplayData = dataToFilter.filter((item) =>
+        isRepair(item.treatment?.type_service)
+      );
+    } else {
+      finalDisplayData = dataToFilter; // If "all" or other, show all from antrianTreatment
+    }
+
+    setFilteredTreatments(finalDisplayData);
+
+    // Update cleaningCount and repairCount based on the data filtered by estimasi (antrianTreatment)
+    setCleaningCount(
+      antrianTreatment.filter((item) =>
+        isCleaning(item.treatment?.type_service)
+      ).length
+    );
+    setRepairCount(
+      antrianTreatment.filter((item) => isRepair(item.treatment?.type_service))
+        .length
+    );
+
+    // Update overall counts for regular, same day, next day from antrianTreatment (base data)
+    // These counts are specific to the current estimasi view, so they will reflect counts within the current estimasi
+    setCountRegular(
+      antrianTreatment.filter(
+        (item) => item.process_time?.toLowerCase() === "regular"
+      ).length
+    );
+    setCountSameDay(
+      antrianTreatment.filter(
+        (item) => item.process_time?.toLowerCase() === "same_day"
+      ).length
+    );
+    setCountNextDay(
+      antrianTreatment.filter(
+        (item) => item.process_time?.toLowerCase() === "next_day"
+      ).length
+    );
+  }, [antrianTreatment, selectedFilter]); // Dependencies changed
 
   const handleFilterChange = (filter) => {
     setSelectedFilter(filter);
-    if (antrianTreatment.length > 0) {
-      const filteredData = antrianTreatment.filter(
-        (item) =>
-          item.status === "not_yet" &&
-          (filter === "cleaning"
-            ? item.treatment?.name?.toLowerCase().includes("cleaning")
-            : item.treatment?.name?.toLowerCase().includes("repair"))
-      );
-      setFilteredTreatments(filteredData);
-    }
+    // fetchAntrianData will be triggered by useEffect
   };
 
   const handleLogout = async () => {
@@ -504,9 +506,7 @@ const Antrian = () => {
                     >
                       {item.shoes_photos && item.shoes_photos.length > 0 ? (
                         <img
-                          src={getThumbnailUrl(
-                            item.shoes_photos[0].url_photo
-                          )}
+                          src={getThumbnailUrl(item.shoes_photos[0].url_photo)}
                           alt="Shoes"
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                           loading="lazy"
@@ -522,16 +522,19 @@ const Antrian = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-md md:text-base truncate">
-                        {item.name || "No Name"}
+                        {item.order?.customer?.name || "No Name"}
                       </p>
                       <p className="text-xs md:text-sm text-gray-600 truncate">
-                        {item.item?.name || "No Item"} -{" "}
-                        {item.treatment?.name || "No Treatment"}
+                        {item.item?.brand || "No Item"} (
+                        {item.treatment?.name || "No Treatment"})
                       </p>
-                      <p className="text-xs md:text-sm text-gray-500">
-                        Process: {item.process_time || "Regular"}
-                      </p>
+                      {item.description && (
+                        <p className="text-xs md:text-sm text-gray-500 truncate mt-1">
+                          ⮕ {item.description}
+                        </p>
+                      )}
                       <p className="text-xs md:text-sm text-gray-500 mt-2 font-bold">
+                        ⮕{" "}
                         {format(new Date(item.due_date), "EEEE, dd MMMM yyyy", {
                           locale: id,
                         })}
@@ -618,11 +621,15 @@ const Antrian = () => {
         onClose={() => setShowTreatmentModal(false)}
         treatment={selectedTreatment?.treatment?.name}
         description={selectedTreatment?.description}
+        brand={selectedTreatment?.item?.brand}
+        color={selectedTreatment?.item?.color}
+        shoesPhotos={selectedTreatment?.shoes_photos}
         treatmentId={selectedTreatment?.id}
         isStarted={activeTreatments[selectedTreatment?.id]?.isStarted}
         duration={activeTreatments[selectedTreatment?.id]?.duration || 0}
         onStart={handleStartTreatment}
         onCancel={handleCancelTreatment}
+        onFinish={fetchAntrianData}
       />
     </div>
   );

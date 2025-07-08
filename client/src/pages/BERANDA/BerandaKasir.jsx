@@ -6,7 +6,6 @@ import WorkTimeAlert from "../../components/WorkTimeAlert";
 import BreakTimeAlert from "../../components/BreakTimeAlert";
 import ConfirmationModal from "../../components/Modal/ConfirmationModal";
 import AnimatedButton from "../../components/Design/AnimatedButton";
-import dummyKasirAntrianData from "../../services/dummyKasirAntrianData";
 
 const BerandaKasir = () => {
   const navigate = useNavigate();
@@ -27,6 +26,7 @@ const BerandaKasir = () => {
       endDate: today,
     };
   });
+  const [fetchedOrders, setFetchedOrders] = useState([]);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showSwitchRoleModal, setShowSwitchRoleModal] = useState(false);
   const [currentTime, setCurrentTime] = useState(
@@ -39,6 +39,44 @@ const BerandaKasir = () => {
   const formatDateForDB = (dateString) => {
     const date = new Date(dateString);
     return date.toISOString().split("T")[0];
+  };
+
+  // Fungsi untuk mengambil data antrian dari API dan menghitung jumlahnya
+  const fetchAntrianCounts = async (range) => {
+    try {
+      const params = {
+        search: "",
+        startDate: formatDateForDB(range.startDate),
+        endDate: formatDateForDB(range.endDate),
+      };
+
+      const response = await axios.get(`https://api.katsikat.id/orders`, {
+        params,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.data && response.data.data && response.data.data.orders) {
+        const rawOrders = response.data.data.orders;
+        const ordersArray = Array.isArray(rawOrders) ? rawOrders : [];
+        setFetchedOrders(ordersArray);
+
+      } else {
+        setFetchedOrders([]);
+        setAntrianData({ regular: 0, same_day: 0, next_day: 0 });
+      }
+    } catch (error) {
+      console.error("Error fetching cashier orders:", error);
+      if (error.response?.status === 401) {
+        console.error("Token tidak valid atau expired");
+        navigate("/login");
+      }
+      setFetchedOrders([]);
+      setAntrianData({ regular: 0, same_day: 0, next_day: 0 });
+    }
   };
 
   // Handle perubahan input tanggal
@@ -59,20 +97,51 @@ const BerandaKasir = () => {
 
     setDateRange(newRange);
     localStorage.setItem("dateRange", JSON.stringify(newRange));
+    fetchAntrianCounts(newRange); // Panggil fetchAntrianCounts saat tanggal berubah
   };
 
   useEffect(() => {
-    // Hitung jumlah antrian berdasarkan process_time dari data dummy
-    const regular = dummyKasirAntrianData.filter(item => item.process_time === "regular").length;
-    const same_day = dummyKasirAntrianData.filter(item => item.process_time === "same_day").length;
-    const next_day = dummyKasirAntrianData.filter(item => item.process_time === "next_day").length;
-    setAntrianData({ regular, same_day, next_day });
+    // Panggil fetchAntrianCounts saat komponen pertama kali dimuat atau dateRange berubah
+    fetchAntrianCounts(dateRange);
+
     // Cek izin dan present seperti sebelumnya
     const fromIzin = sessionStorage.getItem("fromIzin");
     if (fromIzin === "true") setIsFromIzin(true);
     const fromPresent = sessionStorage.getItem("fromPresent");
     if (fromPresent === "true") setIsFromPresent(true);
-  }, [dateRange]);
+  }, [dateRange]); // Tambahkan dateRange sebagai dependency
+
+  // New useEffect to process fetchedOrders and update counts
+  useEffect(() => {
+    if (fetchedOrders.length > 0) {
+      const allTreatments = fetchedOrders.flatMap((order) => {
+        const orderDetails = Array.isArray(order?.order_details)
+          ? order.order_details
+          : [];
+        return orderDetails.map((detail) => ({ ...detail, order: order }));
+      });
+
+      // Filter for "pengeringan" or "siap" status
+      const relevantTreatments = allTreatments.filter(
+        (item) => item.status === "pengeringan" || item.status === "siap"
+      );
+
+      // Hitung jumlah antrian berdasarkan process_time dari data yang relevan
+      const regular = relevantTreatments.filter(
+        (item) => item.process_time?.toLowerCase() === "regular"
+      ).length;
+      const same_day = relevantTreatments.filter(
+        (item) => item.process_time?.toLowerCase() === "same_day"
+      ).length;
+      const next_day = relevantTreatments.filter(
+        (item) => item.process_time?.toLowerCase() === "next_day"
+      ).length;
+
+      setAntrianData({ regular, same_day, next_day });
+    } else {
+      setAntrianData({ regular: 0, same_day: 0, next_day: 0 });
+    }
+  }, [fetchedOrders]); // Depend on fetchedOrders to re-calculate counts
 
   const handleLogoutConfirm = () => {
     // Implementasi log out
@@ -83,7 +152,11 @@ const BerandaKasir = () => {
   };
 
   const handleOpenQueue = () => {
-    navigate(`/berandakasir/antriankasir/${selectedEstimasi}`, {
+    console.log("handleOpenQueue called. Current selectedEstimasi:", selectedEstimasi);
+    // Gunakan selectedEstimasi sebagai format estimasi untuk navigasi
+    const estimasiFormat = selectedEstimasi;
+
+    navigate(`/berandakasir/antriankasir/${estimasiFormat}`, {
       state: {
         dateRange,
         estimasi: selectedEstimasi,

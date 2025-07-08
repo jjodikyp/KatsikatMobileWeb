@@ -8,7 +8,6 @@ import LoadingDots from "../../components/Design/LoadingDots";
 import AnimatedButton from "../../components/Design/AnimatedButton";
 import FilterAndSearch from "../../components/Header Antrian/FilterAndSearch";
 import QualityCheckModal from "../../components/Modal/QualityCheckModal";
-import dummyKasirAntrianData from "../../services/dummyKasirAntrianData";
 
 const AntrianKasir = () => {
   const { estimasi } = useParams();
@@ -31,32 +30,113 @@ const AntrianKasir = () => {
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [notifModal, setNotifModal] = useState({ open: false, message: "" });
 
-  useEffect(() => {
-    // Filter data dummy sesuai filter dan estimasi
-    const filteredData = dummyKasirAntrianData.filter(
-      (item) =>
-        item.treatment_type?.toLowerCase() === selectedFilter.toLowerCase() &&
-        item.process_time?.toLowerCase() === estimasi?.toLowerCase()
-    );
-    setAntrianData(filteredData);
-    setFilteredAntrian(filteredData);
+  // Fungsi untuk memformat tanggal ke format database (YYYY-MM-DD)
+  const formatDateForDB = (dateString) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
 
-    // Hitung total untuk masing-masing kategori
-    setCleaningCount(
-      dummyKasirAntrianData.filter(
-        (item) =>
-          item.treatment_type?.toLowerCase() === "cleaning" &&
-          item.process_time?.toLowerCase() === estimasi?.toLowerCase()
-      ).length
-    );
-    setRepairCount(
-      dummyKasirAntrianData.filter(
-        (item) =>
-          item.treatment_type?.toLowerCase() === "repair" &&
-          item.process_time?.toLowerCase() === estimasi?.toLowerCase()
-      ).length
-    );
-  }, [selectedFilter, estimasi]);
+  // Definisi kategori Cleaning dan Repair
+  const isCleaning = (typeService) =>
+    [
+      "Deep Clean",
+      "Outside Clean",
+      "3 Deep Package",
+      "Deep Clean Extra",
+      "Garansi cuci",
+      "Medium Koper",
+      "2 Deep Clean 50rb",
+    ].includes(typeService);
+  const isRepair = (typeService) =>
+    [
+      "Reglue Minor (<10%)",
+      "Reglue (15%-25%)",
+      "Reglue (25%-50%)",
+      "Reglue (50%-75%)",
+      "Reglue (75%-100%)",
+      "Reglue (Extra)",
+      "Repaint Upper & Deep Clean",
+      "Repaint Upper Leather",
+      "Un-Yellowing",
+      "Reglue (100%)",
+      "Repaint Upper Canvas High Top",
+      "Repaint",
+      "Insole Repair",
+      "Repaint Midsole",
+      "Repaint Upper Special",
+      "Repair Leather",
+      "Outsole Repair 130",
+      "Claim Garansi Reglue",
+      "Full Reglue"
+    ].includes(typeService);
+
+  // Fungsi untuk mengambil data antrian dari API
+  const fetchAntrianData = async () => {
+    try {
+      const formattedStartDate = formatDateForDB(dateRange.startDate);
+      const formattedEndDate = formatDateForDB(dateRange.endDate);
+
+      const params = {
+        search: searchQuery || "",
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+      };
+
+      const response = await axios.get(`https://api.katsikat.id/orders`, {
+        params,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.data && response.data.data && response.data.data.orders) {
+        const rawOrders = response.data.data.orders;
+        const ordersArray = Array.isArray(rawOrders) ? rawOrders : [];
+
+        // Flatten order_details into a single array of treatments
+        const allTreatments = ordersArray.flatMap((order) => {
+          const orderDetails = Array.isArray(order?.order_details)
+            ? order.order_details
+            : [];
+          return orderDetails.map((detail) => ({ ...detail, order: order }));
+        });
+
+        // Filter for "pengeringan" or "siap" status and selected estimasi
+        const processTimeMap = {
+          regular: "regular",
+          same_day: "same_day", // Perhatikan ini, harus sama dengan yang di BerandaKasir
+          next_day: "next_day",
+        };
+        const currentProcessTime = processTimeMap[estimasi];
+
+        const filteredByStatusAndEstimasi = allTreatments.filter(
+          (item) =>
+            (item.status === "pengeringan" || item.status === "siap") &&
+            item.process_time?.toLowerCase() === currentProcessTime
+        );
+
+        setAntrianData(filteredByStatusAndEstimasi); // Data dasar untuk filter cleaning/repair
+      } else {
+        setAntrianData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching cashier orders:", error);
+      if (error.response?.status === 401) {
+        console.error("Token tidak valid atau expired");
+        navigate("/login");
+      }
+      setAntrianData([]);
+    }
+  };
+
+  // Effect untuk memanggil fetchAntrianData
+  useEffect(() => {
+    if (dateRange && dateRange.startDate && dateRange.endDate && estimasi) {
+      fetchAntrianData();
+    }
+  }, [dateRange, estimasi, searchQuery]); // Tambahkan dependencies
 
   // Debounce search query
   useEffect(() => {
@@ -66,26 +146,60 @@ const AntrianKasir = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Filter data berdasarkan pencarian
+  // Filter data berdasarkan pencarian dan selectedFilter (cleaning/repair)
   useEffect(() => {
-    if (debouncedSearch.trim() === "") {
-      setFilteredAntrian(antrianData);
-    } else {
+    let currentFiltered = antrianData; // Start with data already filtered by status and estimasi
+
+    if (debouncedSearch.trim() !== "") {
       const searchLower = debouncedSearch.toLowerCase();
-      const filtered = antrianData.filter(
+      currentFiltered = currentFiltered.filter(
         (item) =>
-          item.name.toLowerCase().includes(searchLower) ||
-          item.treatment_type.toLowerCase().includes(searchLower)
+          item.order?.customer?.name?.toLowerCase().includes(searchLower) ||
+          item.treatment?.name?.toLowerCase().includes(searchLower)
       );
-      setFilteredAntrian(filtered);
     }
-  }, [debouncedSearch, antrianData]);
+
+    // Apply cleaning/repair filter
+    let finalDisplayData = [];
+    if (selectedFilter === "cleaning") {
+      finalDisplayData = currentFiltered.filter((item) =>
+        isCleaning(item.treatment?.type_service)
+      );
+    } else if (selectedFilter === "repair") {
+      finalDisplayData = currentFiltered.filter((item) =>
+        isRepair(item.treatment?.type_service)
+      );
+    } else {
+      finalDisplayData = currentFiltered; // If "all" or other, show all from currentFiltered (after search)
+    }
+
+    setFilteredAntrian(finalDisplayData);
+
+    // Update counts for cleaning and repair based on the base antrianData
+    setCleaningCount(
+      antrianData.filter((item) => isCleaning(item.treatment?.type_service))
+        .length
+    );
+    setRepairCount(
+      antrianData.filter((item) => isRepair(item.treatment?.type_service))
+        .length
+    );
+  }, [debouncedSearch, antrianData, selectedFilter]);
 
   const handleFilterChange = (filter) => {
     setSelectedFilter(filter);
   };
 
   const getThumbnailUrl = (originalUrl) => {
+    // Jika menggunakan Cloudinary
+    if (originalUrl.includes("cloudinary")) {
+      return originalUrl.replace("/upload/", "/upload/w_200,h_200,c_fill/");
+    }
+    // Jika menggunakan ImageKit
+    if (originalUrl.includes("imagekit")) {
+      return originalUrl + "?tr=w-200,h-200";
+    }
+    // Jika tidak menggunakan CDN, gunakan URL original
     return originalUrl;
   };
 
@@ -95,99 +209,46 @@ const AntrianKasir = () => {
     setShowQCModal(true);
   };
 
-  const removeDummyItem = (id) => {
-    const idx = dummyKasirAntrianData.findIndex((item) => item.id === id);
-    if (idx !== -1) dummyKasirAntrianData.splice(idx, 1);
-  };
-
-  const updateDummyStatus = (id, status) => {
-    const idx = dummyKasirAntrianData.findIndex((item) => item.id === id);
-    if (idx !== -1) dummyKasirAntrianData[idx].status = status;
-  };
-
   const handleQCSubmit = async (result) => {
     try {
-      // Step 1: POST ke /qualityControl
-      const qcPayload = {
-        treatment_id: selectedItemId,
-        qc_status: result.status,
-        ...(result.status === "failed" && {
-          rejection_reason: result.reason,
-        }),
-        ...(result.status === "passed" && {
-          delivery_method: result.deliveryOption,
-          ...(result.deliveryOption === "pickup" && {
-            outlet_name: "Outlet A", // Bisa disesuaikan dengan data outlet yang tersedia
-          }),
-          ...(result.deliveryOption === "delivery" && {
-            delivery_date: result.deliveryDateTime.split(" ")[0],
-            delivery_time: result.deliveryDateTime.split(" ")[1],
-          }),
-        }),
-      };
+      // Step 1: Tidak perlu POST ke /qualityControl lagi
 
-      // POST quality control data
-      await axios.post(
-        "https://680340c50a99cb7408eb7488.mockapi.io/api/test/qualityControl",
-        qcPayload
-      );
-
-      // Step 2: PATCH status treatment
+      // Step 2: PATCH status treatment (gunakan API yang benar)
       const updateData = {
-        status: result.status,
+        status: result.status, // Gunakan langsung result.status
       };
 
       await axios.put(
-        `https://680340c50a99cb7408eb7488.mockapi.io/api/test/treatments/${selectedItemId}`,
-        updateData
+        `https://api.katsikat.id/order-details/${selectedItemId}`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
       );
 
-      if (result.status === "failed") {
-        // Hapus dari dummy
-        removeDummyItem(selectedItemId);
-        setAntrianData((prev) =>
-          prev.filter((item) => item.id !== selectedItemId)
-        );
-        setFilteredAntrian((prev) =>
-          prev.filter((item) => item.id !== selectedItemId)
-        );
-        setNotifModal({
-          open: true,
-          message:
-            "Item sudah dikirim kembali ke antrian teknisi untuk dilakukan treatment ulang.",
-        });
-      } else {
-        // Update status di dummy
-        updateDummyStatus(selectedItemId, "passed");
-        setAntrianData((prev) =>
-          prev.map((item) =>
-            item.id === selectedItemId ? { ...item, status: "passed" } : item
-          )
-        );
-        setFilteredAntrian((prev) =>
-          prev.map((item) =>
-            item.id === selectedItemId ? { ...item, status: "passed" } : item
-          )
-        );
-      }
+      // Refresh data setelah update
+      fetchAntrianData(); // Panggil fetchAntrianData untuk memuat ulang data terbaru
+      setNotifModal({
+        open: true,
+        message: `Status item diperbarui menjadi ${result.status}`,
+      });
 
       setShowQCModal(false);
       setSelectedQCType(null);
       setSelectedItemId(null);
     } catch (error) {
       console.error("Error processing QC:", error);
-      // Bisa tambahkan notifikasi error ke user
+      setNotifModal({ open: true, message: "Error updating status." });
     }
   };
 
   const handleOpenQueue = () => {
     // Konversi format estimasi jika diperlukan
-    const estimasiFormat =
-      {
-        regular: "regular",
-        same_day: "same_day",
-        next_day: "next_day",
-      }[selectedEstimasi] || selectedEstimasi;
+    const estimasiFormat = estimasi; // estimasi sudah sesuai dari useParams
 
     navigate(`/berandakasir/antriankasir/${estimasiFormat}`, {
       state: {
@@ -224,42 +285,48 @@ const AntrianKasir = () => {
                   className="bg-white rounded-3xl p-4 outline outline-1 outline-[#C1C1C1] relative"
                 >
                   {/* Badge status untuk QC */}
-                  {item.status === "passed" && (
+                  {item.status === "siap" && (
                     <div className="absolute top-4 right-4 bg-[#2E7CF6] text-white text-xs font-bold px-3 py-1 rounded-full">
                       Lolos QC
-                    </div>
-                  )}
-                  {item.status === "failed" && (
-                    <div className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                      Tidak Lolos QC
                     </div>
                   )}
                   <div className="flex items-start gap-4">
                     <div
                       className="w-[100px] h-[100px] min-w-[100px] bg-gray-200 rounded-lg overflow-hidden shadow-md cursor-pointer"
                       onClick={() => {
-                        setSelectedImage(item.image_url);
-                        setShowModal(true);
+                        if (item.shoes_photos && item.shoes_photos.length > 0) {
+                          setSelectedImage(item.shoes_photos[0].url_photo);
+                          setShowModal(true);
+                        }
                       }}
                     >
                       {imageLoading && <LoadingDots />}
-                      <img
-                        src={item.image_url}
-                        alt="Shoes"
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                        onLoad={() => setImageLoading(false)}
-                      />
+                      {item.shoes_photos && item.shoes_photos.length > 0 ? (
+                        <img
+                          src={getThumbnailUrl(item.shoes_photos[0].url_photo)}
+                          alt="Shoes"
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          onLoad={() => setImageLoading(false)}
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                          <span className="text-gray-400 text-sm">
+                            No Image
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-md md:text-base truncate">
-                        {item.name}
+                        {item.order?.customer?.name || "No Name"}
                       </p>
                       <p className="text-xs md:text-sm text-gray-600 truncate">
-                        {item.treatment_type}
+                        {item.item?.brand || "No Item"} (
+                        {item.treatment?.name || "No Treatment"})
                       </p>
                       <p className="text-xs md:text-sm text-gray-500 mt-1 line-clamp-2 text-[#AA3328]">
-                        {item.note}
+                        {item.description}
                       </p>
                       <p className="text-xs md:text-sm text-gray-500 mt-2 font-bold">
                         {format(new Date(item.due_date), "EEEE, dd MMMM yyyy", {
@@ -270,32 +337,32 @@ const AntrianKasir = () => {
                   </div>
                   <div className="flex gap-2 mt-4">
                     <AnimatedButton
-                      onClick={() => handleStatusUpdate(item.id, "failed")}
+                      onClick={() => handleStatusUpdate(item.id, "not_yet")}
                       className={`flex-1 h-[35px] rounded-xl flex items-center justify-center text-sm font-semibold
                         ${
-                          item.status === "failed"
-                            ? "bg-red-500 text-white"
-                            : item.status === "passed"
-                            ? "bg-red-200 text-red-400 cursor-not-allowed"
-                            : "bg-white text-red-500 outline outline-1 outline-red-500 hover:bg-red-50"
+                          item.status === "not_yet"
+                            ? "bg-[#2E7CF6] text-white"
+                            : item.status === "siap"
+                            ? "bg-[blue-100] text-white cursor-not-allowed"
+                            : "bg-[#FFEEEE] text-[#E55050] hover:bg-blue-50"
                         }
                       `}
-                      disabled={item.status === "passed"}
+                      disabled={item.status === "siap"}
                     >
                       Tidak Lolos
                     </AnimatedButton>
                     <AnimatedButton
-                      onClick={() => handleStatusUpdate(item.id, "passed")}
+                      onClick={() => handleStatusUpdate(item.id, "siap")}
                       className={`flex-1 h-[35px] rounded-xl flex items-center justify-center text-sm font-semibold
                         ${
-                          item.status === "passed"
+                          item.status === "siap"
                             ? "bg-[#2E7CF6] text-white"
-                            : item.status === "failed"
+                            : item.status === "not_yet"
                             ? "bg-blue-100 text-blue-400 cursor-not-allowed"
                             : "bg-[#E6EFF9] text-[#2E7CF6] hover:bg-blue-50"
                         }
                       `}
-                      disabled={item.status === "failed"}
+                      disabled={item.status === "not_yet"}
                     >
                       Lolos
                     </AnimatedButton>

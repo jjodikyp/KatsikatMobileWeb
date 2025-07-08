@@ -9,14 +9,14 @@ const QualityCheckModal = ({ isOpen, onClose, type, onSubmit }) => {
   const [deliveryTime, setDeliveryTime] = useState("");
 
   const handleSubmit = () => {
-    if (type === "failed") {
+    if (type === "not_yet") {
       onSubmit({
-        status: "failed",
+        status: "not_yet",
         reason: reason
       });
     } else {
       onSubmit({
-        status: "passed",
+        status: "siap",
         deliveryOption,
         ...(deliveryOption === "delivery" && {
           deliveryDateTime: `${deliveryDate} ${deliveryTime}`
@@ -71,7 +71,7 @@ const QualityCheckModal = ({ isOpen, onClose, type, onSubmit }) => {
               {/* Header */}
               <div className="bg-gradient-to-r from-[#5096FC] to-[#7BD1FD] px-6 py-3">
                 <h3 className="text-lg font-semibold text-white">
-                  {type === "failed"
+                  {type === "not_yet"
                     ? "Tidak Lolos Quality Check"
                     : "Lolos Quality Check"}
                 </h3>
@@ -79,7 +79,7 @@ const QualityCheckModal = ({ isOpen, onClose, type, onSubmit }) => {
 
               {/* Content */}
               <div className="px-6 py-4">
-                {type === "failed" ? (
+                {type === "not_yet" ? (
                   // Form untuk Tidak Lolos
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -186,14 +186,14 @@ const QualityCheckModal = ({ isOpen, onClose, type, onSubmit }) => {
                   onClick={handleSubmit}
                   variant="blue"
                   disabled={
-                    (type === "failed" && !reason) ||
-                    (type === "passed" && !deliveryOption) ||
+                    (type === "not_yet" && !reason) ||
+                    (type === "siap" && !deliveryOption) ||
                     (deliveryOption === "delivery" &&
                       (!deliveryDate || !deliveryTime))
                   }
                   className={`px-4 py-2 rounded-lg text-white transition-colors ${
-                    (type === "failed" && reason) ||
-                    (type === "passed" &&
+                    (type === "not_yet" && reason) ||
+                    (type === "siap" &&
                       deliveryOption &&
                       (deliveryOption === "pickup" ||
                         (deliveryDate && deliveryTime)))

@@ -11,9 +11,9 @@ const FilterSection = ({
   return (
     <div className="flex justify-between items-center">
       <h1 className="text-2xl font-bebas">
-        {estimasi === "sameDay"
+        {estimasi === "same_day"
           ? "Same Day"
-          : estimasi === "nextDay"
+          : estimasi === "next_day"
           ? "Next Day"
           : "Regular"}
       </h1>

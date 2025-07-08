@@ -16,7 +16,6 @@ import Header from "../../components/Com Header/Header";
 import WorkTimeAlert from "../../components/WorkTimeAlert";
 import BreakTimeAlert from "../../components/BreakTimeAlert";
 import AnimatedButton from "../../components/Design/AnimatedButton";
-import dummyAntrianData from "../../services/dummyAntrianData";
 
 // Konfigurasi axios interceptor
 axios.interceptors.request.use(
@@ -39,6 +38,7 @@ const BerandaTeknisi = () => {
   const [userData, setUserData] = useState(null);
   const [selectedEstimasi, setSelectedEstimasi] = useState("regular");
   const [antrianData, setAntrianData] = useState(null);
+  const [fetchedOrders, setFetchedOrders] = useState([]);
   const [antrianTreatment, setAntrianTreatment] = useState([]);
   const [dateRange, setDateRange] = useState(() => {
     const savedRange = localStorage.getItem("dateRange");
@@ -225,11 +225,22 @@ const BerandaTeknisi = () => {
       console.log("Request Headers:", response.config.headers);
       console.log("Response:", response.data);
 
-      if (response.data && response.data.data) {
+      if (response.data && response.data.data && response.data.data.orders) {
+        // Ensure response.data.data.orders is always an array
+        const rawOrders = response.data.data.orders;
+        const ordersArray = Array.isArray(rawOrders) ? rawOrders : [];
+
         setAntrianData({
-          total: response.data.data.length,
+          total: ordersArray.length,
         });
-        setAntrianTreatment(response.data.data);
+        setFetchedOrders(ordersArray); // Set raw fetched orders here
+      } else {
+        setFetchedOrders([]); // Clear fetchedOrders
+        setAntrianTreatment([]);
+        setCountRegular(0);
+        setCountSameDay(0);
+        setCountNextDay(0);
+        setAntrianData({ total: 0 });
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -238,6 +249,12 @@ const BerandaTeknisi = () => {
         // Redirect ke login jika token expired
         navigate("/login");
       }
+      setFetchedOrders([]);
+      setAntrianTreatment([]);
+      setCountRegular(0);
+      setCountSameDay(0);
+      setCountNextDay(0);
+      setAntrianData({ total: 0 });
     }
   };
 
@@ -246,42 +263,58 @@ const BerandaTeknisi = () => {
   }, []);
 
   useEffect(() => {
-    // Total Regular (Cleaning + Repair)
-    setCountRegular(
-      dummyAntrianData.filter((item) => item.process_time === "Regular").length
-    );
-    // Total Same Day (Cleaning + Repair)
-    setCountSameDay(
-      dummyAntrianData.filter((item) => item.process_time === "Same Day").length
-    );
-    // Total Next Day (Cleaning + Repair)
-    setCountNextDay(
-      dummyAntrianData.filter((item) => item.process_time === "Next Day").length
-    );
-
-    // Filter data sesuai estimasi yang dipilih
-    let filtered = [];
-    if (selectedEstimasi === "regular") {
-      filtered = dummyAntrianData.filter(
-        (item) => item.process_time === "Regular"
-      );
-    } else if (selectedEstimasi === "sameDay") {
-      filtered = dummyAntrianData.filter(
-        (item) => item.process_time === "Same Day"
-      );
-    } else if (selectedEstimasi === "nextDay") {
-      filtered = dummyAntrianData.filter(
-        (item) => item.process_time === "Next Day"
-      );
-    }
-    setAntrianTreatment(filtered);
-
     // Cek izin dan present seperti sebelumnya
     const fromIzin = sessionStorage.getItem("fromIzin");
     if (fromIzin === "true") setIsFromIzin(true);
     const fromPresent = sessionStorage.getItem("fromPresent");
     if (fromPresent === "true") setIsFromPresent(true);
-  }, [dateRange, selectedEstimasi]);
+  }, []);
+
+  useEffect(() => {
+    console.log("fetchedOrders at useEffect start:", fetchedOrders);
+    // Flatten order_details to get all individual treatments with order info
+    const allTreatments = fetchedOrders
+      .filter(order => order && typeof order === 'object') // Pastikan tidak ada order null/undefined atau non-objek
+      .flatMap((order) => {
+        // Pastikan orderDetails adalah array, default ke array kosong jika order.order_details undefined atau bukan array
+        const orderDetails = Array.isArray(order?.order_details) ? order.order_details : [];
+
+        // Sekarang filter keluar setiap detail null/undefined atau non-objek dari array yang valid
+        const filteredDetails = orderDetails.filter(detail => detail && typeof detail === 'object');
+
+        return filteredDetails.map((detail) => ({ ...detail, order: order }));
+      });
+    console.log("All treatments (flattened) in BerandaTeknisi:", allTreatments);
+
+    // Filter for "not_yet" status for counts and display
+    const allNotYetTreatments = allTreatments.filter(item => item.status === "not_yet");
+    console.log("All 'not_yet' treatments in BerandaTeknisi:", allNotYetTreatments);
+
+    // Calculate total counts for each estimasi from not_yet treatments
+    const regularCount = allNotYetTreatments.filter((item) => item.process_time?.toLowerCase() === "regular").length;
+    const sameDayCount = allNotYetTreatments.filter((item) => item.process_time?.toLowerCase() === "same_day").length;
+    const nextDayCount = allNotYetTreatments.filter((item) => item.process_time?.toLowerCase() === "next_day").length;
+
+    setCountRegular(regularCount);
+    setCountSameDay(sameDayCount);
+    setCountNextDay(nextDayCount);
+
+    console.log("Counts - Regular:", regularCount, "Same Day:", sameDayCount, "Next Day:", nextDayCount);
+
+    // Filter data for display based on selected estimasi
+    const processTimeMap = {
+      regular: "regular",
+      sameDay: "same_day",
+      nextDay: "next_day",
+    };
+    const currentProcessTime = processTimeMap[selectedEstimasi];
+
+    const filteredForDisplay = allNotYetTreatments.filter(
+      (item) => item.process_time?.toLowerCase() === currentProcessTime
+    );
+    setAntrianTreatment(filteredForDisplay); // Set the filtered data to antrianTreatment
+
+  }, [fetchedOrders, selectedEstimasi]);
 
   // Debug state changes
   useEffect(() => {
@@ -291,40 +324,7 @@ const BerandaTeknisi = () => {
   // Ubah fungsi filterTreatment
   const filterTreatment = async (estimasi) => {
     setSelectedEstimasi(estimasi);
-    try {
-      const formattedStartDate = formatDateForDB(dateRange.startDate);
-      const formattedEndDate = formatDateForDB(dateRange.endDate);
-
-      const baseUrl = `${import.meta.env.VITE_API_URL}/api/order-details`;
-      let response;
-
-      if (estimasi === "all") {
-        response = await axios.get(baseUrl, {
-          params: {
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
-          },
-        });
-      } else {
-        const processTime =
-          estimasi === "sameDay"
-            ? "same_day"
-            : estimasi === "nextDay"
-            ? "next_day"
-            : "regular";
-        response = await axios.get(`${baseUrl}/process/${processTime}`, {
-          params: {
-            startDate: formattedStartDate,
-            endDate: formattedEndDate,
-          },
-        });
-      }
-
-      setAntrianTreatment(response.data.data);
-    } catch (error) {
-      console.error("Error fetching filtered data:", error);
-      setAntrianTreatment([]);
-    }
+    // fetchAntrianData will be triggered by useEffect due to selectedEstimasi change
   };
 
   const handleLogout = () => {
@@ -344,7 +344,7 @@ const BerandaTeknisi = () => {
     if (userDataFromStorage) {
       const parsedUserData = JSON.parse(userDataFromStorage);
       setUserData(parsedUserData);
-      console.log("User data loaded:", parsedUserData); // untuk debugging
+      console.log("User data loaded:", parsedUserData);
     }
   }, []);
 
