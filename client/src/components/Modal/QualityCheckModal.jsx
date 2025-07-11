@@ -1,30 +1,88 @@
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import AnimatedButton from "../Design/AnimatedButton";
+import axios from "axios";
 
-const QualityCheckModal = ({ isOpen, onClose, type, onSubmit }) => {
+
+const QualityCheckModal = ({ isOpen, onClose, type, onSubmit, dataItem }) => {
   const [reason, setReason] = useState("");
   const [deliveryOption, setDeliveryOption] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [deliveryTime, setDeliveryTime] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = () => {
-    if (type === "not_yet") {
-      onSubmit({
-        status: "not_yet",
-        reason: reason
-      });
-    } else {
-      onSubmit({
-        status: "siap",
-        deliveryOption,
-        ...(deliveryOption === "delivery" && {
-          deliveryDateTime: `${deliveryDate} ${deliveryTime}`
-        })
-      });
+
+  const handleSubmit = async () => {
+    console.log("Submitting quality check:");
+    console.log("dataItem:", dataItem);
+
+    if (!dataItem?.id) {
+      setErrorMsg("ID order detail tidak ditemukan.");
+      return;
     }
-    onClose();
+
+    if (type === "not_yet") {
+      const result = await onSubmit({
+        description: reason,
+        status: "not_yet",
+      });
+
+      if (result.success) {
+        onClose();
+      } else {
+        setErrorMsg(result.message);
+      }
+
+    } else {
+      if (!deliveryOption) {
+        setErrorMsg("Pilih metode pengambilan terlebih dahulu.");
+        return;
+      }
+
+      const payload = {
+        pickup_method: deliveryOption,
+        delivery_date: deliveryOption === "delivery" ? deliveryDate : null,
+        delivery_time: deliveryOption === "delivery" ? deliveryTime : null,
+        courier_id: null,
+        delivery_status: deliveryOption === "delivery" ? "scheduled" : null,
+        status: "siap",
+      };
+
+      console.log("Payload for update:", payload);
+
+      const result = await onSubmit(payload);
+
+      if (result.success) {
+        onClose();
+      } else {
+        setErrorMsg(result.message);
+      }
+    }
   };
+
+  const handleUpdateOrderDetail = async (data) => {
+    try {
+      const res = await axios.put(
+        `https://api.katsikat.id/order-details/${dataItem.id}`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("Berhasil update:", res.data);
+      return { success: true };
+    } catch (err) {
+      console.error("Gagal update:", err);
+      const msg =
+        err?.response?.data?.message || "Gagal menyimpan data.";
+      return { success: false, message: msg };
+    }
+  };
+
 
   return (
     <AnimatePresence>
@@ -102,11 +160,10 @@ const QualityCheckModal = ({ isOpen, onClose, type, onSubmit }) => {
                       </label>
                       <div className="grid grid-cols-2 gap-4">
                         <AnimatedButton
-                          className={`cursor-pointer p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition-all ${
-                            deliveryOption === "pickup"
-                              ? "bg-[#57AEFF] text-white"
-                              : "bg-[#E6EFF9] text-gray-600"
-                          }`}
+                          className={`cursor-pointer p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition-all ${deliveryOption === "pickup"
+                            ? "bg-[#57AEFF] text-white"
+                            : "bg-[#E6EFF9] text-gray-600"
+                            }`}
                           onClick={() => setDeliveryOption("pickup")}
                         >
                           <animated-icons
@@ -122,11 +179,10 @@ const QualityCheckModal = ({ isOpen, onClose, type, onSubmit }) => {
                         </AnimatedButton>
 
                         <AnimatedButton
-                          className={`cursor-pointer p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition-all ${
-                            deliveryOption === "delivery"
-                              ? "bg-[#57AEFF] text-white"
-                              : "bg-[#E6EFF9] text-gray-600"
-                          }`}
+                          className={`cursor-pointer p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition-all ${deliveryOption === "delivery"
+                            ? "bg-[#57AEFF] text-white"
+                            : "bg-[#E6EFF9] text-gray-600"
+                            }`}
                           onClick={() => setDeliveryOption("delivery")}
                         >
                           <animated-icons
@@ -176,6 +232,11 @@ const QualityCheckModal = ({ isOpen, onClose, type, onSubmit }) => {
 
               {/* Footer */}
               <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-2">
+                {errorMsg && (
+                  <div className="text-red-500 text-sm font-medium">
+                    ⚠ {errorMsg}
+                  </div>
+                )}
                 <AnimatedButton
                   onClick={onClose}
                   className="px-4 py-2 rounded-xl text-black opacity-100 outline outline-1 outline-black font-semibold"
@@ -191,15 +252,14 @@ const QualityCheckModal = ({ isOpen, onClose, type, onSubmit }) => {
                     (deliveryOption === "delivery" &&
                       (!deliveryDate || !deliveryTime))
                   }
-                  className={`px-4 py-2 rounded-lg text-white transition-colors ${
-                    (type === "not_yet" && reason) ||
+                  className={`px-4 py-2 rounded-lg text-white transition-colors ${(type === "not_yet" && reason) ||
                     (type === "siap" &&
                       deliveryOption &&
                       (deliveryOption === "pickup" ||
                         (deliveryDate && deliveryTime)))
-                      ? "bg-[#57AEFF] hover:bg-[#4a91d8]"
-                      : "bg-gray-400 cursor-not-allowed"
-                  }`}
+                    ? "bg-[#57AEFF] hover:bg-[#4a91d8]"
+                    : "bg-gray-400 cursor-not-allowed"
+                    }`}
                 >
                   Konfirmasi
                 </AnimatedButton>
