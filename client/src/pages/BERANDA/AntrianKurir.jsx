@@ -1,29 +1,63 @@
 import { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import AntrianHeader from '../../components/Header Antrian/AntrianHeader';
 import AntrianKurirContent from '../../components/AntrianKurirContent';
 import AnimatedButton from '../../components/Design/AnimatedButton';
 import WhatsAppFormatter from '../../components/WhatsAppMessage/WhatsAppFormatter';
-import dummyKurirAntrianData from '../../services/dummyKurirAntrianData';
+import { getKurirAntrianData, updateOrderStatus } from '../../services/kurirService';
 
 const AntrianKurir = () => {
   const { type } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { dateRange } = location.state || {};
 
   const [antrianData, setAntrianData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filteredAntrian, setFilteredAntrian] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Filter data sesuai type (pickup/delivery)
-    const filtered = dummyKurirAntrianData.filter(item => item.type === type);
-    setAntrianData(filtered);
-    setFilteredAntrian(filtered);
-  }, [type]);
+    const fetchAntrianData = async () => {
+      setLoading(true);
+      try {
+        // Ambil data dari API dengan rentang waktu dari location state atau default
+        const currentDateRange = dateRange || {
+          startDate: new Date().toISOString().split('T')[0],
+          endDate: new Date().toISOString().split('T')[0]
+        };
+        
+        const data = await getKurirAntrianData(currentDateRange);
+        
+        // Filter data sesuai pickup_method (pickup/delivery)
+        const filtered = data.filter(item => item.pickup_method === type);
+        setAntrianData(filtered);
+        setFilteredAntrian(filtered);
+        
+        console.log(`Antrian ${type}:`, {
+          totalData: data.length,
+          filteredData: filtered.length,
+          pickupCount: data.filter(item => item.pickup_method === 'pickup').length,
+          deliveryCount: data.filter(item => item.pickup_method === 'delivery').length
+        });
+      } catch (error) {
+        console.error('Error fetching antrian data:', error);
+        if (error.response?.status === 401) {
+          console.error('Token tidak valid atau expired');
+          navigate('/login');
+        }
+        setAntrianData([]);
+        setFilteredAntrian([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAntrianData();
+  }, [type, dateRange]);
 
   // Debounce search query
   useEffect(() => {
@@ -52,38 +86,74 @@ const AntrianKurir = () => {
     window.open(url, '_blank');
   };
 
-  const handleStartDelivery = (id) => {
-    setAntrianData(prevData => 
-      prevData.map(item => 
-        item.id === id ? { ...item, status: 'ongoing' } : item
-      )
-    );
-    
-    const item = antrianData.find(item => item.id === id);
-    if (item) {
-      const message = WhatsAppFormatter.formatStartDeliveryMessage(type);
-      handleWhatsApp(item.phone, message);
+  const handleStartDelivery = async (id) => {
+    try {
+      // Update status di API
+      await updateOrderStatus(id, 'ongoing');
+      
+      // Update state lokal
+      setAntrianData(prevData => 
+        prevData.map(item => 
+          item.id === id ? { ...item, status: 'ongoing' } : item
+        )
+      );
+      
+      const item = antrianData.find(item => item.id === id);
+      if (item) {
+        const message = WhatsAppFormatter.formatStartDeliveryMessage(type);
+        handleWhatsApp(item.phone, message);
+      }
+    } catch (error) {
+      console.error('Error starting delivery:', error);
+      if (error.response?.status === 401) {
+        console.error('Token tidak valid atau expired');
+        navigate('/login');
+      }
     }
   };
 
-  const handleCancelDelivery = (id) => {
-    setAntrianData(prevData => 
-      prevData.map(item => 
-        item.id === id ? { ...item, status: 'pending' } : item
-      )
-    );
+  const handleCancelDelivery = async (id) => {
+    try {
+      // Update status di API
+      await updateOrderStatus(id, 'pending');
+      
+      // Update state lokal
+      setAntrianData(prevData => 
+        prevData.map(item => 
+          item.id === id ? { ...item, status: 'pending' } : item
+        )
+      );
+    } catch (error) {
+      console.error('Error canceling delivery:', error);
+      if (error.response?.status === 401) {
+        console.error('Token tidak valid atau expired');
+        navigate('/login');
+      }
+    }
   };
 
-  const handleCompleteDelivery = (id) => {
-    const item = antrianData.find(item => item.id === id);
-    if (item) {
-      const message = WhatsAppFormatter.formatCompletionMessage();
-      handleWhatsApp(item.phone, message);
+  const handleCompleteDelivery = async (id) => {
+    try {
+      // Update status di API
+      await updateOrderStatus(id, 'completed');
+      
+      const item = antrianData.find(item => item.id === id);
+      if (item) {
+        const message = WhatsAppFormatter.formatCompletionMessage();
+        handleWhatsApp(item.phone, message);
+      }
+      
+      // Hapus dari state lokal
+      setAntrianData(prevData => 
+        prevData.filter(item => item.id !== id)
+      );
+    } catch (error) {
+      console.error('Error completing delivery:', error);
+      if (error.response?.status === 401) {
+        console.error('Token tidak valid atau expired');
+        navigate('/login');
+      }
     }
-    
-    setAntrianData(prevData => 
-      prevData.filter(item => item.id !== id)
-    );
   };
 
   return (
@@ -117,6 +187,7 @@ const AntrianKurir = () => {
           handleStartDelivery={handleStartDelivery}
           handleCancelDelivery={handleCancelDelivery}
           handleCompleteDelivery={handleCompleteDelivery}
+          loading={loading}
         />
       </main>
     </div>

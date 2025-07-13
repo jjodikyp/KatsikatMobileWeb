@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import Header from "../../components/Com Header/Header";
 import WorkTimeAlert from "../../components/WorkTimeAlert";
 import BreakTimeAlert from "../../components/BreakTimeAlert";
 import AnimatedButton from "../../components/Design/AnimatedButton";
-import dummyKurirAntrianData from "../../services/dummyKurirAntrianData";
+import { getKurirAntrianData } from "../../services/kurirService";
 
 const BerandaKurir = () => {
   const navigate = useNavigate();
@@ -28,6 +27,7 @@ const BerandaKurir = () => {
   const [countRegular, setCountRegular] = useState(0);
   const [countSameDay, setCountSameDay] = useState(0);
   const [countNextDay, setCountNextDay] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   // Fungsi untuk memformat tanggal ke format database (YYYY-MM-DD)
   const formatDateForDB = (dateString) => {
@@ -57,14 +57,57 @@ const BerandaKurir = () => {
   };
 
   useEffect(() => {
-    // Hitung jumlah antrian pickup dan delivery dari data dummy
-    const pickup = dummyKurirAntrianData.filter(
-      (item) => item.status === "pending" && item.type === "pickup"
-    ).length;
-    const delivery = dummyKurirAntrianData.filter(
-      (item) => item.status === "pending" && item.type === "delivery"
-    ).length;
-    setAntrianData({ pickup, delivery });
+    const fetchAntrianData = async () => {
+      setLoading(true);
+      try {
+        const data = await getKurirAntrianData(dateRange);
+        
+        console.log('Beranda Kurir - Raw data:', data);
+        console.log('Beranda Kurir - Data status counts:', {
+          siap: data.filter(item => item.status === 'siap').length,
+          pending: data.filter(item => item.status === 'pending').length,
+          ongoing: data.filter(item => item.status === 'ongoing').length,
+          completed: data.filter(item => item.status === 'completed').length
+        });
+        console.log('Beranda Kurir - Data pickup_method counts:', {
+          pickup: data.filter(item => item.pickup_method === 'pickup').length,
+          delivery: data.filter(item => item.pickup_method === 'delivery').length
+        });
+        
+        // Hitung jumlah antrian pickup dan delivery dari data API
+        const pickup = data.filter(
+          (item) => item.status === "siap" && item.pickup_method === "pickup"
+        ).length;
+        
+        const delivery = data.filter(
+          (item) => item.status === "siap" && item.pickup_method === "delivery"
+        ).length;
+        
+        console.log('Beranda Kurir - Final counts:', { pickup, delivery });
+        console.log('Beranda Kurir - Verification:', {
+          totalData: data.length,
+          siapData: data.filter(item => item.status === 'siap').length,
+          pickupMethodPickup: data.filter(item => item.pickup_method === 'pickup').length,
+          pickupMethodDelivery: data.filter(item => item.pickup_method === 'delivery').length,
+          calculatedPickup: pickup,
+          calculatedDelivery: delivery
+        });
+        
+        setAntrianData({ pickup, delivery });
+      } catch (error) {
+        console.error('Error fetching antrian data:', error);
+        if (error.response?.status === 401) {
+          console.error('Token tidak valid atau expired');
+          navigate('/login');
+        }
+        setAntrianData({ pickup: 0, delivery: 0 });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAntrianData();
+    
     // Cek izin dan present seperti sebelumnya
     const fromIzin = sessionStorage.getItem("fromIzin");
     if (fromIzin === "true") setIsFromIzin(true);
@@ -219,7 +262,7 @@ const BerandaKurir = () => {
                     </h3>
                   </div>
                   <p className="text-3xl font-bold">
-                    {antrianData?.pickup || 0}
+                    {loading ? "..." : antrianData?.pickup || 0}
                   </p>
                 </AnimatedButton>
                 <AnimatedButton
@@ -256,7 +299,7 @@ const BerandaKurir = () => {
                     </h3>
                   </div>
                   <p className="text-3xl font-bold">
-                    {antrianData?.delivery || 0}
+                    {loading ? "..." : antrianData?.delivery || 0}
                   </p>
                 </AnimatedButton>
               </div>
@@ -264,13 +307,13 @@ const BerandaKurir = () => {
               <div className="mt-4 text-center outline outline-2 outline-[#EEF1F7] rounded-3xl p-2 mb-4">
                 <p className="text-sm text-gray-600">
                   Total Antrian:{" "}
-                  {antrianData ? antrianData.pickup + antrianData.delivery : 0}
+                  {loading ? "..." : antrianData ? antrianData.pickup + antrianData.delivery : 0}
                 </p>
               </div>
 
               {/* Button Buka Antrian */}
               <AnimatedButton
-                onClick={() => navigate(`/kurir/${selectedEstimasi}`)}
+                onClick={() => navigate(`/kurir/${selectedEstimasi}`, { state: { dateRange } })}
                 variant={
                   isFromIzin ? "disabled" : isFromPresent ? "blue" : "default"
                 }

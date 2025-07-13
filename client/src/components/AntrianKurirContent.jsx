@@ -13,15 +13,20 @@ const AntrianKurirContent = ({
   handleStartDelivery,
   handleCancelDelivery,
   handleCompleteDelivery,
+  loading = false,
 }) => {
   const [copiedId, setCopiedId] = useState(null);
 
-  const getWhatsAppMessage = (type) => {
-    return encodeURIComponent(WhatsAppFormatter.formatInitialMessage());
-  };
-
   const getButtonText = (type) => {
     return type === "pickup" ? "Mulai Penjemputan" : "Mulai Pengantaran";
+  };
+
+  const getWhatsAppMessage = (type) => {
+    if (type === "pickup") {
+      return encodeURIComponent(WhatsAppFormatter.formatStartDeliveryMessage("pickup"));
+    } else {
+      return encodeURIComponent(WhatsAppFormatter.formatStartDeliveryMessage("delivery"));
+    }
   };
 
   const handleCopyAddress = (id, address) => {
@@ -33,7 +38,11 @@ const AntrianKurirContent = ({
   return (
     <div className="max-w-[390px] md:max-w-none mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-8">
-        {filteredAntrian.length > 0 ? (
+        {loading ? (
+          <div className="col-span-full text-center py-8 text-gray-500">
+            Memuat data...
+          </div>
+        ) : filteredAntrian.length > 0 ? (
           filteredAntrian.map((item) => (
             <div
               key={item.id}
@@ -76,14 +85,20 @@ const AntrianKurirContent = ({
                     )}
                   </button>
                 </div>
-                <a
-                  href={item.googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-600 hover:underline mt-1 inline-block"
-                >
-                  Buka di Google Maps
-                </a>
+                {item.googleMapsUrl && item.googleMapsUrl !== '-' ? (
+                  <a
+                    href={item.googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline mt-1 inline-block"
+                  >
+                    Buka di Google Maps
+                  </a>
+                ) : (
+                  <span className="text-sm text-gray-500 mt-1 inline-block">
+                    Link Google Maps tidak tersedia
+                  </span>
+                )}
                 <p className="text-sm text-gray-500 mt-2 font-bold">
                   Time Request:{" "}
                   {format(item.requestTime, "HH:mm", { locale: id })}
@@ -140,7 +155,7 @@ const AntrianKurirContent = ({
           <div className="col-span-full text-center py-8 text-gray-500">
             {searchQuery.trim() !== ""
               ? "Tidak ada data yang sesuai dengan pencarian"
-              : "Tidak ada antrian pengantaran"}
+              : `Tidak ada antrian ${type === 'pickup' ? 'penjemputan' : 'pengantaran'} untuk rentang waktu yang dipilih. Pastikan ada order dengan status 'siap' dan pickup_method '${type}' dalam rentang waktu tersebut.`}
           </div>
         )}
       </div>
