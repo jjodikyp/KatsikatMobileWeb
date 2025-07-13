@@ -14,6 +14,7 @@ const AntrianKurirContent = ({
   handleCancelDelivery,
   handleCompleteDelivery,
   loading = false,
+  activeDeliveryId, // pastikan prop ini diterima
 }) => {
   const [copiedId, setCopiedId] = useState(null);
 
@@ -121,10 +122,10 @@ const AntrianKurirContent = ({
                     style={{ width: "35px", height: "35px" }}
                   />
                 </AnimatedButton>
-                {item.delivery_status === "ongoing" ? (
+                {item.id === activeDeliveryId ? (
                   <>
                     <AnimatedButton
-                      title="WA"
+                      title="Gagal"
                       onClick={() => handleCancelDelivery(item.id)}
                       className="flex-1 h-[41px] rounded-xl flex items-center justify-center text-sm font-semibold text-red-500 opacity-100 outline outline-1 outline-red-500"
                     >
@@ -155,7 +156,7 @@ const AntrianKurirContent = ({
           <div className="col-span-full text-center py-8 text-gray-500">
             {searchQuery.trim() !== ""
               ? "Tidak ada data yang sesuai dengan pencarian"
-              : `Tidak ada antrian ${type === 'pickup' ? 'penjemputan' : 'pengantaran'} untuk rentang waktu yang dipilih. Pastikan ada order dengan status 'siap' dan pickup_method '${type}' dalam rentang waktu tersebut.`}
+              : `Tidak ada antrian ${type === 'pickup' ? 'penjemputan' : 'pengantaran'} untuk saat ini. Fitur sedang dalam pengembangan!`}
           </div>
         )}
       </div>

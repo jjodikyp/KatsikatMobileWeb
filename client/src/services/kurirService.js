@@ -69,6 +69,7 @@ export const getKurirAntrianData = async (dateRange) => {
         dateRange,
         totalDetails: allDetails.length,
         scheduledDetails: allDetails.filter(d => d.delivery_status === 'scheduled').length,
+        statusDetails: allDetails.filter(d => d.status === 'siap').length,
         deliveryDetails: allDetails.filter(d => d.pickup_method === 'delivery').length,
         pickupDetails: allDetails.filter(d => d.pickup_method === 'pickup').length,
         scheduledAndDelivery: allDetails.filter(d => d.delivery_status === 'scheduled' && d.pickup_method === 'delivery').length,
@@ -87,6 +88,7 @@ export const getKurirAntrianData = async (dateRange) => {
           ? new Date(`${detail.delivery_date}T${detail.delivery_time}`)
           : new Date(),
         googleMapsUrl: detail.order?.customer?.gmaps || '-',
+        status: detail.delivery_status || detail.status || 'siap',
         delivery_status: detail.delivery_status || 'scheduled',
         pickup_method: detail.pickup_method,
         type: 'delivery'
@@ -102,7 +104,7 @@ export const getKurirAntrianData = async (dateRange) => {
           ? new Date(`${detail.delivery_date}T${detail.delivery_time}`)
           : new Date(),
         googleMapsUrl: detail.order?.customer?.gmaps || '-',
-        delivery_status: detail.delivery_status || 'scheduled',
+        status: detail.delivery_status || detail.status || 'siap',
         pickup_method: detail.pickup_method,
         type: 'pickup'
       }));
@@ -148,7 +150,7 @@ export const getKurirAntrianData = async (dateRange) => {
         finalDeliveryCount: validData.filter(item => item.pickup_method === 'delivery').length,
         sampleData: validData.slice(0, 2).map(item => ({
           id: item.id,
-          delivery_status: item.delivery_status,
+          status: item.status,
           pickup_method: item.pickup_method,
           type: item.type,
           customerName: item.customerName
