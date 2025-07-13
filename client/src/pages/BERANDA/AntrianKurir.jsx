@@ -94,7 +94,7 @@ const AntrianKurir = () => {
       // Update state lokal
       setAntrianData(prevData => 
         prevData.map(item => 
-          item.id === id ? { ...item, status: 'ongoing' } : item
+          item.id === id ? { ...item, delivery_status: 'ongoing' } : item
         )
       );
       
@@ -120,7 +120,7 @@ const AntrianKurir = () => {
       // Update state lokal
       setAntrianData(prevData => 
         prevData.map(item => 
-          item.id === id ? { ...item, status: 'pending' } : item
+          item.id === id ? { ...item, delivery_status: 'pending' } : item
         )
       );
     } catch (error) {

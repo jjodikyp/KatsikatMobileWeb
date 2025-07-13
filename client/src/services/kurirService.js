@@ -34,7 +34,7 @@ export const getKurirAntrianData = async (dateRange) => {
         if (ordersArray[0].order_details && ordersArray[0].order_details.length > 0) {
           console.log('Sample Order Detail:', {
             id: ordersArray[0].order_details[0].id,
-            status: ordersArray[0].order_details[0].status,
+            delivery_status: ordersArray[0].order_details[0].delivery_status,
             pickup_method: ordersArray[0].order_details[0].pickup_method,
             delivery_date: ordersArray[0].order_details[0].delivery_date
           });
@@ -87,7 +87,7 @@ export const getKurirAntrianData = async (dateRange) => {
           ? new Date(`${detail.delivery_date}T${detail.delivery_time}`)
           : new Date(),
         googleMapsUrl: detail.order?.customer?.gmaps || '-',
-        status: detail.delivery_status || detail.status || 'siap',
+        delivery_status: detail.delivery_status || 'scheduled',
         pickup_method: detail.pickup_method,
         type: 'delivery'
       }));
@@ -102,7 +102,7 @@ export const getKurirAntrianData = async (dateRange) => {
           ? new Date(`${detail.delivery_date}T${detail.delivery_time}`)
           : new Date(),
         googleMapsUrl: detail.order?.customer?.gmaps || '-',
-        status: detail.delivery_status || detail.status || 'siap',
+        delivery_status: detail.delivery_status || 'scheduled',
         pickup_method: detail.pickup_method,
         type: 'pickup'
       }));
@@ -148,7 +148,7 @@ export const getKurirAntrianData = async (dateRange) => {
         finalDeliveryCount: validData.filter(item => item.pickup_method === 'delivery').length,
         sampleData: validData.slice(0, 2).map(item => ({
           id: item.id,
-          status: item.status,
+          delivery_status: item.delivery_status,
           pickup_method: item.pickup_method,
           type: item.type,
           customerName: item.customerName

@@ -121,7 +121,7 @@ const AntrianKurirContent = ({
                     style={{ width: "35px", height: "35px" }}
                   />
                 </AnimatedButton>
-                {item.status === "ongoing" ? (
+                {item.delivery_status === "ongoing" ? (
                   <>
                     <AnimatedButton
                       title="WA"
