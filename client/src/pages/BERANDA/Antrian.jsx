@@ -98,7 +98,6 @@ const Antrian = () => {
       const formattedEndDate = formatDateForDB(dateRange.endDate);
 
       const params = {
-        search: searchQuery || "",
         startDate: formattedStartDate,
         endDate: formattedEndDate,
         pageSize: 1000, // Ambil semua data untuk perhitungan

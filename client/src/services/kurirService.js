@@ -7,7 +7,6 @@ export const getKurirAntrianData = async (dateRange) => {
     // Ambil data orders dengan parameter yang sama seperti kasir
     const response = await axios.get(`${API_BASE_URL}/orders`, {
       params: {
-        search: '',
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
         pageSize: 1000,
@@ -49,10 +48,10 @@ export const getKurirAntrianData = async (dateRange) => {
           : []
       );
 
-      // FILTER KHUSUS KURIR berdasarkan delivery_date
+      // FILTER KHUSUS KURIR berdasarkan delivery_status dan pickup_method
       const filteredDelivery = allDetails.filter(
         detail =>
-          detail.status === 'siap' &&
+          detail.delivery_status === 'scheduled' &&
           detail.pickup_method === 'delivery' &&
           detail.delivery_date >= dateRange.startDate &&
           detail.delivery_date <= dateRange.endDate
@@ -60,7 +59,7 @@ export const getKurirAntrianData = async (dateRange) => {
 
       const filteredPickup = allDetails.filter(
         detail =>
-          detail.status === 'siap' &&
+          detail.delivery_status === 'scheduled' &&
           detail.pickup_method === 'pickup' &&
           detail.delivery_date >= dateRange.startDate &&
           detail.delivery_date <= dateRange.endDate
@@ -69,11 +68,11 @@ export const getKurirAntrianData = async (dateRange) => {
       console.log('Filter details:', {
         dateRange,
         totalDetails: allDetails.length,
-        siapDetails: allDetails.filter(d => d.status === 'siap').length,
+        scheduledDetails: allDetails.filter(d => d.delivery_status === 'scheduled').length,
         deliveryDetails: allDetails.filter(d => d.pickup_method === 'delivery').length,
         pickupDetails: allDetails.filter(d => d.pickup_method === 'pickup').length,
-        siapAndDelivery: allDetails.filter(d => d.status === 'siap' && d.pickup_method === 'delivery').length,
-        siapAndPickup: allDetails.filter(d => d.status === 'siap' && d.pickup_method === 'pickup').length,
+        scheduledAndDelivery: allDetails.filter(d => d.delivery_status === 'scheduled' && d.pickup_method === 'delivery').length,
+        scheduledAndPickup: allDetails.filter(d => d.delivery_status === 'scheduled' && d.pickup_method === 'pickup').length,
         filteredDelivery: filteredDelivery.length,
         filteredPickup: filteredPickup.length
       });

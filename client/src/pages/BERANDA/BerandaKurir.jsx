@@ -63,11 +63,11 @@ const BerandaKurir = () => {
         const data = await getKurirAntrianData(dateRange);
         
         console.log('Beranda Kurir - Raw data:', data);
-        console.log('Beranda Kurir - Data status counts:', {
-          siap: data.filter(item => item.status === 'siap').length,
-          pending: data.filter(item => item.status === 'pending').length,
-          ongoing: data.filter(item => item.status === 'ongoing').length,
-          completed: data.filter(item => item.status === 'completed').length
+        console.log('Beranda Kurir - Data delivery_status counts:', {
+          scheduled: data.filter(item => item.delivery_status === 'scheduled').length,
+          ongoing: data.filter(item => item.delivery_status === 'ongoing').length,
+          completed: data.filter(item => item.delivery_status === 'completed').length,
+          pending: data.filter(item => item.delivery_status === 'pending').length
         });
         console.log('Beranda Kurir - Data pickup_method counts:', {
           pickup: data.filter(item => item.pickup_method === 'pickup').length,
@@ -76,19 +76,21 @@ const BerandaKurir = () => {
         
         // Hitung jumlah antrian pickup dan delivery dari data API
         const pickup = data.filter(
-          (item) => item.status === "siap" && item.pickup_method === "pickup"
+          (item) => item.delivery_status === "scheduled" && item.pickup_method === "pickup"
         ).length;
         
         const delivery = data.filter(
-          (item) => item.status === "siap" && item.pickup_method === "delivery"
+          (item) => item.delivery_status === "scheduled" && item.pickup_method === "delivery"
         ).length;
         
         console.log('Beranda Kurir - Final counts:', { pickup, delivery });
         console.log('Beranda Kurir - Verification:', {
           totalData: data.length,
-          siapData: data.filter(item => item.status === 'siap').length,
+          scheduledData: data.filter(item => item.delivery_status === 'scheduled').length,
           pickupMethodPickup: data.filter(item => item.pickup_method === 'pickup').length,
           pickupMethodDelivery: data.filter(item => item.pickup_method === 'delivery').length,
+          scheduledAndPickup: data.filter(item => item.delivery_status === 'scheduled' && item.pickup_method === 'pickup').length,
+          scheduledAndDelivery: data.filter(item => item.delivery_status === 'scheduled' && item.pickup_method === 'delivery').length,
           calculatedPickup: pickup,
           calculatedDelivery: delivery
         });
