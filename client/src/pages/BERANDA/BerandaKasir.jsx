@@ -48,6 +48,8 @@ const BerandaKasir = () => {
         search: "",
         startDate: formatDateForDB(range.startDate),
         endDate: formatDateForDB(range.endDate),
+        pageSize: 1000, // Ambil semua data untuk perhitungan
+        page: 1,
       };
 
       const response = await axios.get(`https://api.katsikat.id/orders`, {
@@ -63,6 +65,7 @@ const BerandaKasir = () => {
         const rawOrders = response.data.data.orders;
         const ordersArray = Array.isArray(rawOrders) ? rawOrders : [];
         setFetchedOrders(ordersArray);
+        console.log("Fetched orders:", ordersArray);
 
       } else {
         setFetchedOrders([]);

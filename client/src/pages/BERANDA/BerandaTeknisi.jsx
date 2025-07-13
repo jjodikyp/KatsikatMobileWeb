@@ -214,6 +214,8 @@ const BerandaTeknisi = () => {
         search: "",
         startDate: formatDateForDB(range.startDate),
         endDate: formatDateForDB(range.endDate),
+        pageSize: 1000, // Ambil semua data untuk perhitungan
+        page: 1, // Halaman pertama
       };
 
       const response = await axios.get(`https://api.katsikat.id/orders`, {

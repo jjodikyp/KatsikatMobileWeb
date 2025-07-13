@@ -101,6 +101,8 @@ const Antrian = () => {
         search: searchQuery || "",
         startDate: formattedStartDate,
         endDate: formattedEndDate,
+        pageSize: 1000, // Ambil semua data untuk perhitungan
+        page: 1, // Halaman pertama
       };
 
       const response = await axios.get(`https://api.katsikat.id/orders`, {

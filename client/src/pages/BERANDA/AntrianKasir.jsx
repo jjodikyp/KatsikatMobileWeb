@@ -80,6 +80,8 @@ const AntrianKasir = () => {
         search: searchQuery || "",
         startDate: formattedStartDate,
         endDate: formattedEndDate,
+        pageSize: 1000, // Ambil semua data untuk perhitungan
+        page: 1, // Halaman pertama
       };
 
       const response = await axios.get(`https://api.katsikat.id/orders`, {
@@ -214,9 +216,7 @@ const AntrianKasir = () => {
       // Step 1: Tidak perlu POST ke /qualityControl lagi
 
       // Step 2: PATCH status treatment (gunakan API yang benar)
-      const updateData = {
-        status: result.status, // Gunakan langsung result.status
-      };
+      const updateData = result;
 
       await axios.put(
         `https://api.katsikat.id/order-details/${selectedItemId}`,
@@ -426,6 +426,7 @@ const AntrianKasir = () => {
         }}
         type={selectedQCType}
         onSubmit={handleQCSubmit}
+        dataItem={{ id: selectedItemId }}
       />
 
       {/* Notifikasi Modal */}
