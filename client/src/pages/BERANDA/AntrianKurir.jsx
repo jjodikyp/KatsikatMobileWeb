@@ -19,7 +19,10 @@ const AntrianKurir = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filteredAntrian, setFilteredAntrian] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeDeliveryId, setActiveDeliveryId] = useState(null);
+  const [activeDeliveryId, setActiveDeliveryId] = useState(() => {
+    // Ambil dari sessionStorage jika ada
+    return sessionStorage.getItem('activeDeliveryId') || null;
+  });
   const [notification, setNotification] = useState("");
   const [deliveryStartTime, setDeliveryStartTime] = useState({});
 
@@ -32,9 +35,8 @@ const AntrianKurir = () => {
         endDate: new Date().toISOString().split("T")[0],
       };
       const data = await getKurirAntrianData(currentDateRange);
-      const filtered = data.filter((item) => item.pickup_method === type);
-      setAntrianData(filtered);
-      setFilteredAntrian(filtered);
+      setAntrianData(data);
+      setFilteredAntrian(data);
     } catch (error) {
       setAntrianData([]);
       setFilteredAntrian([]);
@@ -46,6 +48,17 @@ const AntrianKurir = () => {
   useEffect(() => {
     fetchAntrianData();
   }, [type, dateRange]);
+
+  // Cek apakah activeDeliveryId masih ada di data antrian setelah data di-load
+  useEffect(() => {
+    if (activeDeliveryId && antrianData.length > 0) {
+      const found = antrianData.some(item => String(item.id) === String(activeDeliveryId));
+      if (!found) {
+        setActiveDeliveryId(null);
+        sessionStorage.removeItem('activeDeliveryId');
+      }
+    }
+  }, [antrianData, activeDeliveryId]);
 
   // Debounce search query
   useEffect(() => {
@@ -116,8 +129,8 @@ const AntrianKurir = () => {
   };
 
   const handleStartDelivery = (id) => {
-    // Set state terlebih dahulu untuk menampilkan button gagal dan selesai
     setActiveDeliveryId(id);
+    sessionStorage.setItem('activeDeliveryId', id); // Simpan ke sessionStorage
     setDeliveryStartTime((prev) => ({
       ...prev,
       [id]: new Date(),
@@ -172,6 +185,7 @@ const AntrianKurir = () => {
       if (response.status === 200 && result.success) {
         await fetchAntrianData();
         setActiveDeliveryId(null);
+        sessionStorage.removeItem('activeDeliveryId'); // Hapus dari sessionStorage
         setDeliveryStartTime((prev) => {
           const newState = { ...prev };
           delete newState[id];
@@ -207,12 +221,13 @@ const AntrianKurir = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ status: 'done' })
+        body: JSON.stringify({ status: 'done', delivery_status: 'delivered' })
       });
       const result = await response.json();
       if (response.status === 200 && result.success) {
         await fetchAntrianData();
         setActiveDeliveryId(null);
+        sessionStorage.removeItem('activeDeliveryId'); // Hapus dari sessionStorage
         setDeliveryStartTime((prev) => {
           const newState = { ...prev };
           delete newState[id];

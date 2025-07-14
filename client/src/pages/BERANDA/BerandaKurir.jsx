@@ -75,13 +75,8 @@ const BerandaKurir = () => {
         });
         
         // Hitung jumlah antrian pickup dan delivery dari data API
-        const pickup = data.filter(
-          (item) => item.delivery_status === "scheduled" && item.pickup_method === "pickup"
-        ).length;
-        
-        const delivery = data.filter(
-          (item) => item.delivery_status === "scheduled" && item.pickup_method === "delivery"
-        ).length;
+        const pickup = data.filter((item) => item.pickup_method === "pickup").length;
+        const delivery = data.filter((item) => item.pickup_method === "delivery").length;
         
         console.log('Beranda Kurir - Final counts:', { pickup, delivery });
         console.log('Beranda Kurir - Verification:', {

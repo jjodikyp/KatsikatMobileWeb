@@ -67,7 +67,8 @@ const AntrianKasir = () => {
       "Repair Leather",
       "Outsole Repair 130",
       "Claim Garansi Reglue",
-      "Full Reglue"
+      "Full Reglue",
+      "Repaint canvas low",
     ].includes(typeService);
 
   // Fungsi untuk mengambil data antrian dari API

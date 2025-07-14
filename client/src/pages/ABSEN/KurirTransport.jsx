@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import FuelCalculationModal from "../../components/FuelCalculationModal";
 import AnimatedButton from "../../components/Design/AnimatedButton";
-import imageCompression from "browser-image-compression";
+// import imageCompression from "browser-image-compression";
 
 const KurirTransport = () => {
   const navigate = useNavigate();
@@ -52,32 +52,32 @@ const KurirTransport = () => {
     };
 
     // Kompres kedua file
-    try {
-      const compressedFiles = await Promise.all(
-        files.map(file => imageCompression(file, options))
-      );
+    // try {
+    //   const compressedFiles = await Promise.all(
+    //     files.map(file => imageCompression(file, options))
+    //   );
 
-      // Tambahkan log keberhasilan kompresi
-      console.log("Foto berhasil di-compress:", compressedFiles.map(f => ({ name: f.name, size: f.size })));
+    //   // Tambahkan log keberhasilan kompresi
+    //   console.log("Foto berhasil di-compress:", compressedFiles.map(f => ({ name: f.name, size: f.size })));
 
-      compressedFiles.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreviews(prev => ({
-            ...prev,
-            [index === 0 ? 'odoStart' : 'odoEnd']: reader.result
-          }));
-        };
-        reader.readAsDataURL(file);
+    //   compressedFiles.forEach((file, index) => {
+    //     const reader = new FileReader();
+    //     reader.onloadend = () => {
+    //       setPreviews(prev => ({
+    //         ...prev,
+    //         [index === 0 ? 'odoStart' : 'odoEnd']: reader.result
+    //       }));
+    //     };
+    //     reader.readAsDataURL(file);
 
-        setPhotos(prev => ({
-          ...prev,
-          [index === 0 ? 'odoStart' : 'odoEnd']: file
-        }));
-      });
-    } catch (err) {
-      setError("Gagal mengompres foto, silakan coba lagi.");
-    }
+    //     setPhotos(prev => ({
+    //       ...prev,
+    //       [index === 0 ? 'odoStart' : 'odoEnd']: file
+    //     }));
+    //   });
+    // } catch (err) {
+    //   setError("Gagal mengompres foto, silakan coba lagi.");
+    // }
   };
 
   const handleSubmit = () => {

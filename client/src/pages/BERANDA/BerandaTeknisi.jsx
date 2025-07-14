@@ -96,19 +96,6 @@ const BerandaTeknisi = () => {
     return new Date(date.toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
   };
 
-  // Fungsi untuk testing waktu
-  const debugTime = (targetHour, targetMinute) => {
-    const testTime = new Date();
-    testTime.setHours(targetHour);
-    testTime.setMinutes(targetMinute);
-    testTime.setSeconds(0);
-
-    // Override getJakartaTime untuk testing
-    getJakartaTime = () => testTime;
-
-    console.log(`Testing dengan waktu: ${format(testTime, "HH:mm:ss")}`);
-  };
-
   // Fungsi untuk mengecek waktu istirahat
   const checkBreakTime = () => {
     const jakartaTime = getJakartaTime();
@@ -276,32 +263,54 @@ const BerandaTeknisi = () => {
     console.log("fetchedOrders at useEffect start:", fetchedOrders);
     // Flatten order_details to get all individual treatments with order info
     const allTreatments = fetchedOrders
-      .filter(order => order && typeof order === 'object') // Pastikan tidak ada order null/undefined atau non-objek
+      .filter((order) => order && typeof order === "object") // Pastikan tidak ada order null/undefined atau non-objek
       .flatMap((order) => {
         // Pastikan orderDetails adalah array, default ke array kosong jika order.order_details undefined atau bukan array
-        const orderDetails = Array.isArray(order?.order_details) ? order.order_details : [];
+        const orderDetails = Array.isArray(order?.order_details)
+          ? order.order_details
+          : [];
 
         // Sekarang filter keluar setiap detail null/undefined atau non-objek dari array yang valid
-        const filteredDetails = orderDetails.filter(detail => detail && typeof detail === 'object');
+        const filteredDetails = orderDetails.filter(
+          (detail) => detail && typeof detail === "object"
+        );
 
         return filteredDetails.map((detail) => ({ ...detail, order: order }));
       });
     console.log("All treatments (flattened) in BerandaTeknisi:", allTreatments);
 
     // Filter for "not_yet" status for counts and display
-    const allNotYetTreatments = allTreatments.filter(item => item.status === "not_yet");
-    console.log("All 'not_yet' treatments in BerandaTeknisi:", allNotYetTreatments);
+    const allNotYetTreatments = allTreatments.filter(
+      (item) => item.status === "not_yet"
+    );
+    console.log(
+      "All 'not_yet' treatments in BerandaTeknisi:",
+      allNotYetTreatments
+    );
 
     // Calculate total counts for each estimasi from not_yet treatments
-    const regularCount = allNotYetTreatments.filter((item) => item.process_time?.toLowerCase() === "regular").length;
-    const sameDayCount = allNotYetTreatments.filter((item) => item.process_time?.toLowerCase() === "same_day").length;
-    const nextDayCount = allNotYetTreatments.filter((item) => item.process_time?.toLowerCase() === "next_day").length;
+    const regularCount = allNotYetTreatments.filter(
+      (item) => item.process_time?.toLowerCase() === "regular"
+    ).length;
+    const sameDayCount = allNotYetTreatments.filter(
+      (item) => item.process_time?.toLowerCase() === "same_day"
+    ).length;
+    const nextDayCount = allNotYetTreatments.filter(
+      (item) => item.process_time?.toLowerCase() === "next_day"
+    ).length;
 
     setCountRegular(regularCount);
     setCountSameDay(sameDayCount);
     setCountNextDay(nextDayCount);
 
-    console.log("Counts - Regular:", regularCount, "Same Day:", sameDayCount, "Next Day:", nextDayCount);
+    console.log(
+      "Counts - Regular:",
+      regularCount,
+      "Same Day:",
+      sameDayCount,
+      "Next Day:",
+      nextDayCount
+    );
 
     // Filter data for display based on selected estimasi
     const processTimeMap = {
@@ -315,7 +324,6 @@ const BerandaTeknisi = () => {
       (item) => item.process_time?.toLowerCase() === currentProcessTime
     );
     setAntrianTreatment(filteredForDisplay); // Set the filtered data to antrianTreatment
-
   }, [fetchedOrders, selectedEstimasi]);
 
   // Debug state changes
