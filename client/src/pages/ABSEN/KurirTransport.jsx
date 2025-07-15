@@ -35,49 +35,29 @@ const KurirTransport = () => {
     }
   };
 
-  const handlePhotoChange = async (e) => {
+  const handlePhotoChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length !== 2) {
       setError("Harap upload 2 foto sekaligus (ODO Mulai dan ODO Selesai)");
       return;
     }
-
     setError("");
 
-    // Opsi kompresi
-    const options = {
-      maxSizeMB: 1,
-      maxWidthOrHeight: 1920, // opsional, bisa diatur sesuai kebutuhan
-      useWebWorker: true,
-    };
+    files.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviews(prev => ({
+          ...prev,
+          [index === 0 ? 'odoStart' : 'odoEnd']: reader.result
+        }));
+      };
+      reader.readAsDataURL(file);
 
-    // Kompres kedua file
-    // try {
-    //   const compressedFiles = await Promise.all(
-    //     files.map(file => imageCompression(file, options))
-    //   );
-
-    //   // Tambahkan log keberhasilan kompresi
-    //   console.log("Foto berhasil di-compress:", compressedFiles.map(f => ({ name: f.name, size: f.size })));
-
-    //   compressedFiles.forEach((file, index) => {
-    //     const reader = new FileReader();
-    //     reader.onloadend = () => {
-    //       setPreviews(prev => ({
-    //         ...prev,
-    //         [index === 0 ? 'odoStart' : 'odoEnd']: reader.result
-    //       }));
-    //     };
-    //     reader.readAsDataURL(file);
-
-    //     setPhotos(prev => ({
-    //       ...prev,
-    //       [index === 0 ? 'odoStart' : 'odoEnd']: file
-    //     }));
-    //   });
-    // } catch (err) {
-    //   setError("Gagal mengompres foto, silakan coba lagi.");
-    // }
+      setPhotos(prev => ({
+        ...prev,
+        [index === 0 ? 'odoStart' : 'odoEnd']: file
+      }));
+    });
   };
 
   const handleSubmit = () => {
